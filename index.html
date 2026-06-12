@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSWIP 3.1 Welding Inspector — Học song ngữ</title>
+<style>
+:root{
+  --bg:#0f1720; --panel:#16212e; --panel2:#1d2b3a; --line:#26384a;
+  --txt:#e8eef5; --muted:#93a4b8; --accent:#ff8a3d; --accent2:#3da5ff;
+  --green:#34c759; --red:#ff453a; --yellow:#ffd60a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.55}
+header{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,#1a2738,#101a26);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{font-size:18px;font-weight:700}
+header .spark{color:var(--accent)}
+.lang-toggle{margin-left:auto;display:flex;gap:6px;background:var(--panel);border-radius:20px;padding:4px}
+.lang-toggle button{background:none;border:none;color:var(--muted);padding:6px 12px;border-radius:16px;cursor:pointer;font-size:13px;font-weight:600}
+.lang-toggle button.on{background:var(--accent);color:#1a1206}
+nav{display:flex;gap:4px;overflow-x:auto;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:53px;z-index:40}
+nav button{white-space:nowrap;background:none;border:1px solid var(--line);color:var(--muted);padding:7px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600}
+nav button.on{background:var(--accent2);color:#06121f;border-color:var(--accent2)}
+main{max-width:920px;margin:0 auto;padding:18px 16px 80px}
+.view{display:none}.view.on{display:block;animation:fade .25s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.card h2{font-size:17px;margin-bottom:6px}
+.card h3{font-size:15px;color:var(--accent);margin:14px 0 6px}
+.muted{color:var(--muted)}
+.pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:10px;background:var(--panel2);color:var(--muted);margin-right:6px}
+.en{color:var(--muted);font-size:14px;font-style:italic;display:block;margin-top:3px}
+.lang-vi,.lang-en{display:block}
+.lang-en{margin-top:2px}
+body.m-both .sub{color:var(--muted);font-style:italic;font-size:.92em;margin-top:2px}
+body.m-vi .lang-en{display:none}
+body.m-en .lang-vi{display:none}
+.timer{font-weight:700;font-size:15px;padding:4px 12px;border-radius:10px;background:var(--panel2)}
+.timer.warn2{background:#3a1a1a;color:var(--red)}
+.chap-list{display:grid;gap:10px}
+.chap{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;transition:.15s}
+.chap:hover{border-color:var(--accent2);transform:translateX(3px)}
+.chap .num{width:34px;height:34px;flex:none;border-radius:9px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)}
+.chap .meta{flex:1}.chap .meta b{font-size:15px}
+.chap .done{color:var(--green);font-size:18px}
+.back{background:none;border:none;color:var(--accent2);cursor:pointer;font-size:14px;margin-bottom:10px;font-weight:600}
+ul.lesson{list-style:none;margin:8px 0}
+ul.lesson li{padding:7px 0 7px 22px;position:relative;border-bottom:1px dashed var(--line)}
+ul.lesson li:before{content:"▸";position:absolute;left:0;color:var(--accent)}
+.term{font-weight:700;color:var(--txt)}
+.flash{perspective:1200px;height:230px;margin-bottom:14px}
+.flash-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
+.flash.flip .flash-inner{transform:rotateY(180deg)}
+.flash-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;border:1px solid var(--line);padding:22px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.flash-front{background:var(--panel2)}
+.flash-back{background:#13212d;transform:rotateY(180deg)}
+.flash-face .q{font-size:19px;font-weight:700}
+.flash-face .a{font-size:15px;color:var(--accent)}
+.flash-face .tip{position:absolute;bottom:10px;font-size:11px;color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.btn{background:var(--accent2);color:#06121f;border:none;border-radius:10px;padding:10px 18px;font-weight:700;cursor:pointer;font-size:14px}
+.btn.sec{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+.btn.ghost{background:none;color:var(--muted);border:1px solid var(--line)}
+.opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:12px 14px;margin:7px 0;cursor:pointer;font-size:14px}
+.opt:hover{border-color:var(--accent2)}
+.opt.correct{background:#173a26;border-color:var(--green)}
+.opt.wrong{background:#3a1a1a;border-color:var(--red)}
+.opt.disabled{pointer-events:none;opacity:.85}
+.progress{height:8px;background:var(--panel2);border-radius:6px;overflow:hidden;margin:8px 0}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--yellow));width:0}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+.stat .b{background:var(--panel2);border-radius:12px;padding:14px}
+.stat .b b{font-size:24px;display:block;color:var(--accent)}
+.stat .b span{font-size:12px;color:var(--muted)}
+.timeline{position:relative;padding-left:22px}
+.timeline:before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:var(--line)}
+.tl{position:relative;margin-bottom:16px}
+.tl:before{content:"";position:absolute;left:-19px;top:5px;width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--bg)}
+.tl b{color:var(--accent2)}
+.q-explain{background:#102030;border-left:3px solid var(--accent2);padding:10px 12px;border-radius:8px;margin-top:10px;font-size:13px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+code{background:#0a121b;padding:1px 6px;border-radius:5px;color:var(--yellow);font-size:13px}
+.warn{background:#2a1f0a;border:1px solid #5a4410;border-radius:10px;padding:12px;font-size:13px;margin-top:10px}
+@media(max-width:520px){header h1{font-size:15px}.flash{height:260px}}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="spark">⚡</span> CSWIP 3.1 — Welding Inspector</h1>
+  <div class="lang-toggle">
+    <button id="lang-en" onclick="setLang('en')">EN</button>
+    <button id="lang-both" class="on" onclick="setLang('both')">EN+VI</button>
+    <button id="lang-vi" onclick="setLang('vi')">VI</button>
+  </div>
+</header>
+<nav id="nav"></nav>
+<main>
+  <div id="v-home" class="view on"></div>
+  <div id="v-learn" class="view"></div>
+  <div id="v-flash" class="view"></div>
+  <div id="v-quiz" class="view"></div>
+  <div id="v-plan" class="view"></div>
+  <div id="v-tutor" class="view"></div>
+</main>
+<footer>CSWIP 3.1 Study App • Lộ trình thi tháng 12/2026 • Dữ liệu syllabus theo TWI/CSWIP</footer>
+
+<script>
+/* ====== DATABASE: nội dung học (sẽ nạp ở file data) ====== */
+</script>
+<script src="data.js"></script>
+<script src="bank.js"></script>
+<script src="realbank.js"></script>
+<script>
+/* ====== APP LOGIC ====== */
+let LANG = localStorage.getItem('cswip_lang')||'both';
+let PROG = JSON.parse(localStorage.getItem('cswip_prog')||'{}'); // {chapIndex:true}
+let QUIZSTATE = JSON.parse(localStorage.getItem('cswip_quiz')||'{}');
+
+function save(){localStorage.setItem('cswip_prog',JSON.stringify(PROG));localStorage.setItem('cswip_quiz',JSON.stringify(QUIZSTATE));}
+function setLang(l){LANG=l;localStorage.setItem('cswip_lang',l);
+  ['en','both','vi'].forEach(x=>document.getElementById('lang-'+x).classList.toggle('on',l===x));
+  document.body.classList.remove('m-en','m-both','m-vi');
+  document.body.classList.add('m-'+l);
+  renderAll();
+}
+// Bài học: tiếng Việt là chính (dễ hiểu), tiếng Anh phụ
+function bili(vi,en){
+  return `<span class="lang-vi">${vi}</span>${en?`<span class="lang-en sub">${en}</span>`:''}`;
+}
+// Câu hỏi/đáp án: tiếng Anh là chính (sát đề thật), tiếng Việt phụ
+function biliE(vi,en){
+  return `<span class="lang-en">${en}</span>${vi?`<span class="lang-vi sub">${vi}</span>`:''}`;
+}
+
+const TABS=[['home','🏠 Tổng quan'],['learn','📚 Bài học'],['flash','🃏 Flashcard'],['quiz','📝 Quiz'],['plan','🗓️ Lộ trình'],['tutor','🤖 AI Gia sư']];
+function buildNav(){
+  document.getElementById('nav').innerHTML=TABS.map(([k,t])=>`<button data-t="${k}" onclick="go('${k}')">${t}</button>`).join('');
+}
+let CUR='home';
+function go(t){CUR=t;
+  if(t!=='quiz'&&typeof QTIMER!=='undefined'&&QTIMER){clearInterval(QTIMER);QTIMER=null;if(typeof Qmode!=='undefined')Qmode='menu';}
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.getElementById('v-'+t).classList.add('on');
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  window.scrollTo(0,0); renderAll();
+}
+
+/* ---------- HOME ---------- */
+function renderHome(){
+  const total=DATA.chapters.length;
+  const done=Object.keys(PROG).filter(k=>PROG[k]).length;
+  const quizDone=Object.keys(QUIZSTATE).length;
+  let qTotal=0;DATA.chapters.forEach(c=>qTotal+=c.quiz.length);
+  let qRight=0;Object.values(QUIZSTATE).forEach(v=>{if(v.correct)qRight++;});
+  document.getElementById('v-home').innerHTML=`
+  <div class="card">
+    <h2>👋 ${bili('Chào bạn! Sẵn sàng chinh phục CSWIP 3.1','Ready to conquer CSWIP 3.1')}</h2>
+    <p class="muted" style="margin-top:6px">${bili('Chứng chỉ Thanh tra Hàn (Welding Inspector) của TWI. Đề gồm 5 bài: Lý thuyết tổng quát, Thực hành tấm (plate), Thực hành ống (pipe), Macro & lý thuyết liên quan. Mỗi phần cần ~70% để đậu.','CSWIP 3.1 = TWI Welding Inspector. 5 papers; pass ~70% each.')}</p>
+    <p class="muted" style="margin-top:8px;font-size:12px">📘 ${bili('Nội dung biên soạn bám theo giáo trình chính thức <b>WIS5 – CSWIP 3.1 (TWI, April 2020)</b> và phụ lục thực hành bạn cung cấp.','Based on the official WIS5 – CSWIP 3.1 course notes (TWI, April 2020) & your appendices.')}</p>
+  </div>
+  <div class="card">
+    <div class="stat">
+      <div class="b"><b>${done}/${total}</b><span>${bili('Chương đã học','Chapters done')}</span></div>
+      <div class="b"><b>${qRight}/${qTotal}</b><span>${bili('Câu quiz đúng','Quiz correct')}</span></div>
+      <div class="b"><b>${countdown()}</b><span>${bili('Ngày tới kỳ thi (1/12)','Days to exam')}</span></div>
+    </div>
+    <div class="progress" style="margin-top:14px"><i style="width:${total?done/total*100:0}%"></i></div>
+    <p class="muted" style="font-size:12px">${bili('Tiến độ học tổng thể','Overall progress')}: ${total?Math.round(done/total*100):0}%</p>
+  </div>
+  <div class="card">
+    <h3>${bili('Cách dùng app hiệu quả nhất','Best way to use this app')}</h3>
+    <ul class="lesson">
+      <li>${bili('<b>Bước 1 — Đọc bài học</b>: học kỹ từng chương ở tab Bài học, hiểu khái niệm trước.','Step 1 — Read each chapter in Lessons.')}</li>
+      <li>${bili('<b>Bước 2 — Lật flashcard</b>: ghi nhớ thuật ngữ Anh–Việt cho đến khi nhớ hết.','Step 2 — Drill flashcards for terminology.')}</li>
+      <li>${bili('<b>Bước 3 — Làm quiz</b>: kiểm tra, làm lại các câu sai.','Step 3 — Take quizzes, redo wrong ones.')}</li>
+      <li>${bili('<b>Bước 4 — AI gia sư</b>: copy prompt sang Claude/ChatGPT để hỏi sâu & thi thử.','Step 4 — Use the AI tutor prompt for deep Q&A and mock exams.')}</li>
+      <li>${bili('<b>Bước 5 — Bám lộ trình</b>: học theo tuần ở tab Lộ trình.','Step 5 — Follow the weekly plan.')}</li>
+    </ul>
+  </div>`;
+}
+function countdown(){const exam=new Date('2026-12-01');const now=new Date();return Math.max(0,Math.ceil((exam-now)/86400000));}
+
+/* ---------- LEARN ---------- */
+let CURCHAP=null;
+function renderLearn(){
+  const el=document.getElementById('v-learn');
+  if(CURCHAP===null){
+    el.innerHTML=`<div class="card"><h2>📚 ${bili('Chương trình học','Syllabus')}</h2>
+      <p class="muted">${bili('Bấm vào từng chương để học. Đánh dấu hoàn thành khi xong.','Tap a chapter to study.')}</p></div>
+      <div class="chap-list">`+DATA.chapters.map((c,i)=>`
+        <div class="chap" onclick="openChap(${i})">
+          <div class="num">${i+1}</div>
+          <div class="meta"><b>${bili(c.vi,c.en)}</b><div class="muted" style="font-size:12px">${c.lessons.length} ${bili('mục','items')} • ${c.quiz.length} quiz</div></div>
+          <div class="done">${PROG[i]?'✓':''}</div>
+        </div>`).join('')+`</div>`;
+  } else {
+    const c=DATA.chapters[CURCHAP];
+    el.innerHTML=`<button class="back" onclick="CURCHAP=null;renderLearn()">← ${bili('Tất cả chương','All chapters')}</button>
+      <div class="card">
+        <span class="pill">${bili('Chương','Chapter')} ${CURCHAP+1}</span>
+        <h2>${bili(c.vi,c.en)}</h2>
+        ${c.intro?`<p class="muted" style="margin-top:8px">${bili(c.intro.vi,c.intro.en)}</p>`:''}
+        <ul class="lesson">${c.lessons.map(L=>`<li>${bili('<span class="term">'+L.t_vi+':</span> '+L.vi, (L.t_en?L.t_en+': ':'')+L.en)}</li>`).join('')}</ul>
+        ${c.key?`<h3>🔑 ${bili('Điểm cần nhớ cho kỳ thi','Exam key points')}</h3><ul class="lesson">${c.key.map(k=>`<li>${bili(k.vi,k.en)}</li>`).join('')}</ul>`:''}
+        <div class="row" style="margin-top:16px;justify-content:flex-start">
+          <button class="btn ${PROG[CURCHAP]?'sec':''}" onclick="toggleDone(${CURCHAP})">${PROG[CURCHAP]?'✓ '+bili('Đã hoàn thành','Done'):bili('Đánh dấu hoàn thành','Mark done')}</button>
+          <button class="btn sec" onclick="go('quiz');startQuiz(${CURCHAP})">${bili('Làm quiz chương này','Quiz this chapter')} →</button>
+        </div>
+      </div>`;
+  }
+}
+function openChap(i){CURCHAP=i;renderLearn();window.scrollTo(0,0);}
+function toggleDone(i){PROG[i]=!PROG[i];save();renderLearn();}
+
+/* ---------- FLASHCARDS ---------- */
+let FC=[],FCi=0;
+function buildFlash(){FC=[];DATA.chapters.forEach((c,ci)=>c.lessons.forEach(L=>{if(L.t_en)FC.push({q:L.t_en,a:L.t_vi+(L.vi?' — '+L.vi:''),c:c.vi});}));}
+function renderFlash(){
+  if(!FC.length)buildFlash();
+  const card=FC[FCi];
+  document.getElementById('v-flash').innerHTML=`
+    <div class="card"><h2>🃏 ${bili('Flashcard thuật ngữ','Terminology flashcards')}</h2>
+      <p class="muted">${bili('Thẻ','Card')} ${FCi+1}/${FC.length} • <span class="muted">${card.c}</span></p></div>
+    <div class="flash" id="flash" onclick="this.classList.toggle('flip')">
+      <div class="flash-inner">
+        <div class="flash-face flash-front"><div class="q">${card.q}</div><div class="tip">${bili('Bấm để lật','Tap to flip')}</div></div>
+        <div class="flash-face flash-back"><div class="a">${card.a}</div><div class="tip">${bili('Bấm để lật lại','Tap to flip')}</div></div>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn sec" onclick="fcMove(-1)">← ${bili('Trước','Prev')}</button>
+      <button class="btn" onclick="fcShuffle()">🔀 ${bili('Trộn','Shuffle')}</button>
+      <button class="btn sec" onclick="fcMove(1)">${bili('Sau','Next')} →</button>
+    </div>`;
+}
+function fcMove(d){FCi=(FCi+d+FC.length)%FC.length;renderFlash();}
+function fcShuffle(){FC.sort(()=>Math.random()-0.5);FCi=0;renderFlash();}
+
+/* ---------- QUIZ ENGINE (chương + ngân hàng + thi có giờ) ---------- */
+let Qz=[],Qi=0,Qscore=0,Qmode='menu',QtimedSecs=0,QTIMER=null,Qanswers=[],Qsource=null;
+
+// Chuẩn hóa câu hỏi từ 2 nguồn về 1 dạng chung
+function normChap(q,id,cat){return {qv:q.vi,qe:q.en,ov:q.opts.map(o=>o.vi),oe:q.opts.map(o=>o.en),a:q.ans,ev:q.exp?q.exp.vi:'',ee:q.exp?q.exp.en:'',id,cat};}
+function normBank(q,id){return {qv:q.qv,qe:q.q,ov:q.ov,oe:q.o,a:q.a,ev:q.ev||'',ee:q.e||'',id,cat:q.c};}
+function poolChapters(){let a=[];DATA.chapters.forEach((c,ci)=>c.quiz.forEach((q,qi)=>a.push(normChap(q,'c'+ci+'-'+qi,c.vi))));return a;}
+function poolBank(){return (typeof BANK!=='undefined')?BANK.map((q,i)=>normBank(q,'b'+i)):[];}
+function poolReal(){return (typeof REALBANK!=='undefined')?REALBANK.map((q,i)=>normBank(q,'r'+i)):[];}
+function poolAll(){return poolChapters().concat(poolBank()).concat(poolReal());}
+function bankCats(){const s={};poolBank().forEach(q=>s[q.cat]=(s[q.cat]||0)+1);return s;}
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
+
+function startSet(pool,timedSecs,label){
+  Qz=shuffle(pool.slice());Qi=0;Qscore=0;Qanswers=[];Qsource={pool,label};
+  Qmode=timedSecs?'timed':'practice';QtimedSecs=timedSecs||0;_timedOrig=timedSecs||0;
+  if(QTIMER){clearInterval(QTIMER);QTIMER=null;}
+  if(timedSecs){QTIMER=setInterval(tick,1000);}
+  renderQuiz();
+}
+function startChap(ci){startSet(poolChapters().filter(q=>q.id.startsWith('c'+ci+'-')),0);}
+function startCat(cat){startSet(poolBank().filter(q=>q.cat===cat),0);}
+function startFullMock(){startSet(poolAll(),0,'Full');}
+function startReal(){startSet(poolReal(),0,'Real');}
+function startTimed(n,mins){let p=shuffle(poolAll().slice()).slice(0,n);startSet(p,mins*60,'Timed');}
+function tick(){QtimedSecs--;const t=document.getElementById('timer');if(t){t.textContent=fmt(QtimedSecs);t.classList.toggle('warn2',QtimedSecs<=60);}if(QtimedSecs<=0){clearInterval(QTIMER);QTIMER=null;Qi=Qz.length;renderQuiz();}}
+function fmt(s){s=Math.max(0,s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+
+function renderQuiz(){
+  const el=document.getElementById('v-quiz');
+  if(Qmode==='menu'){
+    const cats=bankCats();
+    el.innerHTML=`
+    <div class="card"><h2>📝 ${bili('Luyện tập & Thi thử','Practice & Mock exam')}</h2>
+      <p class="muted">${bili('Tổng ngân hàng: '+poolAll().length+' câu (đề thật + giáo trình WIS5). Đề thi thật bằng tiếng Anh — bấm nút EN để luyện sát đề.','Bank: '+poolAll().length+' questions. Real exam is in English — use EN mode.')}</p>
+    </div>
+    <div class="card"><h3>⏱️ ${bili('Thi thử có giờ (mô phỏng đề thật)','Timed mock exam')}</h3>
+      <div class="row" style="justify-content:flex-start;margin-top:6px">
+        <button class="btn" onclick="startTimed(20,20)">20 ${bili('câu','Q')} / 20'</button>
+        <button class="btn" onclick="startTimed(30,45)">30 ${bili('câu','Q')} / 45'</button>
+        <button class="btn" onclick="startTimed(40,60)">40 ${bili('câu','Q')} / 60'</button>
+      </div>
+      <p class="muted" style="font-size:12px;margin-top:8px">${bili('Có đồng hồ đếm ngược, không hiện đáp án tới khi nộp/hết giờ. Mốc đậu 70%.','Countdown timer, answers hidden until submit. Pass 70%.')}</p>
+    </div>
+    <div class="card"><h3>★ ${bili('Luyện tập (hiện đáp án ngay)','Practice (instant feedback)')}</h3>
+      <div class="chap-list" style="margin-top:8px">
+        <div class="chap" onclick="startReal()"><div class="num">🎯</div><div class="meta"><b>${bili('Đề thật CÓ ĐÁP ÁN','Real exam WITH answers')}</b><div class="muted" style="font-size:12px">${poolReal().length} ${bili('câu từ practice paper, đã chấm đáp án','real questions, answer-keyed')}</div></div></div>
+        <div class="chap" onclick="startFullMock()"><div class="num">∑</div><div class="meta"><b>${bili('Tất cả ngân hàng','Whole bank')}</b><div class="muted" style="font-size:12px">${poolAll().length} ${bili('câu, trộn ngẫu nhiên','questions shuffled')}</div></div></div>
+      </div>
+    </div>
+    <div class="card"><h3>📂 ${bili('Theo chủ đề (ngân hàng đề thật)','By topic (real-exam bank)')}</h3>
+      <div class="chap-list" style="margin-top:8px">
+      ${Object.keys(cats).map(c=>`<div class="chap" onclick="startCat('${c.replace(/'/g,"\\'")}')"><div class="num">Q</div><div class="meta"><b>${c}</b><div class="muted" style="font-size:12px">${cats[c]} ${bili('câu','Q')}</div></div></div>`).join('')}
+      </div>
+    </div>
+    <div class="card"><h3>📖 ${bili('Theo chương giáo trình','By syllabus chapter')}</h3>
+      <div class="chap-list" style="margin-top:8px">
+      ${DATA.chapters.map((c,i)=>`<div class="chap" onclick="startChap(${i})"><div class="num">${i+1}</div><div class="meta"><b>${bili(c.vi,c.en)}</b><div class="muted" style="font-size:12px">${c.quiz.length} ${bili('câu','Q')}</div></div></div>`).join('')}
+      </div>
+    </div>`;
+    return;
+  }
+  if(Qi>=Qz.length){
+    if(QTIMER){clearInterval(QTIMER);QTIMER=null;}
+    const pct=Qz.length?Math.round(Qscore/Qz.length*100):0;
+    let review='';
+    if(Qmode==='timed'){
+      review=`<div class="card"><h3>${bili('Xem lại bài làm','Review')}</h3>`+Qz.map((q,i)=>{
+        const a=Qanswers[i];const ok=a===q.a;
+        return `<div style="padding:10px 0;border-bottom:1px dashed var(--line)">
+          <div style="font-size:13px">${ok?'✅':'❌'} <b>${i+1}.</b> ${biliE(q.qv,q.qe)}</div>
+          <div class="q-explain" style="margin-top:6px">${bili('Đáp án đúng: ','Answer: ')}${biliE(q.ov[q.a],q.oe[q.a])}${(q.ee||q.ev)?'<br>'+biliE(q.ev,q.ee):''}</div>
+        </div>`;}).join('')+`</div>`;
+    }
+    el.innerHTML=`<div class="card" style="text-align:center">
+      <h2>${pct>=70?'🎉':'💪'} ${bili('Kết quả','Result')}</h2>
+      <div class="stat" style="margin-top:14px"><div class="b"><b>${Qscore}/${Qz.length}</b><span>${bili('Đúng','Correct')}</span></div>
+      <div class="b" style="grid-column:span 2"><b style="color:${pct>=70?'var(--green)':'var(--red)'}">${pct}%</b><span>${pct>=70?bili('ĐẠT (≥70%)','PASS'):bili('Chưa đạt — ôn lại','Below pass')}</span></div></div>
+      <div class="row" style="margin-top:16px"><button class="btn" onclick="startSet(Qsource.pool,${Qmode==='timed'?_timedOrig:0})">🔁 ${bili('Làm lại','Retry')}</button><button class="btn sec" onclick="quizMenu()">${bili('Về menu','Menu')}</button></div>
+    </div>`+review;
+    return;
+  }
+  const q=Qz[Qi];
+  el.innerHTML=`<div class="card">
+    <div class="row" style="justify-content:space-between"><span class="muted" style="font-size:12px">${bili('Câu','Q')} ${Qi+1}/${Qz.length} • ${q.cat}</span>${Qmode==='timed'?`<span class="timer" id="timer">${fmt(QtimedSecs)}</span>`:''}</div>
+    <div class="progress" style="margin-top:8px"><i style="width:${Qi/Qz.length*100}%"></i></div>
+    <h2 style="margin:12px 0">${biliE(q.qv,q.qe)}</h2>
+    <div id="opts">${q.oe.map((o,oi)=>`<button class="opt" onclick="answer(${oi})">${biliE(q.ov[oi],o)}</button>`).join('')}</div>
+    <div id="exp"></div>
+  </div>`;
+}
+function answer(oi){
+  const q=Qz[Qi];Qanswers[Qi]=oi;
+  const right=oi===q.a;if(right)Qscore++;
+  if(q.id)QUIZSTATE[q.id]={correct:right};save();
+  if(Qmode==='timed'){Qi++;renderQuiz();return;}
+  const opts=document.querySelectorAll('#opts .opt');
+  opts.forEach((b,i)=>{b.classList.add('disabled');if(i===q.a)b.classList.add('correct');if(i===oi&&oi!==q.a)b.classList.add('wrong');});
+  document.getElementById('exp').innerHTML=`<div class="q-explain">${right?'✅ '+bili('Chính xác','Correct'):'❌ '+bili('Đáp án đúng: ','Correct answer: ')+biliE(q.ov[q.a],q.oe[q.a])}${(q.ee||q.ev)?'<br>'+biliE(q.ev,q.ee):''}</div>
+    <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" onclick="Qi++;renderQuiz()">${Qi+1>=Qz.length?bili('Xem kết quả','See result'):bili('Câu tiếp','Next')} →</button></div>`;
+}
+function quizMenu(){if(QTIMER){clearInterval(QTIMER);QTIMER=null;}Qmode='menu';Qz=[];renderQuiz();}
+
+/* ---------- PLAN & TUTOR ---------- */
+function renderPlan(){document.getElementById('v-plan').innerHTML=DATA.planHTML;}
+function renderTutor(){document.getElementById('v-tutor').innerHTML=DATA.tutorHTML;}
+function copyPrompt(id){const t=document.getElementById(id).innerText;navigator.clipboard.writeText(t).then(()=>{const b=event.target;const o=b.innerText;b.innerText='✓ Đã copy!';setTimeout(()=>b.innerText=o,1500);});}
+
+function renderAll(){
+  if(CUR==='home')renderHome();
+  if(CUR==='learn')renderLearn();
+  if(CUR==='flash')renderFlash();
+  if(CUR==='quiz')renderQuiz();
+  if(CUR==='plan')renderPlan();
+  if(CUR==='tutor')renderTutor();
+}
+buildNav();setLang(LANG);go('home');
+</script>
+</body>
+</html>
