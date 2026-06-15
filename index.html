@@ -61,6 +61,10 @@ table.deep-tbl th,table.deep-tbl td{border:1px solid var(--line);padding:7px 9px
 table.deep-tbl th{background:#142233;color:var(--accent2);font-weight:700}
 table.deep-tbl td:first-child{font-weight:700;color:var(--txt);white-space:nowrap}
 .deep-foot{font-size:12px;margin-top:8px;font-style:italic}
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:10px 0}
+.tool-grid label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.tool-grid input,.tool-grid select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:8px;font-size:14px;width:100%}
+.tool-out{margin-top:8px;padding:10px 12px;background:#13212d;border-left:3px solid var(--accent);border-radius:8px;font-size:15px}
 .flash{perspective:1200px;height:230px;margin-bottom:14px}
 .flash-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
 .flash.flip .flash-inner{transform:rotateY(180deg)}
@@ -114,6 +118,7 @@ code{background:#0a121b;padding:1px 6px;border-radius:5px;color:var(--yellow);fo
   <div id="v-quiz" class="view"></div>
   <div id="v-plan" class="view"></div>
   <div id="v-tutor" class="view"></div>
+  <div id="v-tools" class="view"></div>
 </main>
 <footer>CSWIP 3.1 Study App • Lộ trình thi tháng 12/2026 • Dữ liệu syllabus theo TWI/CSWIP</footer>
 
@@ -145,7 +150,7 @@ function biliE(vi,en){
   return `<span class="lang-en">${en}</span>${vi?`<span class="lang-vi sub">${vi}</span>`:''}`;
 }
 
-const TABS=[['home','🏠 Tổng quan'],['learn','📚 Bài học'],['flash','🃏 Flashcard'],['quiz','📝 Quiz'],['plan','🗓️ Lộ trình'],['tutor','🤖 AI Gia sư']];
+const TABS=[['home','🏠 Tổng quan'],['learn','📚 Bài học'],['flash','🃏 Flashcard'],['quiz','📝 Quiz'],['tools','🛠️ Công cụ'],['plan','🗓️ Lộ trình'],['tutor','🤖 AI Gia sư']];
 function buildNav(){
   document.getElementById('nav').innerHTML=TABS.map(([k,t])=>`<button data-t="${k}" onclick="go('${k}')">${t}</button>`).join('');
 }
@@ -366,6 +371,72 @@ function renderPlan(){document.getElementById('v-plan').innerHTML=DATA.planHTML;
 function renderTutor(){document.getElementById('v-tutor').innerHTML=DATA.tutorHTML;}
 function copyPrompt(id){const t=document.getElementById(id).innerText;navigator.clipboard.writeText(t).then(()=>{const b=event.target;const o=b.innerText;b.innerText='✓ Đã copy!';setTimeout(()=>b.innerText=o,1500);});}
 
+/* ---------- TOOLS (Công cụ thực chiến) ---------- */
+function renderTools(){
+  document.getElementById('v-tools').innerHTML=`
+  <div class="card">
+    <h2>🛠️ ${bili('Công cụ thực chiến','Field tools')}</h2>
+    <p class="muted" style="font-size:13px">${bili('Tính nhanh cho công việc & tư vấn quy trình hàn. Kết quả mang tính THAM KHẢO — luôn đối chiếu tiêu chuẩn áp dụng.','Quick calculators for field work & procedure consulting. Results are INDICATIVE — always verify against the applicable standard.')}</p>
+  </div>
+  <div class="card">
+    <h3>① ${bili('Carbon tương đương (CEV)','Carbon equivalent')}</h3>
+    <p class="muted" style="font-size:12px">CEV = C + Mn/6 + (Cr+Mo+V)/5 + (Ni+Cu)/15 (IIW)</p>
+    <div class="tool-grid">${['C','Mn','Cr','Mo','V','Ni','Cu'].map(e=>`<label>${e} %<input type="number" step="0.01" min="0" id="cev_${e}" value="0" oninput="calcCEV()"></label>`).join('')}</div>
+    <div id="cev_out" class="tool-out">CEV = —</div>
+  </div>
+  <div class="card">
+    <h3>② ${bili('Nhiệt đầu vào (Heat input)','Heat input')}</h3>
+    <p class="muted" style="font-size:12px">HI = (A × V × 60 × k) / (v[mm/ph] × 1000) — k: SAW 1,0 · MMA/MIG/MAG/FCAW 0,8 · TIG 0,6</p>
+    <div class="tool-grid">
+      <label>${bili('Dòng','Current')} (A)<input type="number" min="0" id="hi_a" value="150" oninput="calcHI()"></label>
+      <label>${bili('Điện áp','Voltage')} (V)<input type="number" min="0" id="hi_v" value="24" oninput="calcHI()"></label>
+      <label>${bili('Tốc độ','Travel')} (mm/${bili('ph','min')})<input type="number" min="0" id="hi_s" value="250" oninput="calcHI()"></label>
+      <label>${bili('Quá trình','Process')}<select id="hi_k" onchange="calcHI()"><option value="0.8">MMA/MIG/MAG/FCAW (0,8)</option><option value="1">SAW (1,0)</option><option value="0.6">TIG/Plasma (0,6)</option></select></label>
+    </div>
+    <div id="hi_out" class="tool-out">HI = —</div>
+  </div>
+  <div class="card">
+    <h3>③ ${bili('Quy đổi cổ ↔ cạnh fillet','Fillet throat ↔ leg')}</h3>
+    <p class="muted" style="font-size:12px">a (${bili('cổ','throat')}) ≈ 0,7 × z (${bili('cạnh','leg')})</p>
+    <div class="tool-grid">
+      <label>z — ${bili('cạnh','leg')} (mm)<input type="number" min="0" id="fz" value="8" oninput="calcFillet('z')"></label>
+      <label>a — ${bili('cổ','throat')} (mm)<input type="number" min="0" id="fa" value="5.6" oninput="calcFillet('a')"></label>
+    </div>
+    <div id="f_out" class="tool-out">a = 5,6 mm · z = 8 mm</div>
+  </div>
+  <div class="card">
+    <h3>④ ${bili('Phạm vi qualify thợ theo vị trí','Welder position qualification')}</h3>
+    <p class="muted" style="font-size:12px">${bili('Tham khảo (ống): vị trí thi → vị trí được phép hàn. Code cụ thể có thể khác.','Indicative (pipe): test position → qualified positions. May vary by code.')}</p>
+    <div class="tbl-wrap"><table class="deep-tbl"><thead><tr><th>${bili('Thi ở','Tested')}</th><th>${bili('Được hàn','Qualifies')}</th></tr></thead><tbody>
+      <tr><td>1G</td><td>${bili('Bằng (F)','Flat')}</td></tr>
+      <tr><td>2G</td><td>${bili('Bằng + Ngang','Flat + Horizontal')}</td></tr>
+      <tr><td>5G</td><td>${bili('Bằng + Đứng + Trần','Flat + Vertical + Overhead')}</td></tr>
+      <tr><td>6G</td><td>${bili('TẤT CẢ vị trí','ALL positions')}</td></tr>
+    </tbody></table></div>
+  </div>`;
+  calcCEV(); calcHI(); calcFillet('z');
+}
+function _tn(id){const v=parseFloat(document.getElementById(id).value);return isNaN(v)?0:v;}
+function calcCEV(){
+  const ce=_tn('cev_C')+_tn('cev_Mn')/6+(_tn('cev_Cr')+_tn('cev_Mo')+_tn('cev_V'))/5+(_tn('cev_Ni')+_tn('cev_Cu'))/15;
+  let note;
+  if(ce<0.40)note=bili('Dễ hàn — thường không cần tiền nhiệt (vẫn kiểm tra chiều dày).','Readily weldable — usually no preheat (still check thickness).');
+  else if(ce<0.45)note=bili('Cân nhắc tiền nhiệt ~100°C; kiểm soát hydro.','Consider ~100°C preheat; control hydrogen.');
+  else if(ce<0.50)note=bili('Cần tiền nhiệt ~150°C, que ít hydro.','Preheat ~150°C, low-hydrogen consumables.');
+  else note=bili('Tôi cứng mạnh: tiền nhiệt ~200°C+, kiểm soát chặt, cân nhắc PWHT.','Highly hardenable: ~200°C+ preheat, tight control, consider PWHT.');
+  document.getElementById('cev_out').innerHTML='<b>CEV = '+ce.toFixed(2)+'</b><br><span class="muted" style="font-size:12px">'+note+' — '+bili('tham khảo, tra EN 1011-2 / AWS D1.1','indicative, see EN 1011-2 / AWS D1.1')+'</span>';
+}
+function calcHI(){
+  const s=_tn('hi_s'); const out=document.getElementById('hi_out');
+  if(s<=0){out.innerHTML='HI = —';return;}
+  const hi=(_tn('hi_a')*_tn('hi_v')*60*parseFloat(document.getElementById('hi_k').value))/(s*1000);
+  out.innerHTML='<b>HI = '+hi.toFixed(2)+' kJ/mm</b>';
+}
+function calcFillet(from){
+  if(from==='z')document.getElementById('fa').value=(_tn('fz')*0.7).toFixed(1);
+  else document.getElementById('fz').value=(_tn('fa')/0.7).toFixed(1);
+  document.getElementById('f_out').innerHTML='<b>a = '+_tn('fa').toFixed(1)+' mm · z = '+_tn('fz').toFixed(1)+' mm</b>';
+}
 function renderAll(){
   if(CUR==='home')renderHome();
   if(CUR==='learn')renderLearn();
@@ -373,6 +444,7 @@ function renderAll(){
   if(CUR==='quiz')renderQuiz();
   if(CUR==='plan')renderPlan();
   if(CUR==='tutor')renderTutor();
+  if(CUR==='tools')renderTools();
 }
 buildNav();setLang(LANG);go('home');
 </script>
