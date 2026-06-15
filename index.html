@@ -413,8 +413,85 @@ function renderTools(){
       <tr><td>5G</td><td>${bili('Bằng + Đứng + Trần','Flat + Vertical + Overhead')}</td></tr>
       <tr><td>6G</td><td>${bili('TẤT CẢ vị trí','ALL positions')}</td></tr>
     </tbody></table></div>
+  </div>
+  <div class="card">
+    <h3>⑤ ${bili('Tạo WPS/PQR nhanh','Quick WPS/PQR builder')}</h3>
+    <p class="muted" style="font-size:12px">${bili('Điền thông số → tạo bản WPS in được (Lưu PDF). Tham khảo — cần kỹ sư duyệt & PQR chống lưng.','Fill parameters → generate a printable WPS (Save as PDF). Indicative — needs engineer approval & a backing PQR.')}</p>
+    <div class="tool-grid">
+      <label>${bili('Công ty','Company')}<input id="w_co" placeholder="—"></label>
+      <label>${bili('Số WPS','WPS No.')}<input id="w_no" placeholder="WPS-001"></label>
+      <label>PQR ref<input id="w_pqr" placeholder="PQR-001"></label>
+      <label>${bili('Tiêu chuẩn','Code')}<select id="w_code"><option>ISO 15614-1</option><option>ASME IX</option><option>AWS D1.1</option><option>ISO 9606-1</option></select></label>
+      <label>${bili('Quá trình','Process')}<select id="w_proc"><option>111 MMA</option><option>135 MAG</option><option>136 FCAW</option><option>141 TIG</option><option>121 SAW</option></select></label>
+      <label>${bili('Kiểu mối nối','Joint')}<input id="w_joint" value="BW"></label>
+      <label>${bili('Vật liệu nền','Base metal')}<input id="w_base" placeholder="S355 / P-No.1"></label>
+      <label>${bili('Chiều dày','Thickness')} (mm)<input id="w_thk" placeholder="—"></label>
+      <label>${bili('Đường kính','Diameter')} (mm)<input id="w_dia" placeholder="—"></label>
+      <label>${bili('Que/dây hàn','Filler')}<input id="w_fill" value="E7018"></label>
+      <label>${bili('ĐK que/dây','Filler Ø')} (mm)<input id="w_fdia" value="3.2"></label>
+      <label>${bili('Khí bảo vệ','Shield gas')}<input id="w_gas" placeholder="—"></label>
+      <label>${bili('Vị trí','Position')}<input id="w_pos" value="PA"></label>
+      <label>${bili('Tiền nhiệt','Preheat')} (°C)<input id="w_pre" placeholder="—"></label>
+      <label>Interpass max (°C)<input id="w_inter" placeholder="—"></label>
+      <label>PWHT<input id="w_pwht" placeholder="—"></label>
+      <label>${bili('Dòng & cực','Current & pol.')}<input id="w_cur" value="DC+"></label>
+      <label>${bili('Dòng','Amps')} (A)<input id="w_amp" placeholder="—"></label>
+      <label>${bili('Điện áp','Volts')} (V)<input id="w_volt" placeholder="—"></label>
+      <label>${bili('Tốc độ','Travel')} (mm/${bili('ph','min')})<input id="w_spd" placeholder="—"></label>
+    </div>
+    <div class="row" style="margin-top:10px;gap:8px;justify-content:flex-start">
+      <button class="btn" onclick="genWPS()">${bili('Tạo WPS','Generate WPS')}</button>
+      <button class="btn sec" id="w_print" onclick="printWPS()" style="display:none">🖨️ ${bili('In / Lưu PDF','Print / Save PDF')}</button>
+    </div>
+    <div id="wps_doc" style="margin-top:10px"></div>
   </div>`;
   calcCEV(); calcHI(); calcFillet('z');
+}
+function _wv(id){const el=document.getElementById(id);const v=(el&&el.value||'').trim();return v||'—';}
+function genWPS(){
+  const proc=_wv('w_proc');
+  const k = proc.indexOf('121')===0?1 : proc.indexOf('141')===0?0.6 : 0.8;
+  const a=parseFloat(_wv('w_amp')), v=parseFloat(_wv('w_volt')), s=parseFloat(_wv('w_spd'));
+  let hi='—';
+  if(a>0&&v>0&&s>0) hi=((a*v*60*k)/(s*1000)).toFixed(2)+' kJ/mm (k='+k+')';
+  const rows=[
+    ['Công ty / Company', _wv('w_co')],
+    ['Số WPS / WPS No.', _wv('w_no')],
+    ['PQR ref', _wv('w_pqr')],
+    ['Tiêu chuẩn / Code', _wv('w_code')],
+    ['Quá trình / Process', proc],
+    ['Mối nối / Joint', _wv('w_joint')],
+    ['Vật liệu nền / Base metal', _wv('w_base')],
+    ['Chiều dày / Thickness (mm)', _wv('w_thk')],
+    ['Đường kính / Diameter (mm)', _wv('w_dia')],
+    ['Que/dây / Filler', _wv('w_fill')+'  Ø'+_wv('w_fdia')+' mm'],
+    ['Khí bảo vệ / Shielding', _wv('w_gas')],
+    ['Vị trí / Position', _wv('w_pos')],
+    ['Tiền nhiệt / Preheat (°C)', _wv('w_pre')],
+    ['Interpass max (°C)', _wv('w_inter')],
+    ['PWHT', _wv('w_pwht')],
+    ['Dòng & cực / Current & pol.', _wv('w_cur')],
+    ['Dòng / Amps (A)', _wv('w_amp')],
+    ['Điện áp / Volts (V)', _wv('w_volt')],
+    ['Tốc độ / Travel (mm/min)', _wv('w_spd')],
+    ['Nhiệt đầu vào / Heat input', hi]
+  ];
+  const today=new Date().toLocaleDateString('vi-VN');
+  const doc='<div id="wps_print" style="background:#fff;color:#111;border:1px solid #ccc;border-radius:8px;padding:16px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:8px">'
+    +'<b style="font-size:15px">WELDING PROCEDURE SPECIFICATION (WPS)</b><span style="font-size:12px;color:#444">'+today+'</span></div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:13px">'
+    +rows.map(r=>'<tr><td style="border:1px solid #bbb;padding:5px 8px;width:48%;color:#444">'+r[0]+'</td><td style="border:1px solid #bbb;padding:5px 8px;font-weight:600">'+r[1]+'</td></tr>').join('')
+    +'</table>'
+    +'<p style="font-size:11px;color:#666;margin-top:8px">Tham khảo — cần kỹ sư duyệt & PQR chống lưng. / Indicative — requires engineer approval & a supporting PQR.</p></div>';
+  document.getElementById('wps_doc').innerHTML=doc;
+  document.getElementById('w_print').style.display='';
+}
+function printWPS(){
+  const el=document.getElementById('wps_print'); if(!el)return;
+  const w=window.open('','_blank'); if(!w){alert('Cho phép pop-up để in.');return;}
+  w.document.write('<html><head><title>WPS</title><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;margin:16px">'+el.outerHTML+'</body></html>');
+  w.document.close(); w.focus(); setTimeout(function(){w.print();},300);
 }
 function _tn(id){const v=parseFloat(document.getElementById(id).value);return isNaN(v)?0:v;}
 function calcCEV(){
