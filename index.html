@@ -65,6 +65,10 @@ table.deep-tbl td:first-child{font-weight:700;color:var(--txt);white-space:nowra
 .tool-grid label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
 .tool-grid input,.tool-grid select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:8px;font-size:14px;width:100%}
 .tool-out{margin-top:8px;padding:10px 12px;background:#13212d;border-left:3px solid var(--accent);border-radius:8px;font-size:15px}
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.score-cell{background:var(--panel2);border-radius:10px;padding:12px;text-align:center}
+.score-cell b{font-size:22px;display:block}
+.score-cell span{font-size:11px;color:var(--muted)}
 .flash{perspective:1200px;height:230px;margin-bottom:14px}
 .flash-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
 .flash.flip .flash-inner{transform:rotateY(180deg)}
@@ -119,6 +123,7 @@ code{background:#0a121b;padding:1px 6px;border-radius:5px;color:var(--yellow);fo
   <div id="v-plan" class="view"></div>
   <div id="v-tutor" class="view"></div>
   <div id="v-tools" class="view"></div>
+  <div id="v-profile" class="view"></div>
 </main>
 <footer>CSWIP 3.1 Study App • Lộ trình thi tháng 12/2026 • Dữ liệu syllabus theo TWI/CSWIP</footer>
 
@@ -133,6 +138,7 @@ code{background:#0a121b;padding:1px 6px;border-radius:5px;color:var(--yellow);fo
 let LANG = localStorage.getItem('cswip_lang')||'both';
 let PROG = JSON.parse(localStorage.getItem('cswip_prog')||'{}'); // {chapIndex:true}
 let QUIZSTATE = JSON.parse(localStorage.getItem('cswip_quiz')||'{}');
+let USER = JSON.parse(localStorage.getItem('cswip_user')||'{}');
 
 function save(){localStorage.setItem('cswip_prog',JSON.stringify(PROG));localStorage.setItem('cswip_quiz',JSON.stringify(QUIZSTATE));}
 function setLang(l){LANG=l;localStorage.setItem('cswip_lang',l);
@@ -150,7 +156,7 @@ function biliE(vi,en){
   return `<span class="lang-en">${en}</span>${vi?`<span class="lang-vi sub">${vi}</span>`:''}`;
 }
 
-const TABS=[['home','🏠 Tổng quan'],['learn','📚 Bài học'],['flash','🃏 Flashcard'],['quiz','📝 Quiz'],['tools','🛠️ Công cụ'],['plan','🗓️ Lộ trình'],['tutor','🤖 AI Gia sư']];
+const TABS=[['home','🏠 Tổng quan'],['learn','📚 Bài học'],['flash','🃏 Flashcard'],['quiz','📝 Quiz'],['tools','🛠️ Công cụ'],['profile','👤 Hồ sơ'],['plan','🗓️ Lộ trình'],['tutor','🤖 AI Gia sư']];
 function buildNav(){
   document.getElementById('nav').innerHTML=TABS.map(([k,t])=>`<button data-t="${k}" onclick="go('${k}')">${t}</button>`).join('');
 }
@@ -371,6 +377,73 @@ function renderPlan(){document.getElementById('v-plan').innerHTML=DATA.planHTML;
 function renderTutor(){document.getElementById('v-tutor').innerHTML=DATA.tutorHTML;}
 function copyPrompt(id){const t=document.getElementById(id).innerText;navigator.clipboard.writeText(t).then(()=>{const b=event.target;const o=b.innerText;b.innerText='✓ Đã copy!';setTimeout(()=>b.innerText=o,1500);});}
 
+/* ---------- PROFILE (Hồ sơ & chấm điểm) ---------- */
+function _scoreStats(){
+  const total=DATA.chapters.length;
+  const done=Object.keys(PROG).filter(k=>PROG[k]).length;
+  const ans=Object.keys(QUIZSTATE).length;
+  const correct=Object.keys(QUIZSTATE).filter(k=>QUIZSTATE[k]&&QUIZSTATE[k].correct).length;
+  const pct=ans?Math.round(correct/ans*100):0;
+  let qTotal=0;DATA.chapters.forEach(c=>qTotal+=c.quiz.length);
+  return {total,done,ans,correct,pct,qTotal};
+}
+function _esc(s){return String(s||'').replace(/[<>"]/g,'');}
+function saveUserField(k,v){USER[k]=v;localStorage.setItem('cswip_user',JSON.stringify(USER));}
+function resetProgress(){if(confirm('Xóa toàn bộ tiến độ và điểm? / Clear all progress & scores?')){PROG={};QUIZSTATE={};save();renderAll();}}
+function renderProfile(){
+  const s=_scoreStats();
+  document.getElementById('v-profile').innerHTML=`
+  <div class="card">
+    <h2>👤 ${bili('Hồ sơ học viên','Learner profile')}</h2>
+    <p class="muted" style="font-size:13px">${bili('Ghi tên để app chấm điểm theo bạn. Dữ liệu lưu trên máy bạn (riêng tư).','Enter your name so the app scores you. Stored on your device (private).')}</p>
+    <div class="tool-grid">
+      <label>${bili('Họ tên','Full name')}<input id="u_name" value="${_esc(USER.name)}" oninput="saveUserField('name',this.value)"></label>
+      <label>${bili('Đơn vị','Company')}<input id="u_org" value="${_esc(USER.org)}" oninput="saveUserField('org',this.value)"></label>
+      <label>Email/SĐT<input id="u_contact" value="${_esc(USER.contact)}" oninput="saveUserField('contact',this.value)"></label>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📊 ${bili('Bảng điểm','Scorecard')}</h3>
+    <div class="score-grid">
+      <div class="score-cell"><b>${s.done}/${s.total}</b><span>${bili('Chương xong','Chapters')}</span></div>
+      <div class="score-cell"><b>${s.correct}/${s.ans}</b><span>${bili('Quiz đúng/đã làm','Quiz correct/done')}</span></div>
+      <div class="score-cell"><b style="color:${s.pct>=70?'var(--green)':'var(--accent)'}">${s.pct}%</b><span>${bili('Tỉ lệ đúng','Accuracy')}</span></div>
+    </div>
+    <p class="muted" style="font-size:12px;margin-top:6px">${s.pct>=70?'✅ '+bili('Đạt mốc 70% (mô phỏng)','Meets the 70% mark (mock)'):bili('Cần ≥70% để đạt mốc thi.','Aim for ≥70% to reach the pass mark.')}</p>
+    <div class="row" style="margin-top:10px;gap:8px;justify-content:flex-start">
+      <button class="btn" onclick="printScorecard()">🖨️ ${bili('In bảng điểm','Print scorecard')}</button>
+      <button class="btn sec" onclick="resetProgress()">${bili('Đặt lại tiến độ','Reset progress')}</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>⭐ ${bili('Dịch vụ cao cấp','Premium services')}</h3>
+    <ul class="lesson">
+      <li>${bili('Tư vấn quy trình hàn (WPS) theo dự án','Project welding procedure (WPS) consulting')}</li>
+      <li>${bili('Lập & duyệt PQR, qualify thợ hàn','PQR preparation & welder qualification')}</li>
+      <li>${bili('Soát hồ sơ chất lượng (data book)','Quality data-book review')}</li>
+    </ul>
+    <p class="muted" style="font-size:12px">${bili('Đây là dịch vụ tính phí, sắp xếp riêng — app chưa tích hợp thanh toán. Liên hệ để kích hoạt.','Paid services arranged separately — no in-app payment yet. Contact to activate.')}</p>
+  </div>`;
+}
+function printScorecard(){
+  const s=_scoreStats();
+  const today=new Date().toLocaleDateString('vi-VN');
+  const row=function(a,b){return '<tr><td style="padding:6px 8px;color:#444">'+a+'</td><td style="padding:6px 8px;font-weight:700">'+b+'</td></tr>';};
+  let h='<div style="background:#fff;color:#111;border:2px solid #111;border-radius:10px;padding:20px;max-width:560px;font-family:Arial,sans-serif">'
+    +'<div style="text-align:center;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:12px"><b style="font-size:18px">BẢNG ĐIỂM ÔN TẬP CSWIP 3.1</b><br><span style="font-size:12px;color:#555">CSWIP 3.1 Study Scorecard · '+today+'</span></div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:14px">'
+    +row('Họ tên / Name', _esc(USER.name)||'—');
+  if(USER.org)h+=row('Đơn vị / Company', _esc(USER.org));
+  if(USER.contact)h+=row('Liên hệ / Contact', _esc(USER.contact));
+  h+=row('Chương hoàn thành / Chapters', s.done+' / '+s.total)
+    +row('Quiz đúng / đã làm', s.correct+' / '+s.ans)
+    +row('Tỉ lệ đúng / Accuracy', s.pct+'%')
+    +'</table>'
+    +'<p style="font-size:11px;color:#666;margin-top:10px">Tự đánh giá ôn tập — KHÔNG phải chứng chỉ chính thức. / Self-study record — NOT an official certificate.</p></div>';
+  const w=window.open('','_blank'); if(!w){alert('Cho phép pop-up để in.');return;}
+  w.document.write('<html><head><title>Scorecard</title><meta charset="utf-8"></head><body style="margin:16px">'+h+'</body></html>');
+  w.document.close();w.focus();setTimeout(function(){w.print();},300);
+}
 /* ---------- TOOLS (Công cụ thực chiến) ---------- */
 function renderTools(){
   document.getElementById('v-tools').innerHTML=`
@@ -522,6 +595,7 @@ function renderAll(){
   if(CUR==='plan')renderPlan();
   if(CUR==='tutor')renderTutor();
   if(CUR==='tools')renderTools();
+  if(CUR==='profile')renderProfile();
 }
 buildNav();setLang(LANG);go('home');
 </script>
