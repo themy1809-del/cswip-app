@@ -233,6 +233,7 @@ function premiumCardHTML(){
     +'<li>🧰 '+bili('Tạo PQR/WPQR có kết quả thử & phạm vi phê duyệt','PQR/WPQR with test results & range of approval')+'</li>'
     +'<li>📝 '+bili('Tư vấn WPS, gợi ý tiền nhiệt & nhiệt đầu vào','WPS consulting, preheat & heat-input hints')+'</li>'
     +'</ul>'
+    +'<div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn" onclick="buyNow()">📩 '+bili('Mua ngay','Buy now')+' — '+fmtPrice()+'</button></div>'
     +'<div style="background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px">'
     +'<b style="font-size:14px">'+bili('Cách kích hoạt','How to activate')+'</b>'
     +'<ol class="muted" style="font-size:13px;margin:6px 0 0 18px;line-height:1.7">'
@@ -252,6 +253,16 @@ function doActivate(){
   var m=document.getElementById('act_msg');
   if(m) m.innerHTML='<span style="color:'+(r.ok?'var(--green)':'var(--red)')+'">'+r.msg+'</span>';
   if(r.ok) setTimeout(function(){renderProfile();},900);
+}
+function buyNow(){
+  var u=_curUser();
+  var to=(CONFIG.contactEmail||'');
+  var subj=encodeURIComponent('Mua '+(CONFIG.premiumName||'CSWIP PRO'));
+  var body=encodeURIComponent('Toi muon mua goi '+(CONFIG.premiumName||'CSWIP PRO')+' ('+fmtPrice()+').\n'+
+    'Ho ten cua toi (de tao ma kich hoat): '+((u.name)||'')+'\n'+
+    'Da chuyen khoan: [dinh kem bien lai]\n');
+  if(to) window.location.href='mailto:'+to+'?subject='+subj+'&body='+body;
+  else alert('Chưa cấu hình liên hệ. / Contact not configured.');
 }
 
 /* ---------- override renderProfile ---------- */
