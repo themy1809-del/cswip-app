@@ -488,7 +488,17 @@ function renderTools(){
     </tbody></table></div>
   </div>
   <div class="card">
-    <h3>⑤ ${bili('Tạo WPS/PQR nhanh','Quick WPS/PQR builder')}</h3>
+    <h3>⑤ ${bili('Ước lượng tiền nhiệt','Preheat estimate')}</h3>
+    <p class="muted" style="font-size:12px">${bili('Theo CEV + chiều dày tổ hợp + mức hydro que. CHỈ THAM KHẢO — phải tra EN 1011-2 / AWS D1.1 / WPS dự án.','From CEV + combined thickness + electrode hydrogen. INDICATIVE only — follow EN 1011-2 / AWS D1.1 / project WPS.')}</p>
+    <div class="tool-grid">
+      <label>CEV<input type="number" step="0.01" min="0" id="ph_ce" value="0.42" oninput="calcPreheat()"></label>
+      <label>${bili('Chiều dày tổ hợp','Combined thk')} (mm)<input type="number" min="0" id="ph_t" value="30" oninput="calcPreheat()"></label>
+      <label>${bili('Hydro que','H level')}<select id="ph_h" onchange="calcPreheat()"><option value="low">${bili('Thấp (basic/sấy)','Low (basic/dried)')}</option><option value="med">${bili('TB (rutile)','Medium (rutile)')}</option><option value="high">${bili('Cao (cellulosic/ẩm)','High (cellulosic/damp)')}</option></select></label>
+    </div>
+    <div id="ph_out" class="tool-out">—</div>
+  </div>
+  <div class="card">
+    <h3>⑥ ${bili('Tạo WPS/PQR nhanh','Quick WPS/PQR builder')}</h3>
     <p class="muted" style="font-size:12px">${bili('Điền thông số → tạo bản WPS in được (Lưu PDF). Tham khảo — cần kỹ sư duyệt & PQR chống lưng.','Fill parameters → generate a printable WPS (Save as PDF). Indicative — needs engineer approval & a backing PQR.')}</p>
     <div class="tool-grid">
       <label>${bili('Công ty','Company')}<input id="w_co" placeholder="—"></label>
@@ -518,7 +528,7 @@ function renderTools(){
     </div>
     <div id="wps_doc" style="margin-top:10px"></div>
   </div>`;
-  calcCEV(); calcHI(); calcFillet('z');
+  calcCEV(); calcHI(); calcFillet('z'); calcPreheat();
 }
 function _wv(id){const el=document.getElementById(id);const v=(el&&el.value||'').trim();return v||'—';}
 function genWPS(){
@@ -586,6 +596,17 @@ function calcFillet(from){
   if(from==='z')document.getElementById('fa').value=(_tn('fz')*0.7).toFixed(1);
   else document.getElementById('fz').value=(_tn('fa')/0.7).toFixed(1);
   document.getElementById('f_out').innerHTML='<b>a = '+_tn('fa').toFixed(1)+' mm · z = '+_tn('fz').toFixed(1)+' mm</b>';
+}
+function calcPreheat(){
+  const ce=_tn('ph_ce'), t=_tn('ph_t'), h=document.getElementById('ph_h').value;
+  let base;
+  if(ce<0.40)base=0; else if(ce<0.45)base=75; else if(ce<0.50)base=125; else if(ce<0.55)base=175; else base=225;
+  if(t>=20&&t<40)base+=25; else if(t>=40&&t<60)base+=50; else if(t>=60)base+=75;
+  if(h==='high')base+=50; else if(h==='med')base+=25;
+  base=Math.round(base/25)*25;
+  const out=document.getElementById('ph_out');
+  if(base<=0&&t<20) out.innerHTML='<b>'+bili('Thường không cần tiền nhiệt','Usually no preheat')+'</b><br><span class="muted" style="font-size:12px">'+bili('vẫn kiểm tra ẩm & ràng buộc — tham khảo EN 1011-2','still check moisture & restraint — see EN 1011-2')+'</span>';
+  else out.innerHTML='<b>'+bili('Tiền nhiệt ước lượng','Estimated preheat')+': ~'+Math.max(base,20)+'°C</b><br><span class="muted" style="font-size:12px">'+bili('chỉ tham khảo — tra EN 1011-2 / AWS D1.1 / WPS dự án','indicative — see EN 1011-2 / AWS D1.1 / project WPS')+'</span>';
 }
 function renderAll(){
   if(CUR==='home')renderHome();
