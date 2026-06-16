@@ -11,7 +11,7 @@ const CONFIG = {
 
   /* ---- Giá & nội dung gói Premium ---- */
   premiumName: "CSWIP 3.1 PRO",
-  price: 199000,                 // số tiền (VND). Đổi theo bạn.
+  price: 499000,                 // số tiền (VND). Đổi theo bạn.
   currency: "đ",
   planNote: "Mở khóa trọn bộ công cụ: tạo PQR/WPQR, tính phạm vi qualify thợ, soạn WPS — dùng không giới hạn.",
 
