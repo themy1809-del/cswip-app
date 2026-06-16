@@ -1,5 +1,5 @@
 /* Service worker — offline support (stale-while-revalidate) */
-const CACHE = 'cswip-v1';
+const CACHE = 'cswip-v2';
 const ASSETS = [
   './', './index.html', './data.js', './bank.js', './realbank.js', './cwibank.js',
   './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'
