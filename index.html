@@ -637,9 +637,90 @@ function renderTools(){
       <button class="btn sec" id="w_print" onclick="printWPS()" style="display:none">🖨️ ${bili('In / Lưu PDF','Print / Save PDF')}</button>
     </div>
     <div id="wps_doc" style="margin-top:10px"></div>
+  </div>
+  <div class="card">
+    <h3>⑦ ${bili('Phạm vi qualify thợ hàn (ASME IX)','Welder qualification range (ASME IX)')}</h3>
+    <p class="muted" style="font-size:12px">${bili('Nhập kết quả thi → phạm vi được phép hàn. THAM KHẢO — phải đối chiếu ASME IX QW-452/461 hoặc code áp dụng & WPS.','From the test result → the qualified range. INDICATIVE — verify against ASME IX QW-452/461 or the applicable code & WPS.')}</p>
+    <div class="tool-grid">
+      <label>${bili('Dạng mẫu','Coupon')}<select id="wq_form" onchange="calcWQ()"><option value="plate">${bili('Tấm','Plate')}</option><option value="pipe">${bili('Ống','Pipe')}</option></select></label>
+      <label>${bili('Vị trí thi','Test position')}<select id="wq_pos" onchange="calcWQ()"><option>1G</option><option>2G</option><option>3G</option><option>4G</option><option>3G+4G</option><option>5G</option><option>6G</option><option>2G+5G</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select></label>
+      <label>${bili('Chiều dày mẫu','Coupon thk')} (mm)<input type="number" min="0" id="wq_t" value="10" oninput="calcWQ()"></label>
+      <label>${bili('ĐK ống','Pipe OD')} (mm)<input type="number" min="0" id="wq_d" value="60" oninput="calcWQ()"></label>
+      <label>${bili('Tấm lót','Backing')}<select id="wq_back" onchange="calcWQ()"><option value="no">${bili('Không lót','No backing')}</option><option value="yes">${bili('Có lót/đệm','With backing')}</option></select></label>
+    </div>
+    <div id="wq_out" class="tool-out">—</div>
+  </div>
+  <div class="card">
+    <h3>⑧ ${bili('Mẫu hồ sơ QA/QC (NCR / Báo cáo kiểm tra)','QA/QC forms (NCR / Inspection report)')}</h3>
+    <p class="muted" style="font-size:12px">${bili('Điền → tạo bản in (Lưu PDF). Mẫu tham khảo, điều chỉnh theo dự án.','Fill → printable (Save PDF). Indicative template, adapt to your project.')}</p>
+    <div class="tool-grid">
+      <label>${bili('Loại hồ sơ','Document')}<select id="dc_type"><option value="ncr">NCR (Non-Conformance)</option><option value="vt">${bili('Báo cáo kiểm tra hàn','Weld inspection report')}</option></select></label>
+      <label>${bili('Dự án','Project')}<input id="dc_proj" placeholder="—"></label>
+      <label>${bili('Số hồ sơ','Doc No.')}<input id="dc_no" placeholder="NCR-001"></label>
+      <label>${bili('Hạng mục/mối hàn','Item/Weld ID')}<input id="dc_item" placeholder="—"></label>
+      <label>${bili('Tiêu chuẩn','Code')}<input id="dc_code" value="ISO 5817"></label>
+      <label>${bili('Người kiểm tra','Inspector')}<input id="dc_insp" placeholder="—"></label>
+    </div>
+    <label style="font-size:12px;color:var(--muted);display:block;margin-top:8px">${bili('Yêu cầu (theo spec/code)','Requirement (per spec/code)')}<textarea id="dc_req" rows="2" style="width:100%;margin-top:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.11);border-radius:10px;color:var(--txt);padding:8px;font-size:14px;font-family:inherit"></textarea></label>
+    <label style="font-size:12px;color:var(--muted);display:block;margin-top:8px">${bili('Thực tế / không phù hợp quan sát được','Actual / non-conformance observed')}<textarea id="dc_act" rows="2" style="width:100%;margin-top:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.11);border-radius:10px;color:var(--txt);padding:8px;font-size:14px;font-family:inherit"></textarea></label>
+    <div class="tool-grid"><label>${bili('Đề xuất xử lý / Kết luận','Disposition / Result')}<input id="dc_disp" placeholder="Sửa / Làm lại / Loại / Nhân nhượng"></label></div>
+    <div class="row" style="margin-top:10px;gap:8px;justify-content:flex-start">
+      <button class="btn" onclick="genDoc()">${bili('Tạo hồ sơ','Generate')}</button>
+      <button class="btn sec" id="dc_print" onclick="printDoc()" style="display:none">🖨️ ${bili('In / Lưu PDF','Print / Save PDF')}</button>
+    </div>
+    <div id="dc_out" style="margin-top:10px"></div>
   </div>`;
-  calcCEV(); calcHI(); calcFillet('z'); calcPreheat();
+  calcCEV(); calcHI(); calcFillet('z'); calcPreheat(); calcWQ();
 }
+function calcWQ(){
+  const g=function(id){return document.getElementById(id);};
+  if(!g('wq_form'))return;
+  const form=g('wq_form').value, pos=g('wq_pos').value, back=g('wq_back').value;
+  const t=parseFloat(g('wq_t').value)||0, d=parseFloat(g('wq_d').value)||0;
+  const POS={'1G':['F'],'2G':['F','H'],'3G':['F','V'],'4G':['F','OH'],'3G+4G':['F','V','OH'],'5G':['F','V','OH'],'6G':['F','H','V','OH'],'2G+5G':['F','H','V','OH'],'1F':['F'],'2F':['F','H'],'3F':['F','V'],'4F':['F','OH']};
+  const isFillet=/F$/.test(pos);
+  const nm={F:'Bằng (F)',H:'Ngang (H)',V:'Đứng (V)',OH:'Trần (OH)'};
+  const posTxt=(POS[pos]||['?']).map(function(p){return nm[p]||p;}).join(', ');
+  let tmax = t<=0?'—' : (t<12.7? (2*t).toFixed(1)+' mm' : bili('Không giới hạn','Unlimited'));
+  const tTxt = isFillet ? bili('Mọi chiều dày (mối góc)','All thicknesses (fillet)') : ('1.5 mm → '+tmax);
+  let dTxt;
+  if(isFillet) dTxt=bili('Mọi đường kính','All diameters');
+  else if(form==='pipe') dTxt=(d<=0?'—':(d<25?d.toFixed(0)+' mm':'25 mm'))+' → '+bili('Không giới hạn','Unlimited');
+  else dTxt=bili('Tấm; và ống OD ≥ ~600 mm (24 in)','Plate; and pipe OD ≥ ~600 mm (24 in)');
+  const backTxt = back==='no' ? bili('Thi KHÔNG lót → hàn được CÓ và KHÔNG lót.','No backing → qualifies WITH and WITHOUT backing.') : bili('Thi CÓ lót → chỉ hàn CÓ lót.','With backing → qualifies WITH backing only.');
+  g('wq_out').innerHTML='<b>'+bili('Vị trí được hàn','Positions')+':</b> '+posTxt+(isFillet?' <span class="muted">('+bili('chỉ mối góc','fillets only')+')</span>':'')
+    +'<br><b>'+bili('Chiều dày','Thickness')+':</b> '+tTxt
+    +'<br><b>'+bili('Đường kính','Diameter')+':</b> '+dTxt
+    +'<br><span class="muted" style="font-size:12px">'+backTxt+' '+bili('Tham khảo ASME IX QW-452/461.','See ASME IX QW-452/461.')+'</span>';
+}
+function genDoc(){
+  const g=function(id){return (document.getElementById(id)&&document.getElementById(id).value||'').trim();};
+  const type=g('dc_type');
+  const title=type==='ncr'?'NON-CONFORMANCE REPORT (NCR)':'WELDING INSPECTION REPORT';
+  const today=new Date().toLocaleDateString('vi-VN');
+  const esc=function(s){return String(s||'—').replace(/[<>]/g,'');};
+  const rows=[
+    ['Dự án / Project', esc(g('dc_proj'))],
+    [type==='ncr'?'Số NCR / NCR No.':'Số báo cáo / Report No.', esc(g('dc_no'))],
+    ['Ngày / Date', today],
+    ['Hạng mục / Item / Weld ID', esc(g('dc_item'))],
+    ['Tiêu chuẩn / Code', esc(g('dc_code'))],
+    ['Yêu cầu / Requirement', esc(g('dc_req'))],
+    [type==='ncr'?'Thực tế / Non-conformance':'Quan sát / Finding', esc(g('dc_act'))],
+    [type==='ncr'?'Đề xuất xử lý / Disposition':'Kết luận / Result', esc(g('dc_disp'))],
+    ['Người kiểm tra / Inspector', esc(g('dc_insp'))]
+  ];
+  let h='<div id="dc_print_doc" style="background:#fff;color:#111;border:2px solid #111;border-radius:8px;padding:18px;font-family:Arial,sans-serif;max-width:640px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:10px"><b style="font-size:16px">'+title+'</b><span style="font-size:12px;color:#555">'+today+'</span></div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:13px">'
+    +rows.map(function(r){return '<tr><td style="border:1px solid #bbb;padding:6px 8px;width:34%;color:#444;vertical-align:top">'+r[0]+'</td><td style="border:1px solid #bbb;padding:6px 8px;white-space:pre-wrap">'+r[1]+'</td></tr>';}).join('')
+    +'</table>'
+    +'<div style="display:flex;justify-content:space-between;margin-top:26px;font-size:12px;color:#444"><div>____________________<br>'+(type==='ncr'?'Người lập / Raised by':'Thanh tra / Inspector')+'</div><div>____________________<br>Duyệt / Approved</div></div>'
+    +'<p style="font-size:10px;color:#888;margin-top:10px">Mẫu tham khảo — điều chỉnh theo dự án. / Indicative template.</p></div>';
+  document.getElementById('dc_out').innerHTML=h;
+  document.getElementById('dc_print').style.display='';
+}
+function printDoc(){const el=document.getElementById('dc_print_doc');if(!el)return;const w=window.open('','_blank');if(!w){alert('Cho phép pop-up để in.');return;}w.document.write('<html><head><title>Doc</title><meta charset="utf-8"></head><body style="margin:16px">'+el.outerHTML+'</body></html>');w.document.close();w.focus();setTimeout(function(){w.print();},300);}
 function _wv(id){const el=document.getElementById(id);const v=(el&&el.value||'').trim();return v||'—';}
 function genWPS(){
   const proc=_wv('w_proc');
