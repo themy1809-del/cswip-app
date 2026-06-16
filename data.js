@@ -95,6 +95,17 @@ const DATA = {chapters:[
   {vi:"MMA & TIG dùng nguồn CC (dốc); MIG/MAG & SAW dây nhỏ dùng nguồn CV (phẳng) — câu hỏi rất hay gặp trong đề.",en:"MMA & TIG use CC (drooping); MIG/MAG & thin-wire SAW use CV (flat) — a favourite exam question."},
  ],
  deep:[
+  {h_vi:"So sánh nhanh 4 quá trình (bảng ôn thi)",h_en:"Quick 4-process comparison (exam table)",
+ body:[{vi:"Gom điểm phân biệt cốt lõi để trả lời mọi câu 'quá trình nào năng suất/chất lượng cao nhất, chịu gió'.",en:"Core differences to answer any highest-output/quality/wind-tolerant question."}],
+ table:{cols:[{vi:"QT",en:"Proc"},{vi:"Nguồn & bảo vệ",en:"Source & shield"},{vi:"Năng suất",en:"Output"},{vi:"Vị trí",en:"Positions"},{vi:"Khuyết tật hay gặp",en:"Typical defects"}],
+  data:[
+   [{vi:"111 MMA",en:"111 MMA"},{vi:"CC; xỉ vỏ que",en:"CC; coating slag"},{vi:"Thấp-TB",en:"Low-med"},{vi:"Mọi vị trí",en:"All"},{vi:"Ngậm xỉ, rỗ (ẩm)",en:"Slag, porosity"}],
+   [{vi:"135 MAG",en:"135 MAG"},{vi:"CV; CO2/hỗn hợp",en:"CV; CO2/mix"},{vi:"Cao",en:"High"},{vi:"Mọi vị trí",en:"All"},{vi:"Thiếu ngấu, bắn tóe",en:"Lack of fusion, spatter"}],
+   [{vi:"141 TIG",en:"141 TIG"},{vi:"CC; Ar trơ",en:"CC; inert Ar"},{vi:"Thấp",en:"Low"},{vi:"Mọi vị trí",en:"All"},{vi:"Ngậm vonfram",en:"Tungsten"}],
+   [{vi:"121 SAW",en:"121 SAW"},{vi:"thuốc hạt",en:"granular flux"},{vi:"Rất cao",en:"Very high"},{vi:"Bằng/ngang",en:"Flat/horiz"},{vi:"Nứt nóng giữa mối",en:"Centreline crack"}]
+  ]},
+ foot:{vi:"TIG=chất lượng nhất/chậm; SAW=năng suất nhất/chỉ bằng-ngang; MMA=linh hoạt-chịu gió; MAG=năng suất cao, dễ cơ giới.",en:"TIG best/slow; SAW highest/flat-horiz; MMA versatile/wind; MAG high & mechanisable."}},
+
   {h_vi:"Vật lý hồ quang quyết định cách chọn quá trình",h_en:"Arc physics drives the process choice",
    body:[
     {vi:"Mọi khác biệt giữa các quá trình bắt nguồn từ CÁCH kim loại chuyển từ điện cực sang vũng hàn, và điều đó do dòng–áp quyết định. Ở dòng/áp thấp, dây chạm vũng rồi ngắn mạch tách giọt (dip) — nhiệt thấp, vũng nhỏ đông nhanh nên hàn được tấm mỏng và mọi vị trí, nhưng chính nhiệt thấp lại dễ gây THIẾU NGẤU trên tấm dày. Tăng dòng/áp đủ cao thì giọt mịn bay tự do qua hồ quang (spray) — ngấu sâu, năng suất cao, nhưng vũng lớn chảy xệ nên chỉ hàn bằng/ngang. Pulsed 'đánh lừa' vật lý: xen kẽ xung cao (tách giọt kiểu spray) và nền thấp (giữ nguội) → được ngấu và độ sạch của spray ở dòng trung bình thấp, nên hàn được mọi vị trí. Hiểu trục dòng–áp này giải thích vì sao một quá trình hợp việc này mà không hợp việc kia.",en:"Every difference between processes comes from HOW metal transfers from the electrode to the pool, and that is set by current–voltage. At low current/voltage the wire touches the pool and short-circuits off a droplet (dip) — low heat, a small fast-freezing pool, so it welds thin sheet in all positions, yet that same low heat risks LACK OF FUSION on thick material. Raise current/voltage enough and fine droplets fly freely across the arc (spray) — deep penetration, high output, but the large pool sags, so it is flat/horizontal only. Pulsed 'tricks' the physics: alternating a high pulse (spray-like detachment) with a low background (keeps it cool) → it gets spray's penetration and cleanliness at a low average current, so it is all-positional. This current–voltage axis explains why a process suits one job but not another."},
@@ -386,6 +397,19 @@ const DATA = {chapters:[
   {vi:"Nứt nóng: yếu tố Lưu huỳnh (S). Nứt nguội: Hydro. Rách lớp: tạp chất MnS + ứng suất theo chiều dày. Đừng nhầm lẫn ba loại này.",en:"Hot cracking: sulphur. Cold cracking: hydrogen. Lamellar tearing: MnS inclusions + through-thickness strain. Do not mix them up."},
  ],
  deep:[
+  {h_vi:"Bản đồ khuyết tật: nguyên nhân→phòng ngừa→NDT (bảng ghép đôi)",h_en:"Defect map: cause→prevention→NDT",
+ body:[{vi:"Dạng câu ghép đôi rất hay gặp: gọi tên khuyết tật, nêu nguyên nhân gốc và NDT lộ ra nó.",en:"Common matching question: defect, root cause, and the NDT that reveals it."}],
+ table:{cols:[{vi:"Khuyết tật",en:"Defect"},{vi:"Nguyên nhân",en:"Cause"},{vi:"Phòng ngừa",en:"Prevent"},{vi:"NDT",en:"NDT"}],
+  data:[
+   [{vi:"Nứt nguội",en:"Cold crack"},{vi:"H2+cứng+ứng suất",en:"H2+hard+stress"},{vi:"Que sấy, tiền nhiệt",en:"Dry rods, preheat"},{vi:"MT/PT, UT",en:"MT/PT, UT"}],
+   [{vi:"Nứt nóng",en:"Hot crack"},{vi:"S/P cao, sâu/rộng lớn",en:"High S/P, depth/width"},{vi:"Thép sạch, Mn",en:"Clean steel, Mn"},{vi:"MT/PT, macro",en:"MT/PT, macro"}],
+   [{vi:"Rỗ khí",en:"Porosity"},{vi:"Ẩm, dầu, mất khí",en:"Moisture, oil, lost gas"},{vi:"Sạch, chắn gió",en:"Clean, screen"},{vi:"RT (tốt nhất)",en:"RT (best)"}],
+   [{vi:"Thiếu ngấu",en:"Lack of fusion"},{vi:"Nhiệt thấp, góc sai",en:"Low heat, angle"},{vi:"Tăng nhiệt, kỹ thuật",en:"More heat, technique"},{vi:"UT (tốt nhất)",en:"UT (best)"}],
+   [{vi:"Undercut",en:"Undercut"},{vi:"Dòng cao, hồ quang dài",en:"High current, long arc"},{vi:"Giảm dòng, tốc độ đúng",en:"Lower current, speed"},{vi:"VT + dưỡng",en:"VT + gauge"}],
+   [{vi:"Rách lớp",en:"Lamellar tear"},{vi:"Ứng suất chiều dày+MnS",en:"Through-thk+MnS"},{vi:"Thép Z, buttering",en:"Z-grade, buttering"},{vi:"UT",en:"UT"}]
+  ]},
+ foot:{vi:"PHẲNG→UT; KHỐI→RT; BỀ MẶT→MT(sắt từ)/PT.",en:"PLANAR→UT; VOLUMETRIC→RT; SURFACE→MT/PT."}},
+
   {h_vi:"Nứt nguội do hydro — phân tích cơ chế đầy đủ",h_en:"Hydrogen (cold) cracking — full mechanism analysis",
    body:[
     {vi:"Cơ chế: hồ quang phân ly hơi ẩm, dầu, gỉ thành hydro NGUYÊN TỬ, hòa tan vào vũng hàn lỏng. Khi mối hàn nguội, độ hòa tan hydro tụt đột ngột nên hydro khuếch tán (diffusible H) dồn về vùng ảnh hưởng nhiệt (HAZ). Nếu HAZ nguội nhanh tạo martensite cứng giòn, hydro tích tụ tại các điểm tập trung ứng suất (chân khía, biên hạt); dưới ứng suất kéo do co ngót và kẹp chặt, vết nứt khởi phát rồi lan. Vì hydro cần thời gian khuếch tán, nứt mang tính TRỄ — xuất hiện hàng giờ đến 72 giờ sau khi hàn, ở nhiệt độ dưới ~300°C. Đó chính là lý do NDT cuối phải hoãn 48–72 giờ với thép nhạy.",en:"Mechanism: the arc dissociates moisture, oil and rust into ATOMIC hydrogen that dissolves in the liquid pool. As the weld cools, hydrogen solubility drops sharply, so diffusible hydrogen migrates into the heat-affected zone (HAZ). If the HAZ cools fast enough to form hard, brittle martensite, hydrogen concentrates at stress raisers (notches, grain boundaries); under tensile stress from shrinkage and restraint, a crack initiates and propagates. Because hydrogen needs time to diffuse, the cracking is DELAYED — appearing hours up to 72 h after welding, below ~300°C. That is exactly why final NDT is held for 48–72 h on sensitive steels."},
@@ -536,6 +560,18 @@ const DATA = {chapters:[
   {vi:"Câu thần chú: PHẲNG → UT, KHỐI → RT, bề mặt sắt từ → MT, bề mặt không nhiễm từ → PT.",en:"Mantra: PLANAR → UT, VOLUMETRIC → RT, magnetic surface → MT, non-magnetic surface → PT."},
  ],
  deep:[
+  {h_vi:"Ma trận chọn phương pháp NDT (5 PP)",h_en:"NDT selection matrix (5 methods)",
+ body:[{vi:"Chọn theo loại khuyết tật, vật liệu, tiếp cận. Khung trả lời mọi câu 'nên dùng NDT nào'.",en:"Choose by defect, material, access — frames every which-NDT question."}],
+ table:{cols:[{vi:"PP",en:"Method"},{vi:"Phát hiện",en:"Detects"},{vi:"Hồ sơ",en:"Record"},{vi:"Hạn chế",en:"Limit"}],
+  data:[
+   [{vi:"VT",en:"VT"},{vi:"Bề mặt, hình dạng",en:"Surface, profile"},{vi:"Báo cáo+ảnh",en:"Report+photo"},{vi:"Chỉ bề mặt thấy",en:"Visible only"}],
+   [{vi:"PT",en:"PT"},{vi:"Nứt HỞ bề mặt",en:"Surface-breaking"},{vi:"Ảnh",en:"Photo"},{vi:"Không thấy kín",en:"No subsurface"}],
+   [{vi:"MT",en:"MT"},{vi:"Bề mặt & sát mặt",en:"Surface/near"},{vi:"Ảnh",en:"Photo"},{vi:"Chỉ sắt từ",en:"Magnetic only"}],
+   [{vi:"RT",en:"RT"},{vi:"Rỗ, xỉ (KHỐI)",en:"Volumetric"},{vi:"Phim lưu lâu",en:"Permanent film"},{vi:"Kém với nứt lệch tia",en:"Poor misoriented crack"}],
+   [{vi:"UT",en:"UT"},{vi:"Nứt PHẲNG, đo sâu",en:"Planar, depth"},{vi:"Hạn chế",en:"Limited"},{vi:"Phụ thuộc tay nghề",en:"Operator-dependent"}]
+  ]},
+ foot:{vi:"Bẫy: inox austenit không nhiễm từ→dùng PT không MT.",en:"Trap: austenitic stainless non-magnetic→PT not MT."}},
+
   {h_vi:"Chọn phương pháp NDT — logic theo loại khuyết tật",h_en:"Choosing an NDT method — logic by defect type",
    body:[
     {vi:"Mọi lựa chọn NDT xoay quanh hai câu hỏi: khuyết tật nằm ở BỀ MẶT hay trong THỂ TÍCH, và nó PHẲNG (nứt, thiếu ngấu) hay KHỐI (rỗ, xỉ tròn). PT và MT bắt khuyết tật bề mặt (MT thấy thêm một chút ngay dưới bề mặt); RT và UT nhìn vào bên trong. Chọn sai phương pháp nghĩa là có thể bỏ sót đúng loại khuyết tật nguy hiểm nhất — vì thế thanh tra phải khớp phương pháp với khuyết tật cần bắt và với vật liệu.",en:"Every NDT choice turns on two questions: is the flaw at the SURFACE or in the VOLUME, and is it PLANAR (cracks, lack of fusion) or VOLUMETRIC (porosity, rounded slag)? PT and MT catch surface flaws (MT also sees a little just below the surface); RT and UT look inside. Choosing the wrong method can miss exactly the most dangerous defect — so the inspector must match the method to the flaw sought and to the material."},
@@ -811,6 +847,12 @@ const DATA = {chapters:[
   {vi:"Thuộc lòng k: SAW 1,0 — MMA/MIG/MAG 0,8 — TIG 0,6. Và nhớ đổi tốc độ về mm/s trước khi tính. Đề thi RẤT hay cho bài tính này.",en:"Memorise k: SAW 1.0 — MMA/MIG/MAG 0.8 — TIG 0.6. Convert speed to mm/s first. This calculation is a perennial exam question."},
  ],
  deep:[
+  {h_vi:"Bài tập nhiệt đầu vào có lời giải (hay thi)",h_en:"Heat-input worked example (exam favourite)",
+ body:[{vi:"Công thức: AE(kJ/mm)=(U×I)/(v×1000), v tính mm/GIÂY. HI=k×AE.",en:"AE(kJ/mm)=(U×I)/(v×1000), v in mm/SECOND. HI=k×AE."}],
+ table:{cols:[{vi:"k",en:"k"},{vi:"Quá trình",en:"Process"}],
+  data:[[{vi:"1,0",en:"1.0"},{vi:"121 SAW",en:"121 SAW"}],[{vi:"0,8",en:"0.8"},{vi:"MMA, MIG/MAG/FCAW",en:"MMA, MIG/MAG/FCAW"}],[{vi:"0,6",en:"0.6"},{vi:"141 TIG, plasma",en:"141 TIG, plasma"}]]},
+ foot:{vi:"VD: 24V,200A,240mm/ph → v=4mm/s → AE=(24×200)/(4×1000)=1,2 kJ/mm. MMA(k=0,8)→HI=0,96 kJ/mm. LỖI HAY GẶP: quên đổi mm/ph→mm/s.",en:"Ex: 24V,200A,240mm/min→v=4mm/s→AE=1.2 kJ/mm. MMA→HI=0.96. ERROR: forgetting mm/min→mm/s."}},
+
   {h_vi:"Biến dạng & ứng suất dư — hai mặt của co ngót",h_en:"Distortion & residual stress — two faces of shrinkage",
    body:[
     {vi:"Hàn nung NÓNG cục bộ rồi để nguội; kim loại nở ra khi nóng và co lại khi nguội, nhưng vùng xung quanh nguội cản trở sự co đó. Kết quả tất yếu là ỨNG SUẤT DƯ (kéo ở mối hàn và vùng sát, nén ở xa hơn) cộng với BIẾN DẠNG (cong vênh). Ứng suất dư có thể đạt tới GIỚI HẠN CHẢY của vật liệu — vô hình với mắt thường nhưng góp phần gây nứt, phá hủy giòn và ăn mòn ứng suất (SCC). Biến dạng thì thấy được và làm sai kích thước, khó lắp ghép. Cả hai đều sinh từ một gốc: co ngót không đồng đều.",en:"Welding heats LOCALLY then lets it cool; metal expands when hot and contracts when cooling, but the surrounding cooler material restrains that contraction. The inevitable result is RESIDUAL STRESS (tensile at the weld and nearby, compressive further out) plus DISTORTION (warping). Residual stress can reach the material's YIELD strength — invisible to the eye yet contributing to cracking, brittle fracture and stress-corrosion cracking (SCC). Distortion is visible and throws off dimensions and fit-up. Both spring from one root: uneven shrinkage."},

@@ -637,41 +637,8 @@ function renderTools(){
       <button class="btn sec" id="w_print" onclick="printWPS()" style="display:none">🖨️ ${bili('In / Lưu PDF','Print / Save PDF')}</button>
     </div>
     <div id="wps_doc" style="margin-top:10px"></div>
-  </div>
-  <div class="card">
-    <h3>⑦ ${bili('Phạm vi qualify thợ hàn (ASME IX)','Welder qualification range (ASME IX)')}</h3>
-    <p class="muted" style="font-size:12px">${bili('Nhập kết quả thi → phạm vi được phép hàn. THAM KHẢO — phải đối chiếu ASME IX QW-452/461 hoặc code áp dụng & WPS.','From the test result → the qualified range. INDICATIVE — verify against ASME IX QW-452/461 or the applicable code & WPS.')}</p>
-    <div class="tool-grid">
-      <label>${bili('Dạng mẫu','Coupon')}<select id="wq_form" onchange="calcWQ()"><option value="plate">${bili('Tấm','Plate')}</option><option value="pipe">${bili('Ống','Pipe')}</option></select></label>
-      <label>${bili('Vị trí thi','Test position')}<select id="wq_pos" onchange="calcWQ()"><option>1G</option><option>2G</option><option>3G</option><option>4G</option><option>3G+4G</option><option>5G</option><option>6G</option><option>2G+5G</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select></label>
-      <label>${bili('Chiều dày mẫu','Coupon thk')} (mm)<input type="number" min="0" id="wq_t" value="10" oninput="calcWQ()"></label>
-      <label>${bili('ĐK ống','Pipe OD')} (mm)<input type="number" min="0" id="wq_d" value="60" oninput="calcWQ()"></label>
-      <label>${bili('Tấm lót','Backing')}<select id="wq_back" onchange="calcWQ()"><option value="no">${bili('Không lót','No backing')}</option><option value="yes">${bili('Có lót/đệm','With backing')}</option></select></label>
-    </div>
-    <div id="wq_out" class="tool-out">—</div>
   </div>`;
-  calcCEV(); calcHI(); calcFillet('z'); calcPreheat(); calcWQ();
-}
-function calcWQ(){
-  const g=function(id){return document.getElementById(id);};
-  if(!g('wq_form'))return;
-  const form=g('wq_form').value, pos=g('wq_pos').value, back=g('wq_back').value;
-  const t=parseFloat(g('wq_t').value)||0, d=parseFloat(g('wq_d').value)||0;
-  const POS={'1G':['F'],'2G':['F','H'],'3G':['F','V'],'4G':['F','OH'],'3G+4G':['F','V','OH'],'5G':['F','V','OH'],'6G':['F','H','V','OH'],'2G+5G':['F','H','V','OH'],'1F':['F'],'2F':['F','H'],'3F':['F','V'],'4F':['F','OH']};
-  const isFillet=/F$/.test(pos);
-  const nm={F:'Bằng (F)',H:'Ngang (H)',V:'Đứng (V)',OH:'Trần (OH)'};
-  const posTxt=(POS[pos]||['?']).map(function(p){return nm[p]||p;}).join(', ');
-  let tmax = t<=0?'—' : (t<12.7? (2*t).toFixed(1)+' mm' : bili('Không giới hạn','Unlimited'));
-  const tTxt = isFillet ? bili('Mọi chiều dày (mối góc)','All thicknesses (fillet)') : ('1.5 mm → '+tmax);
-  let dTxt;
-  if(isFillet) dTxt=bili('Mọi đường kính','All diameters');
-  else if(form==='pipe') dTxt=(d<=0?'—':(d<25?d.toFixed(0)+' mm':'25 mm'))+' → '+bili('Không giới hạn','Unlimited');
-  else dTxt=bili('Tấm; và ống OD ≥ ~600 mm (24 in)','Plate; and pipe OD ≥ ~600 mm (24 in)');
-  const backTxt = back==='no' ? bili('Thi KHÔNG lót → hàn được CÓ và KHÔNG lót.','No backing → qualifies WITH and WITHOUT backing.') : bili('Thi CÓ lót → chỉ hàn CÓ lót.','With backing → qualifies WITH backing only.');
-  g('wq_out').innerHTML='<b>'+bili('Vị trí được hàn','Positions')+':</b> '+posTxt+(isFillet?' <span class="muted">('+bili('chỉ mối góc','fillets only')+')</span>':'')
-    +'<br><b>'+bili('Chiều dày','Thickness')+':</b> '+tTxt
-    +'<br><b>'+bili('Đường kính','Diameter')+':</b> '+dTxt
-    +'<br><span class="muted" style="font-size:12px">'+backTxt+' '+bili('Tham khảo ASME IX QW-452/461.','See ASME IX QW-452/461.')+'</span>';
+  calcCEV(); calcHI(); calcFillet('z'); calcPreheat();
 }
 function _wv(id){const el=document.getElementById(id);const v=(el&&el.value||'').trim();return v||'—';}
 function genWPS(){

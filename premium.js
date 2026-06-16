@@ -1,0 +1,295 @@
+/* ============================================================
+   PREMIUM LAYER — đăng ký, kích hoạt, công cụ Premium
+   (nạp SAU index.html để mở rộng các hàm có sẵn)
+   ============================================================ */
+
+/* ---------- helpers ---------- */
+function _gv(id){var e=document.getElementById(id);return e?(''+e.value).trim():'';}
+function _r1(x){return Math.round(x*10)/10;}
+function _rng(a,b){return _r1(a)+' – '+_r1(b)+' mm';}
+function _posLabel(p){var m={F:bili('Bằng','flat'),H:bili('Ngang','horiz'),V:bili('Đứng','vert'),OH:bili('Trần','overhead')};return m[p]?(p+' ('+m[p]+')'):p;}
+
+/* ---------- WELDER QUALIFICATION DATA (verified) ---------- */
+var ISO_BUTT_POS={'PA':['PA'],'PC':['PA','PC'],'PE':['PA','PC','PE'],'PF':['PA','PF'],'PG':['PG'],'PH':['PA','PE','PF'],'PJ':['PA','PE','PG'],'H-L045':['PA','PC','PE','PF'],'J-L045':['PA','PC','PE','PG']};
+var ISO_FILLET_POS={'PA':['PA'],'PB':['PA','PB'],'PC':['PA','PB','PC'],'PD':['PA','PB','PC','PD','PE'],'PE':['PA','PB','PC','PD','PE'],'PF':['PA','PB','PF'],'PG':['PG'],'PH':['PA','PB','PC','PD','PE','PF'],'PJ':['PA','PB','PD','PE','PG']};
+var ASME_GROOVE_PLATE={'1G':['F'],'2G':['F','H'],'3G':['F','V'],'4G':['F','OH'],'3G+4G':['F','V','OH']};
+var ASME_GROOVE_PIPE={'1G':['F'],'2G':['F','H'],'5G':['F','V','OH'],'6G':['F','H','V','OH'],'2G+5G':['F','H','V','OH']};
+var ASME_FILLET_PLATE={'1F':['F'],'2F':['F','H'],'3F':['F','H','V'],'4F':['F','H','OH'],'3F+4F':['F','H','V','OH']};
+var ASME_FILLET_PIPE={'1F':['F'],'2F':['F','H'],'4F':['F','H','OH'],'5F':['F','H','V','OH']};
+
+function buildQualPositions(){
+  var sys=_gv('q_sys'),form=_gv('q_form'),weld=_gv('q_weld');
+  var sel=document.getElementById('q_pos'); if(!sel)return;
+  var opts=[];
+  if(sys==='iso'){
+    if(weld==='butt') opts=form==='pipe'?['PA','PC','PE','PF','PG','PH','PJ','H-L045','J-L045']:['PA','PC','PE','PF','PG'];
+    else opts=form==='pipe'?['PA','PB','PC','PD','PE','PF','PG','PH','PJ']:['PA','PB','PC','PD','PE','PF','PG'];
+  } else {
+    if(weld==='butt') opts=form==='pipe'?['1G','2G','5G','6G','2G+5G']:['1G','2G','3G','4G','3G+4G'];
+    else opts=form==='pipe'?['1F','2F','4F','5F']:['1F','2F','3F','4F','3F+4F'];
+  }
+  var cur=sel.value;
+  sel.innerHTML=opts.map(function(o){return '<option '+(o===cur?'selected':'')+'>'+o+'</option>';}).join('');
+  var dl=document.getElementById('q_dlbl'); if(dl)dl.style.display=(form==='pipe')?'':'none';
+}
+function calcQual(){
+  var out=document.getElementById('qual_out'); if(!out)return;
+  var sys=_gv('q_sys'),form=_gv('q_form'),weld=_gv('q_weld');
+  var t=parseFloat(_gv('q_t'))||0, D=parseFloat(_gv('q_d'))||0, pos=_gv('q_pos');
+  var thk='—',dia='—',posq='—',note='';
+  var UNL=bili('không giới hạn','unlimited');
+  if(sys==='iso'){
+    if(weld==='butt'){
+      if(t<3) thk=_rng(t,Math.max(3,2*t));
+      else if(t<12) thk=_rng(3,2*t);
+      else thk='3 mm → '+bili('không giới hạn (cần ≥3 lớp)','unlimited (needs ≥3 layers)');
+    } else {
+      if(t<3) thk=_rng(t,Math.max(3,2*t)); else thk='3 mm → '+UNL;
+    }
+    if(form==='pipe') dia = D<=25 ? _rng(D,2*D) : ('≥ '+_r1(Math.max(25,0.5*D))+' mm → '+UNL);
+    var mapI=weld==='butt'?ISO_BUTT_POS:ISO_FILLET_POS;
+    posq=(mapI[pos]||[pos]).join(', ');
+    note=bili('Mỗi quá trình (ISO 4063) qualify riêng; 135↔138 và 121↔125 dùng lẫn. Hàn KHÔNG đệm lưng qualify CÓ đệm lưng (không ngược lại).','Each process qualifies itself; 135↔138 & 121↔125 interchangeable. No-backing qualifies with-backing, not vice-versa.');
+  } else {
+    if(t<12.7) thk=bili('không quy định min','no min')+' → '+_r1(2*t)+' mm (2t)';
+    else thk=bili('không quy định min','no min')+' → '+bili('không giới hạn (≥3 lớp)','unlimited (≥3 layers)');
+    if(form==='pipe'){
+      if(D<25) dia=_r1(D)+' mm → '+UNL;
+      else if(D<=73) dia='25 mm → '+UNL;
+      else dia='73 mm (2⅞") → '+UNL;
+    }
+    var mapA=weld==='butt'?(form==='pipe'?ASME_GROOVE_PIPE:ASME_GROOVE_PLATE):(form==='pipe'?ASME_FILLET_PIPE:ASME_FILLET_PLATE);
+    var arr=mapA[pos]||[]; posq=arr.length?arr.map(_posLabel).join(', '):'—';
+    note=bili('Giới hạn đường kính chỉ áp dụng thợ tay/bán tự động. 6G hoặc 2G+5G phủ mọi vị trí. Thử GÓC không qualify mối giáp mép.','Diameter limits apply to manual/semi-auto only. 6G or 2G+5G covers all positions. A fillet test does NOT qualify groove.');
+  }
+  out.innerHTML='<b>'+bili('Phạm vi qualify','Qualified range')+' ('+(sys==='iso'?'ISO 9606-1':'ASME IX')+', '+(weld==='butt'?bili('giáp mép','butt'):bili('góc','fillet'))+'):</b>'+
+    '<div style="margin-top:6px">📏 '+bili('Chiều dày','Thickness')+': <b>'+thk+'</b></div>'+
+    (form==='pipe'?'<div>⭕ '+bili('Đường kính','Diameter')+': <b>'+dia+'</b></div>':'')+
+    '<div>🧭 '+bili('Vị trí được hàn','Positions qualified')+': <b>'+posq+'</b></div>'+
+    '<div class="muted" style="font-size:12px;margin-top:6px">'+note+'</div>';
+}
+
+/* ---------- PQR builder + range of approval ---------- */
+function procThk(code,t,runs){
+  if(code==='iso'){
+    if(t<=3) return [0.7*t,2*t];
+    if(runs==='single'){ if(t<=12) return [Math.max(3,0.5*t),1.3*t]; if(t<=100) return [0.5*t,1.1*t]; return [50,2*t]; }
+    if(t<=12) return [3,2*t]; if(t<=100) return [0.5*t,2*t]; return [50,2*t];
+  }
+  if(t<1.5) return [t,2*t];
+  if(t<38) return [t<9.5?1.5:4.8,2*t];
+  if(t<=150) return [4.8,200];
+  return [4.8,1.33*t];
+}
+function _wvP(id){var el=document.getElementById(id);var v=(el&&el.value||'').trim();return v||'—';}
+function genPQR(){
+  var code=_gv('p_code'), runs=_gv('p_runs'), form=_gv('p_form'), proc=_gv('p_proc');
+  var t=parseFloat(_gv('p_t'))||0, D=parseFloat(_gv('p_d'))||0;
+  var k=proc.indexOf('121')===0?1:proc.indexOf('141')===0?0.6:0.8;
+  var a=parseFloat(_gv('p_amp')),v=parseFloat(_gv('p_volt')),s=parseFloat(_gv('p_spd'));
+  var hi='—'; if(a>0&&v>0&&s>0) hi=((a*v*60*k)/(s*1000)).toFixed(2)+' kJ/mm (k='+k+')';
+  var tr=procThk(code,t,runs); var thkRange=t>0?_rng(tr[0],tr[1]):'—';
+  var diaRange='—';
+  if(form==='pipe'&&D>0){ diaRange = code==='iso' ? (D<=25?_rng(0.5*D,2*D):('≥ '+_r1(0.5*D)+' mm')) : bili('không giới hạn theo đường kính (theo độ dày)','no diameter limit (governed by thickness)'); }
+  var codeName=code==='iso'?'ISO 15614-1 (Level 2)':'ASME IX (QW-451.1)';
+  var rows=[
+    ['Công ty / Company',_wvP('p_co')],['Số PQR / PQR No.',_wvP('p_no')],['Tiêu chuẩn / Code',codeName],
+    ['Quá trình / Process',_wvP('p_proc')],['Dạng mẫu / Coupon',form==='pipe'?'Pipe':'Plate'],['Số lớp / Runs',runs==='single'?'Single-run':'Multi-run'],
+    ['Vật liệu nền / Base metal',_wvP('p_base')],['Chiều dày mẫu / Thickness (mm)',_wvP('p_t')],['Đường kính / Diameter (mm)',_wvP('p_d')],
+    ['Que dây / Filler',_wvP('p_fill')],['Vị trí / Position',_wvP('p_pos')],
+    ['Tiền nhiệt / Preheat (°C)',_wvP('p_pre')],['Interpass max (°C)',_wvP('p_inter')],['PWHT',_wvP('p_pwht')],
+    ['Dòng / Amps (A)',_wvP('p_amp')],['Điện áp / Volts (V)',_wvP('p_volt')],['Tốc độ / Travel (mm/min)',_wvP('p_spd')],['Nhiệt đầu vào / Heat input',hi]
+  ];
+  var res=[
+    ['Kéo / Tensile Rm (MPa)',_wvP('p_ts')+'  ('+bili('đứt tại','fracture')+': '+_wvP('p_tf')+')'],
+    ['Uốn / Bend',_gv('p_bend')],['Va đập / Charpy (J)',_wvP('p_cv')],
+    ['Độ cứng / Hardness (HV)',_wvP('p_hv')],['Macro',_gv('p_macro')],['VT/RT/UT',_gv('p_ndt')]
+  ];
+  var appr=[
+    ['Phạm vi chiều dày / Thickness range',thkRange],
+    ['Phạm vi đường kính / Diameter range',diaRange],
+    ['Nhiệt đầu vào / Heat input',hi==='—'?'—':bili('±25% giá trị thử (impact: chỉ +25%; hardness: chỉ −25%)','±25% (impact: +25% only; hardness: −25% only)')],
+    ['Tiền nhiệt / Preheat',code==='iso'?bili('tối thiểu = thử − 50°C','min = tested − 50°C'):bili('theo QW-406','per QW-406')],
+    ['Interpass',code==='iso'?bili('tối đa = thử + 50°C (trừ nhóm 8/10/41-48)','max = tested + 50°C (except gp 8/10/41-48)'):bili('theo QW-407','per QW-407')]
+  ];
+  var today=new Date().toLocaleDateString('vi-VN');
+  var tbl=function(title,arr){return '<div style="font-weight:700;margin:10px 0 4px;font-size:13px">'+title+'</div><table style="width:100%;border-collapse:collapse;font-size:12.5px">'+arr.map(function(r){return '<tr><td style="border:1px solid #bbb;padding:4px 7px;width:50%;color:#444">'+r[0]+'</td><td style="border:1px solid #bbb;padding:4px 7px;font-weight:600">'+r[1]+'</td></tr>';}).join('')+'</table>';};
+  var doc='<div id="pqr_print" style="background:#fff;color:#111;border:1px solid #ccc;border-radius:8px;padding:16px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:6px"><b style="font-size:15px">PROCEDURE QUALIFICATION RECORD (PQR / WPQR)</b><span style="font-size:12px;color:#444">'+today+'</span></div>'
+    +tbl('① THÔNG SỐ HÀN / WELDING PARAMETERS',rows)
+    +tbl('② KẾT QUẢ THỬ / TEST RESULTS',res)
+    +tbl('③ PHẠM VI PHÊ DUYỆT / RANGE OF APPROVAL ('+codeName+')',appr)
+    +'<p style="font-size:11px;color:#666;margin-top:8px">Tham khảo theo '+codeName+' — phạm vi tính tự động; kỹ sư hàn (IWE/IWT) phải duyệt & ký. / Indicative; a welding engineer must approve & sign.</p></div>';
+  document.getElementById('pqr_doc').innerHTML=doc;
+  document.getElementById('p_print').style.display='';
+}
+function printPQR(){
+  var el=document.getElementById('pqr_print'); if(!el)return;
+  var w=window.open('','_blank'); if(!w){alert('Cho phép pop-up để in.');return;}
+  w.document.write('<html><head><title>PQR</title><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;margin:16px">'+el.outerHTML+'</body></html>');
+  w.document.close(); w.focus(); setTimeout(function(){w.print();},300);
+}
+
+/* ---------- premium tool HTML ---------- */
+function premiumLockHTML(){
+  return '<div class="card" style="border-color:rgba(255,122,51,.45)">'
+    +'<h3>🔒 '+bili('Công cụ Premium','Premium tools')+' — '+CONFIG.premiumName+'</h3>'
+    +'<p class="muted" style="font-size:13px">'+bili('Mở khóa công cụ chuyên sâu cho thanh tra/kỹ sư hàn:','Unlock pro tools for inspectors/engineers:')+'</p>'
+    +'<ul class="lesson">'
+    +'<li>👷 '+bili('<b>Tính phạm vi qualify thợ</b> — ISO 9606-1 & ASME IX: độ dày, đường kính, vị trí.','<b>Welder qualification range</b> — ISO 9606-1 & ASME IX.')+'</li>'
+    +'<li>🧰 '+bili('<b>Tạo PQR/WPQR</b> — nhập kết quả thử, tự tính phạm vi phê duyệt, in hồ sơ.','<b>PQR/WPQR builder</b> — test results + auto range of approval, printable.')+'</li>'
+    +'<li>📝 '+bili('<b>Tư vấn WPS</b> — gợi ý tiền nhiệt & nhiệt đầu vào (bản cơ bản đã có ở trên).','<b>WPS consulting</b> — preheat & heat-input hints.')+'</li>'
+    +'</ul>'
+    +'<div class="row" style="justify-content:flex-start;margin-top:6px"><button class="btn" onclick="go(\'profile\')">⭐ '+bili('Nâng cấp / Nhập mã','Upgrade / Enter code')+' ('+fmtPrice()+')</button></div>'
+    +'<p class="muted" style="font-size:11px;margin-top:8px">'+bili('Tính theo tiêu chuẩn nhưng mang tính tham khảo — kỹ sư hàn phải duyệt hồ sơ cuối.','Per the standards but indicative — a welding engineer must approve final records.')+'</p>'
+    +'</div>';
+}
+function premiumToolsHTML(){
+  return '<div class="card" style="border-color:rgba(52,199,89,.35)">'
+    +'<h3>⭐ '+bili('Công cụ Premium đã mở khóa','Premium tools unlocked')+'</h3>'
+    +'<p class="muted" style="font-size:12px">'+bili('Theo ISO 9606-1 / ISO 15614-1 / ASME IX — THAM KHẢO; kỹ sư hàn phải duyệt.','Per ISO 9606-1 / ISO 15614-1 / ASME IX — indicative; engineer must approve.')+'</p></div>'
+    +'<div class="card"><h3>👷 '+bili('Tính phạm vi qualify thợ hàn','Welder qualification range')+'</h3>'
+    +'<div class="tool-grid">'
+    +'<label>'+bili('Hệ tiêu chuẩn','System')+'<select id="q_sys" onchange="buildQualPositions();calcQual()"><option value="iso">ISO 9606-1</option><option value="asme">ASME IX</option></select></label>'
+    +'<label>'+bili('Dạng mẫu','Coupon')+'<select id="q_form" onchange="buildQualPositions();calcQual()"><option value="plate">'+bili('Tấm','Plate')+'</option><option value="pipe">'+bili('Ống','Pipe')+'</option></select></label>'
+    +'<label>'+bili('Loại mối hàn','Weld type')+'<select id="q_weld" onchange="buildQualPositions();calcQual()"><option value="butt">'+bili('Giáp mép (BW)','Butt')+'</option><option value="fillet">'+bili('Góc (FW)','Fillet')+'</option></select></label>'
+    +'<label>'+bili('Chiều dày mẫu t','Test thk t')+' (mm)<input type="number" min="0" step="0.5" id="q_t" value="10" oninput="calcQual()"></label>'
+    +'<label id="q_dlbl">'+bili('Đường kính ngoài D','Outside dia D')+' (mm)<input type="number" min="0" step="1" id="q_d" value="168" oninput="calcQual()"></label>'
+    +'<label>'+bili('Vị trí thi','Test position')+'<select id="q_pos" onchange="calcQual()"></select></label>'
+    +'</div><div id="qual_out" class="tool-out">—</div></div>'
+    +'<div class="card"><h3>🧰 '+bili('Tạo PQR / WPQR','PQR / WPQR builder')+'</h3>'
+    +'<p class="muted" style="font-size:12px">'+bili('Nhập thông số + kết quả thử → tự tính phạm vi phê duyệt & in hồ sơ.','Enter parameters + test results → auto range of approval & printable.')+'</p>'
+    +'<div class="tool-grid">'
+    +'<label>'+bili('Công ty','Company')+'<input id="p_co" placeholder="—"></label>'
+    +'<label>'+bili('Số PQR','PQR No.')+'<input id="p_no" placeholder="PQR-001"></label>'
+    +'<label>'+bili('Tiêu chuẩn','Code')+'<select id="p_code"><option value="iso">ISO 15614-1</option><option value="asme">ASME IX</option></select></label>'
+    +'<label>'+bili('Quá trình','Process')+'<select id="p_proc"><option>111 MMA</option><option>135 MAG</option><option>136 FCAW</option><option>141 TIG</option><option>121 SAW</option></select></label>'
+    +'<label>'+bili('Dạng mẫu','Coupon')+'<select id="p_form"><option value="plate">'+bili('Tấm','Plate')+'</option><option value="pipe">'+bili('Ống','Pipe')+'</option></select></label>'
+    +'<label>'+bili('Số lớp','Runs')+'<select id="p_runs"><option value="multi">'+bili('Nhiều lớp','Multi-run')+'</option><option value="single">'+bili('Một lớp','Single-run')+'</option></select></label>'
+    +'<label>'+bili('Vật liệu nền','Base metal')+'<input id="p_base" placeholder="S355 / P-No.1"></label>'
+    +'<label>'+bili('Chiều dày t','Thickness t')+' (mm)<input id="p_t" value="12"></label>'
+    +'<label>'+bili('Đường kính D','Diameter D')+' (mm)<input id="p_d" placeholder="—"></label>'
+    +'<label>'+bili('Que/dây','Filler')+'<input id="p_fill" value="E7018 / FM1"></label>'
+    +'<label>'+bili('Vị trí','Position')+'<input id="p_pos" value="PF / 3G"></label>'
+    +'<label>'+bili('Tiền nhiệt','Preheat')+' (°C)<input id="p_pre" value="100"></label>'
+    +'<label>Interpass max (°C)<input id="p_inter" value="250"></label>'
+    +'<label>PWHT<input id="p_pwht" placeholder="—"></label>'
+    +'<label>'+bili('Dòng','Amps')+' (A)<input id="p_amp" value="160"></label>'
+    +'<label>'+bili('Điện áp','Volts')+' (V)<input id="p_volt" value="23"></label>'
+    +'<label>'+bili('Tốc độ','Travel')+' (mm/'+bili('ph','min')+')<input id="p_spd" value="180"></label>'
+    +'</div>'
+    +'<h4 style="color:var(--accent2);font-size:13px;margin:12px 0 2px">'+bili('Kết quả thử (DT/NDT)','Test results')+'</h4>'
+    +'<div class="tool-grid">'
+    +'<label>'+bili('Kéo Rm','Tensile Rm')+' (MPa)<input id="p_ts" placeholder="≥510"></label>'
+    +'<label>'+bili('Vị trí đứt','Fracture')+'<input id="p_tf" placeholder="'+bili('Nền','Base')+'"></label>'
+    +'<label>'+bili('Uốn','Bend')+'<select id="p_bend"><option>'+bili('Đạt','Accept')+'</option><option>'+bili('Không đạt','Reject')+'</option></select></label>'
+    +'<label>'+bili('Charpy','Charpy')+' (J)<input id="p_cv" placeholder="60 @ -20°C"></label>'
+    +'<label>'+bili('Độ cứng max','Hardness max')+' (HV)<input id="p_hv" placeholder="≤350"></label>'
+    +'<label>Macro<select id="p_macro"><option>'+bili('Đạt','Accept')+'</option><option>'+bili('Không đạt','Reject')+'</option></select></label>'
+    +'<label>VT/RT/UT<select id="p_ndt"><option>'+bili('Đạt','Accept')+'</option><option>'+bili('Không đạt','Reject')+'</option></select></label>'
+    +'</div>'
+    +'<div class="row" style="margin-top:10px;gap:8px;justify-content:flex-start"><button class="btn" onclick="genPQR()">'+bili('Tạo PQR','Generate PQR')+'</button>'
+    +'<button class="btn sec" id="p_print" onclick="printPQR()" style="display:none">🖨️ '+bili('In / Lưu PDF','Print / Save PDF')+'</button></div>'
+    +'<div id="pqr_doc" style="margin-top:10px"></div></div>';
+}
+
+/* ---------- override renderTools (wrap) ---------- */
+var _origRenderTools = (typeof renderTools==='function') ? renderTools : function(){};
+renderTools = function(){
+  _origRenderTools();
+  var host=document.getElementById('v-tools'); if(!host)return;
+  var div=document.createElement('div');
+  div.innerHTML = isPremium() ? premiumToolsHTML() : premiumLockHTML();
+  host.appendChild(div);
+  if(isPremium()){ try{ buildQualPositions(); calcQual(); }catch(e){} }
+};
+
+/* ---------- profile premium card + history ---------- */
+function examHistoryHTML(){
+  var u=_curUser(); var h=(u.history&&u.history.length)?u.history:[];
+  if(!h.length) return '<div class="card"><h3>📈 '+bili('Lịch sử thi thử','Mock-exam history')+'</h3><p class="muted" style="font-size:13px">'+bili('Chưa có lượt thi. Vào tab Quiz làm một đề có giờ để bắt đầu ghi điểm.','No attempts yet. Take a timed quiz to start logging scores.')+'</p></div>';
+  return '<div class="card"><h3>📈 '+bili('Lịch sử thi thử','Mock-exam history')+'</h3>'
+    +'<div class="tbl-wrap"><table class="deep-tbl"><thead><tr><th>'+bili('Ngày','Date')+'</th><th>'+bili('Bộ đề','Set')+'</th><th>'+bili('Điểm','Score')+'</th><th>%</th></tr></thead><tbody>'
+    +h.map(function(r){return '<tr><td>'+r.d+'</td><td>'+(r.label||'-')+'</td><td>'+r.s+'/'+r.t+'</td><td style="color:'+(r.p>=70?'var(--green)':'var(--red)')+';font-weight:700">'+r.p+'%</td></tr>';}).join('')
+    +'</tbody></table></div></div>';
+}
+function premiumCardHTML(){
+  if(isPremium()){
+    return '<div class="card" style="border-color:rgba(52,199,89,.4)">'
+      +'<h3>⭐ '+CONFIG.premiumName+' — <span style="color:var(--green)">'+bili('Đã kích hoạt','Active')+'</span></h3>'
+      +'<p class="muted" style="font-size:13px">'+bili('Hiệu lực','Valid')+': <b>'+premiumExpiryText()+'</b> · '+bili('cho','for')+' <b>'+_esc(_curUser().name)+'</b></p>'
+      +'<p class="muted" style="font-size:13px;margin-top:6px">'+bili('Đã mở khóa toàn bộ công cụ Premium ở tab 🛠️ Công cụ.','All premium tools unlocked in the 🛠️ Tools tab.')+'</p></div>';
+  }
+  var qr=vietQRUrl();
+  var pay = qr
+    ? '<div style="text-align:center;margin-top:10px"><img src="'+qr+'" alt="QR" style="width:210px;max-width:80%;border-radius:12px;background:#fff;padding:6px"><div class="muted" style="font-size:12px;margin-top:4px">'+bili('Quét QR để chuyển khoản','Scan to pay')+' · '+CONFIG.bankCode+' '+CONFIG.accountNo+(CONFIG.accountName?' · '+CONFIG.accountName:'')+'</div></div>'
+    : '<p class="muted" style="font-size:13px;margin-top:8px">'+bili('Liên hệ để thanh toán & nhận mã','Contact to pay & get a code')+': <b>'+(CONFIG.contactEmail||'')+'</b>'+(CONFIG.contactZalo?' · Zalo '+CONFIG.contactZalo:'')+'</p>';
+  return '<div class="card" style="border-color:rgba(255,122,51,.45)">'
+    +'<h3>⭐ '+CONFIG.premiumName+' — <span class="muted">'+bili('Nâng cấp','Upgrade')+'</span></h3>'
+    +'<div style="font-size:24px;font-weight:800;color:var(--accent)">'+fmtPrice()+'</div>'
+    +'<p class="muted" style="font-size:13px;margin-top:4px">'+CONFIG.planNote+'</p>'
+    +'<ul class="lesson" style="margin-top:6px">'
+    +'<li>👷 '+bili('Tính phạm vi qualify thợ (ISO 9606-1 & ASME IX)','Welder qualification range')+'</li>'
+    +'<li>🧰 '+bili('Tạo PQR/WPQR có kết quả thử & phạm vi phê duyệt','PQR/WPQR with test results & range of approval')+'</li>'
+    +'<li>📝 '+bili('Tư vấn WPS, gợi ý tiền nhiệt & nhiệt đầu vào','WPS consulting, preheat & heat-input hints')+'</li>'
+    +'</ul>'
+    +'<div style="background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px">'
+    +'<b style="font-size:14px">'+bili('Cách kích hoạt','How to activate')+'</b>'
+    +'<ol class="muted" style="font-size:13px;margin:6px 0 0 18px;line-height:1.7">'
+    +'<li>'+bili('Đảm bảo đã nhập đúng <b>Họ tên</b> ở trên.','Make sure your <b>name</b> above is correct.')+'</li>'
+    +'<li>'+bili('Chuyển khoản theo QR/thông tin bên dưới.','Pay via the QR/info below.')+'</li>'
+    +'<li>'+bili('Gửi tên + biên lai cho người bán để nhận <b>mã</b>.','Send name + receipt to get a <b>code</b>.')+'</li>'
+    +'<li>'+bili('Dán mã vào ô dưới rồi bấm Kích hoạt.','Paste the code and tap Activate.')+'</li></ol>'
+    +pay
+    +'<div class="tool-grid" style="margin-top:12px;grid-template-columns:1fr"><label>'+bili('Mã kích hoạt','Activation code')+'<input id="act_code" placeholder="CSWIP-L-XXXXXXX"></label></div>'
+    +'<div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" onclick="doActivate()">🔓 '+bili('Kích hoạt','Activate')+'</button></div>'
+    +'<div id="act_msg" style="margin-top:8px;font-size:13px"></div>'
+    +'</div></div>';
+}
+function doActivate(){
+  var c=(document.getElementById('act_code')||{}).value||'';
+  var r=applyCode(c);
+  var m=document.getElementById('act_msg');
+  if(m) m.innerHTML='<span style="color:'+(r.ok?'var(--green)':'var(--red)')+'">'+r.msg+'</span>';
+  if(r.ok) setTimeout(function(){renderProfile();},900);
+}
+
+/* ---------- override renderProfile ---------- */
+renderProfile = function(){
+  var s=_scoreStats(); var u=_curUser();
+  document.getElementById('v-profile').innerHTML=
+    '<div class="card"><h2>👤 '+bili('Hồ sơ học viên','Learner profile')+'</h2>'
+    +'<p class="muted" style="font-size:13px">'+bili('Ghi tên để app chấm điểm theo bạn. Dữ liệu lưu trên máy bạn (riêng tư).','Enter your name so the app scores you. Stored privately on your device.')+'</p>'
+    +'<div class="tool-grid">'
+    +'<label>'+bili('Họ tên','Full name')+'<input id="u_name" value="'+_esc(u.name)+'" oninput="saveUserField(\'name\',this.value)"></label>'
+    +'<label>'+bili('Đơn vị','Company')+'<input id="u_org" value="'+_esc(u.org)+'" oninput="saveUserField(\'org\',this.value)"></label>'
+    +'<label>Email/SĐT<input id="u_contact" value="'+_esc(u.contact)+'" oninput="saveUserField(\'contact\',this.value)"></label>'
+    +'</div></div>'
+    +'<div class="card"><h3>📊 '+bili('Bảng điểm','Scorecard')+'</h3>'
+    +'<div class="score-grid">'
+    +'<div class="score-cell"><b>'+s.done+'/'+s.total+'</b><span>'+bili('Chương xong','Chapters')+'</span></div>'
+    +'<div class="score-cell"><b>'+s.correct+'/'+s.ans+'</b><span>'+bili('Quiz đúng/đã làm','Quiz correct/done')+'</span></div>'
+    +'<div class="score-cell"><b style="color:'+(s.pct>=70?'var(--green)':'var(--accent)')+'">'+s.pct+'%</b><span>'+bili('Tỉ lệ đúng','Accuracy')+'</span></div>'
+    +'</div>'
+    +'<p class="muted" style="font-size:12px;margin-top:6px">'+(s.pct>=70?'✅ '+bili('Đạt mốc 70% (mô phỏng)','Meets the 70% mark (mock)'):bili('Cần ≥70% để đạt mốc thi.','Aim for ≥70%.'))+'</p>'
+    +'<div class="row" style="margin-top:10px;gap:8px;justify-content:flex-start">'
+    +'<button class="btn" onclick="printScorecard()">🖨️ '+bili('In bảng điểm','Print scorecard')+'</button>'
+    +'<button class="btn sec" onclick="resetProgress()">'+bili('Đặt lại tiến độ','Reset progress')+'</button>'
+    +'</div></div>'
+    + examHistoryHTML()
+    + premiumCardHTML();
+};
+
+/* ---------- wrap renderQuiz to log mock-exam scores ---------- */
+var _origRenderQuiz = (typeof renderQuiz==='function') ? renderQuiz : function(){};
+renderQuiz = function(){
+  try{
+    if(typeof Qmode!=='undefined' && Qmode!=='menu' && typeof Qi!=='undefined' && Qi>=Qz.length && Qsource && !Qsource._logged && Qz.length){
+      logExam(Qscore, Qz.length, Qsource.label||'Quiz'); Qsource._logged=true;
+    }
+  }catch(e){}
+  return _origRenderQuiz.apply(this, arguments);
+};
+
+/* ---------- first-run registration ---------- */
+try{ maybeRegister(); }catch(e){}
