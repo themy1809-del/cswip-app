@@ -216,6 +216,7 @@ footer{margin-top:auto}
 <script src="data.js"></script>
 <script src="bank.js"></script>
 <script src="realbank.js"></script>
+<script src="cwibank.js"></script>
 <script>
 /* ====== APP LOGIC ====== */
 let LANG = localStorage.getItem('cswip_lang')||'both';
@@ -362,7 +363,8 @@ function normBank(q,id){return {qv:q.qv,qe:q.q,ov:q.ov,oe:q.o,a:q.a,ev:q.ev||'',
 function poolChapters(){let a=[];DATA.chapters.forEach((c,ci)=>c.quiz.forEach((q,qi)=>a.push(normChap(q,'c'+ci+'-'+qi,c.vi))));return a;}
 function poolBank(){return (typeof BANK!=='undefined')?BANK.map((q,i)=>normBank(q,'b'+i)):[];}
 function poolReal(){return (typeof REALBANK!=='undefined')?REALBANK.map((q,i)=>normBank(q,'r'+i)):[];}
-function poolAll(){return poolChapters().concat(poolBank()).concat(poolReal());}
+function poolCWI(){return (typeof CWIBANK!=='undefined')?CWIBANK.map((q,i)=>normBank(q,'w'+i)):[];}
+function poolAll(){return poolChapters().concat(poolBank()).concat(poolReal()).concat(poolCWI());}
 function bankCats(){const s={};poolBank().forEach(q=>s[q.cat]=(s[q.cat]||0)+1);return s;}
 function shuffle(a){return a.sort(()=>Math.random()-0.5);}
 
@@ -377,6 +379,7 @@ function startChap(ci){startSet(poolChapters().filter(q=>q.id.startsWith('c'+ci+
 function startCat(cat){startSet(poolBank().filter(q=>q.cat===cat),0);}
 function startFullMock(){startSet(poolAll(),0,'Full');}
 function startReal(){startSet(poolReal(),0,'Real');}
+function startCWI(){startSet(poolCWI(),0,'CWI');}
 function startTimed(n,mins){let p=shuffle(poolAll().slice()).slice(0,n);startSet(p,mins*60,'Timed');}
 function tick(){QtimedSecs--;const t=document.getElementById('timer');if(t){t.textContent=fmt(QtimedSecs);t.classList.toggle('warn2',QtimedSecs<=60);}if(QtimedSecs<=0){clearInterval(QTIMER);QTIMER=null;Qi=Qz.length;renderQuiz();}}
 function fmt(s){s=Math.max(0,s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
@@ -400,6 +403,7 @@ function renderQuiz(){
     <div class="card"><h3>★ ${bili('Luyện tập (hiện đáp án ngay)','Practice (instant feedback)')}</h3>
       <div class="chap-list" style="margin-top:8px">
         <div class="chap" onclick="startReal()"><div class="num">🎯</div><div class="meta"><b>${bili('Đề thật CÓ ĐÁP ÁN','Real exam WITH answers')}</b><div class="muted" style="font-size:12px">${poolReal().length} ${bili('câu từ practice paper, đã chấm đáp án','real questions, answer-keyed')}</div></div></div>
+        <div class="chap" onclick="startCWI()"><div class="num">🇺🇸</div><div class="meta"><b>${bili('Đề CWI (AWS) — có đáp án','CWI exam bank (AWS)')}</b><div class="muted" style="font-size:12px">${typeof poolCWI==='function'?poolCWI().length:0} ${bili('câu từ "1001 Q&A for CWI", đáp án gốc','questions from 1001 Q&A, answer-keyed')}</div></div></div>
         <div class="chap" onclick="startFullMock()"><div class="num">∑</div><div class="meta"><b>${bili('Tất cả ngân hàng','Whole bank')}</b><div class="muted" style="font-size:12px">${poolAll().length} ${bili('câu, trộn ngẫu nhiên','questions shuffled')}</div></div></div>
       </div>
     </div>
