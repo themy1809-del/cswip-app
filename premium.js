@@ -181,7 +181,7 @@ function premiumToolsHTML(){
     +'<h4 style="color:var(--accent2);font-size:13px;margin:12px 0 2px">'+bili('Kết quả thử (DT/NDT)','Test results')+'</h4>'
     +'<div class="tool-grid">'
     +'<label>'+bili('Kéo Rm','Tensile Rm')+' (MPa)<input id="p_ts" placeholder="≥510"></label>'
-    +'<label>'+bili('Vị trí đứt','Fracture')+'<input id="p_tf" placeholder="'+bili('Nền','Base')+'"></label>'
+    +'<label>'+bili('Vị trí đứt','Fracture')+'<input id="p_tf" placeholder="Nền / Base"></label>'
     +'<label>'+bili('Uốn','Bend')+'<select id="p_bend"><option>'+bili('Đạt','Accept')+'</option><option>'+bili('Không đạt','Reject')+'</option></select></label>'
     +'<label>'+bili('Charpy','Charpy')+' (J)<input id="p_cv" placeholder="60 @ -20°C"></label>'
     +'<label>'+bili('Độ cứng max','Hardness max')+' (HV)<input id="p_hv" placeholder="≤350"></label>'
