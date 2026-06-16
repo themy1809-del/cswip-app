@@ -7,6 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0e17">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CSWIP 3.1">
 <style>
 :root{
   --bg:#0a0e17; --panel:#141b29; --panel2:#1b2334; --line:#2a3550;
@@ -223,6 +229,7 @@ let LANG = localStorage.getItem('cswip_lang')||'both';
 let PROG = JSON.parse(localStorage.getItem('cswip_prog')||'{}'); // {chapIndex:true}
 let QUIZSTATE = JSON.parse(localStorage.getItem('cswip_quiz')||'{}');
 let USER = JSON.parse(localStorage.getItem('cswip_user')||'{}');
+let SRS = JSON.parse(localStorage.getItem('cswip_srs')||'{}');
 
 function save(){localStorage.setItem('cswip_prog',JSON.stringify(PROG));localStorage.setItem('cswip_quiz',JSON.stringify(QUIZSTATE));}
 function setLang(l){LANG=l;localStorage.setItem('cswip_lang',l);
@@ -380,6 +387,12 @@ function startCat(cat){startSet(poolBank().filter(q=>q.cat===cat),0);}
 function startFullMock(){startSet(poolAll(),0,'Full');}
 function startReal(){startSet(poolReal(),0,'Real');}
 function startCWI(){startSet(poolCWI(),0,'CWI');}
+function saveSRS(){localStorage.setItem('cswip_srs',JSON.stringify(SRS));}
+function srsUpdate(id,right){if(!id)return;const now=Date.now(),day=86400000;let s=SRS[id]||{intv:0,reps:0};if(right){s.reps=(s.reps||0)+1;s.intv=s.intv?Math.min(Math.round(s.intv*2.3),150):1;s.due=now+s.intv*day;}else{s.reps=0;s.intv=0;s.due=now+600000;}SRS[id]=s;saveSRS();}
+function _dueCount(){const now=Date.now();return poolAll().filter(q=>q.id&&SRS[q.id]&&SRS[q.id].due<=now).length;}
+function startSmart(){const now=Date.now();const all=poolAll();const due=all.filter(q=>q.id&&SRS[q.id]&&SRS[q.id].due<=now).sort((a,b)=>SRS[a.id].due-SRS[b.id].due);const wrong=shuffle(all.filter(q=>q.id&&QUIZSTATE[q.id]&&!QUIZSTATE[q.id].correct&&!(SRS[q.id]&&SRS[q.id].due>now)));const fresh=shuffle(all.filter(q=>q.id&&!SRS[q.id]&&!QUIZSTATE[q.id]));const seen={};let set=[];due.concat(wrong,fresh).forEach(q=>{if(!seen[q.id]){seen[q.id]=1;set.push(q);}});set=set.slice(0,20);if(!set.length)set=shuffle(all.slice()).slice(0,20);startSet(set,0,'Smart');}
+function startWeak(){const acc={};poolAll().forEach(q=>{if(q.id&&QUIZSTATE[q.id]){const c=q.cat||'?';acc[c]=acc[c]||{n:0,k:0};acc[c].n++;if(QUIZSTATE[q.id].correct)acc[c].k++;}});const weak=new Set(Object.keys(acc).filter(c=>acc[c].n>=2&&acc[c].k/acc[c].n<0.7));let set;if(weak.size){set=poolAll().filter(q=>weak.has(q.cat||'?'));set.sort((a,b)=>{const wa=QUIZSTATE[a.id]&&!QUIZSTATE[a.id].correct?0:(QUIZSTATE[a.id]?2:1);const wb=QUIZSTATE[b.id]&&!QUIZSTATE[b.id].correct?0:(QUIZSTATE[b.id]?2:1);return wa-wb;});set=shuffle(set.slice(0,40)).slice(0,20);}else{set=shuffle(poolAll().filter(q=>q.id&&QUIZSTATE[q.id]&&!QUIZSTATE[q.id].correct));set=set.length>=10?set.slice(0,20):shuffle(poolAll().slice()).slice(0,20);}startSet(set,0,'Weak');}
+function _topicBreak(){if(!Qz||!Qz.length)return '';const t={};Qz.forEach((q,i)=>{const c=q.cat||'?';t[c]=t[c]||{n:0,k:0};t[c].n++;if(Qanswers[i]===q.a)t[c].k++;});const cats=Object.keys(t);if(cats.length<2)return '';const rows=cats.sort((a,b)=>(t[a].k/t[a].n)-(t[b].k/t[b].n)).map(c=>{const p=Math.round(t[c].k/t[c].n*100);return '<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--line)"><span>'+c+'</span><span style="color:'+(p>=70?'var(--green)':'var(--accent)')+'">'+t[c].k+'/'+t[c].n+' ('+p+'%)</span></div>';}).join('');return '<div class="card"><h3>📊 '+bili('Phân tích theo chủ đề','By-topic breakdown')+'</h3>'+rows+'</div>';}
 function startTimed(n,mins){let p=shuffle(poolAll().slice()).slice(0,n);startSet(p,mins*60,'Timed');}
 function tick(){QtimedSecs--;const t=document.getElementById('timer');if(t){t.textContent=fmt(QtimedSecs);t.classList.toggle('warn2',QtimedSecs<=60);}if(QtimedSecs<=0){clearInterval(QTIMER);QTIMER=null;Qi=Qz.length;renderQuiz();}}
 function fmt(s){s=Math.max(0,s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
@@ -391,6 +404,13 @@ function renderQuiz(){
     el.innerHTML=`
     <div class="card"><h2>📝 ${bili('Luyện tập & Thi thử','Practice & Mock exam')}</h2>
       <p class="muted">${bili('Tổng ngân hàng: '+poolAll().length+' câu (đề thật + giáo trình WIS5). Đề thi thật bằng tiếng Anh — bấm nút EN để luyện sát đề.','Bank: '+poolAll().length+' questions. Real exam is in English — use EN mode.')}</p>
+    </div>
+    <div class="card"><h3>🧠 ${bili('Học thông minh','Smart study')}</h3>
+      <p class="muted" style="font-size:12px">${bili('Ôn lại theo lịch ngắt quãng (spaced repetition) & tập trung vào phần bạn hay sai.','Spaced-repetition review focused on what you get wrong.')}</p>
+      <div class="row" style="justify-content:flex-start;margin-top:8px;gap:8px">
+        <button class="btn" onclick="startSmart()">🔁 ${bili('Ôn ngắt quãng','Smart review')}${_dueCount()?' ('+_dueCount()+')':''}</button>
+        <button class="btn sec" onclick="startWeak()">🎯 ${bili('Luyện điểm yếu','Weak spots')}</button>
+      </div>
     </div>
     <div class="card"><h3>⏱️ ${bili('Thi thử có giờ (mô phỏng đề thật)','Timed mock exam')}</h3>
       <div class="row" style="justify-content:flex-start;margin-top:6px">
@@ -436,7 +456,7 @@ function renderQuiz(){
       <div class="stat" style="margin-top:14px"><div class="b"><b>${Qscore}/${Qz.length}</b><span>${bili('Đúng','Correct')}</span></div>
       <div class="b" style="grid-column:span 2"><b style="color:${pct>=70?'var(--green)':'var(--red)'}">${pct}%</b><span>${pct>=70?bili('ĐẠT (≥70%)','PASS'):bili('Chưa đạt — ôn lại','Below pass')}</span></div></div>
       <div class="row" style="margin-top:16px"><button class="btn" onclick="startSet(Qsource.pool,${Qmode==='timed'?_timedOrig:0})">🔁 ${bili('Làm lại','Retry')}</button><button class="btn sec" onclick="quizMenu()">${bili('Về menu','Menu')}</button></div>
-    </div>`+review;
+    </div>`+_topicBreak()+review;
     return;
   }
   const q=Qz[Qi];
@@ -451,7 +471,7 @@ function renderQuiz(){
 function answer(oi){
   const q=Qz[Qi];Qanswers[Qi]=oi;
   const right=oi===q.a;if(right)Qscore++;
-  if(q.id)QUIZSTATE[q.id]={correct:right};save();
+  if(q.id){QUIZSTATE[q.id]={correct:right};srsUpdate(q.id,right);}save();
   if(Qmode==='timed'){Qi++;renderQuiz();return;}
   const opts=document.querySelectorAll('#opts .opt');
   opts.forEach((b,i)=>{b.classList.add('disabled');if(i===q.a)b.classList.add('correct');if(i===oi&&oi!==q.a)b.classList.add('wrong');});
@@ -707,6 +727,7 @@ function renderAll(){
   if(CUR==='profile')renderProfile();
 }
 buildNav();setLang(LANG);go('home');
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
 </script>
 </body>
 </html>
