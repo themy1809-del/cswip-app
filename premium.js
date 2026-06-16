@@ -358,3 +358,77 @@ function _quizLockView(){ var el=document.getElementById('v-quiz'); if(el) el.in
 
 /* ---------- first-run registration ---------- */
 try{ maybeRegister(); }catch(e){}
+
+/* ================= TRỢ LÝ HỎI ĐÁP NỔI (góc phải) ================= */
+(function(){
+  function aNorm(s){return (s||'').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'d').toLowerCase();}
+  function aEsc(s){return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  var KB=[];
+  try{
+    DATA.chapters.forEach(function(c,ci){
+      (c.lessons||[]).forEach(function(L){ KB.push({ci:ci,t:'lesson',term:(L.t_vi||'')+' / '+(L.t_en||''),vi:L.vi,en:L.en,text:aNorm((L.t_vi||'')+' '+(L.t_en||'')+' '+(L.vi||'')+' '+(L.en||''))}); });
+      (c.key||[]).forEach(function(k){ KB.push({ci:ci,t:'key',term:'🔑 '+bili('Điểm cần nhớ','Key point'),vi:k.vi,en:k.en,text:aNorm((k.vi||'')+' '+(k.en||''))}); });
+      (c.quiz||[]).forEach(function(q){ if(q&&q.exp) KB.push({ci:ci,t:'quiz',term:(q.vi||'')+' / '+(q.en||''),vi:q.exp.vi,en:q.exp.en,text:aNorm((q.vi||'')+' '+(q.en||'')+' '+(q.exp.vi||'')+' '+(q.exp.en||''))}); });
+    });
+  }catch(e){}
+  function aSearch(query){
+    var words=aNorm(query).split(/[^a-z0-9]+/).filter(function(w){return w.length>=2;});
+    if(!words.length) return [];
+    var scored=[];
+    KB.forEach(function(it){ var s=0; words.forEach(function(w){ if(it.text.indexOf(w)>=0)s++; if(aNorm(it.term).indexOf(w)>=0)s++; }); if(s>0)scored.push({it:it,s:s}); });
+    scored.sort(function(a,b){return b.s-a.s;});
+    return scored.slice(0,3).map(function(x){return x.it;});
+  }
+  function chName(ci){ return (DATA.chapters[ci]&&DATA.chapters[ci].vi)||('Chương '+(ci+1)); }
+  function answerHTML(query){
+    var hits=aSearch(query);
+    if(!hits.length) return '<div class="ai-bot">'+bili('Mình chưa thấy trong bài học 🤔. Bấm <b>Hỏi ChatGPT</b> bên dưới để hỏi sâu hơn nhé.','Not in the lessons. Tap <b>Ask ChatGPT</b> below for more.')+'</div>';
+    return hits.map(function(it){
+      var locked=(typeof chapFree==='function')?!chapFree(it.ci):false;
+      var head='<div class="ai-src">📘 '+bili('Chương','Ch.')+' '+(it.ci+1)+' — '+aEsc(chName(it.ci))+(it.t==='quiz'?' · quiz':'')+'</div>';
+      if(locked) return '<div class="ai-bot">'+head+'<div><b>'+aEsc(it.term)+'</b></div><div class="ai-lock">🔒 '+bili('Câu trả lời nằm trong chương PRO. Mở khóa để xem đầy đủ.','Answer is in a PRO chapter. Unlock to view.')+'</div><button class="ai-unlock" onclick="(document.getElementById(\'ai-panel\').classList.remove(\'on\'));go(\'profile\')">⭐ '+bili('Mở khóa','Unlock')+' '+fmtPrice()+'</button></div>';
+      return '<div class="ai-bot">'+head+'<div style="font-weight:700;margin-bottom:3px">'+aEsc(it.term)+'</div><div>'+bili(aEsc(it.vi),aEsc(it.en))+'</div></div>';
+    }).join('');
+  }
+  var css='#ai-fab{position:fixed;right:18px;bottom:18px;z-index:150;width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#4ca8ff,#2f7fe0);color:#fff;font-size:24px;box-shadow:0 8px 24px rgba(76,168,255,.45);transition:.2s}'
+   +'#ai-fab:hover{transform:scale(1.06)}'
+   +'#ai-panel{position:fixed;right:18px;bottom:84px;z-index:150;width:min(370px,92vw);max-height:72vh;display:none;flex-direction:column;background:#0e1622;border:1px solid rgba(255,255,255,.14);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.55);overflow:hidden}'
+   +'#ai-panel.on{display:flex}'
+   +'.ai-head{padding:12px 14px;background:linear-gradient(135deg,#1a2738,#101a26);font-weight:800;display:flex;justify-content:space-between;align-items:center;color:#eaeff7;font-size:15px}'
+   +'.ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;font-size:14px;color:#eaeff7;line-height:1.5}'
+   +'.ai-bot{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px}'
+   +'.ai-me{align-self:flex-end;background:linear-gradient(135deg,#4ca8ff,#2f7fe0);color:#06121f;border-radius:12px;padding:8px 12px;font-weight:600;max-width:85%}'
+   +'.ai-src{font-size:11px;color:#94a3bb;margin-bottom:4px}'
+   +'.ai-lock{color:#ffb15a;font-size:13px;margin-top:4px}'
+   +'.ai-unlock{margin-top:7px;background:linear-gradient(135deg,#ff7a33,#ff5a1f);border:none;color:#1a1206;font-weight:700;border-radius:8px;padding:6px 11px;cursor:pointer;font-size:13px}'
+   +'.ai-in{display:flex;gap:6px;padding:10px;border-top:1px solid rgba(255,255,255,.1)}'
+   +'.ai-in input{flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#eaeff7;padding:9px;font-size:14px}'
+   +'.ai-in button{background:#4ca8ff;border:none;color:#06121f;font-weight:700;border-radius:10px;padding:0 14px;cursor:pointer}'
+   +'.ai-gpt{margin:0 10px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#eaeff7;border-radius:10px;padding:9px;cursor:pointer;font-size:13px;font-weight:600}';
+  function build(){
+    if(document.getElementById('ai-fab')) return;
+    var st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
+    var fab=document.createElement('button'); fab.id='ai-fab'; fab.innerHTML='💬'; fab.setAttribute('aria-label','Trợ lý hỏi đáp');
+    var panel=document.createElement('div'); panel.id='ai-panel';
+    panel.innerHTML='<div class="ai-head"><span>🤖 '+bili('Trợ lý CSWIP','CSWIP assistant')+'</span><span style="cursor:pointer;font-size:18px" id="ai-x">✕</span></div>'
+      +'<div class="ai-msgs" id="ai-msgs"></div>'
+      +'<button class="ai-gpt" id="ai-gpt">💬 '+bili('Hỏi sâu hơn với ChatGPT','Ask ChatGPT for more')+'</button>'
+      +'<div class="ai-in"><input id="ai-q" placeholder="'+bili('vd: undercut là gì?','e.g. what is undercut?')+'"><button id="ai-send">'+bili('Gửi','Send')+'</button></div>';
+    document.body.appendChild(fab); document.body.appendChild(panel);
+    var msgs=panel.querySelector('#ai-msgs'); var lastQ='';
+    function add(html,me){ var d=document.createElement('div'); if(me){d.className='ai-me'; d.textContent=html;} else {d.innerHTML=html;} msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; }
+    function greet(){ if(!msgs.children.length) add('<div class="ai-bot">'+bili('Chào bạn 👋 Hỏi mình thuật ngữ/khái niệm CSWIP bất kỳ (vd: <i>undercut là gì</i>, <i>nứt nguội</i>, <i>WPS là gì</i>, <i>tiền nhiệt</i>). Mình tra trong bài học cho bạn ngay.','Ask me any CSWIP term/concept and I will search the lessons for you.')+'</div>'); }
+    function ask(){ var inp=panel.querySelector('#ai-q'); var q=(inp.value||'').trim(); if(!q)return; lastQ=q; add(q,true); inp.value=''; setTimeout(function(){ add(answerHTML(q)); },120); }
+    fab.onclick=function(){ panel.classList.toggle('on'); greet(); var inp=panel.querySelector('#ai-q'); if(panel.classList.contains('on')&&inp) inp.focus(); };
+    panel.querySelector('#ai-x').onclick=function(){ panel.classList.remove('on'); };
+    panel.querySelector('#ai-send').onclick=ask;
+    panel.querySelector('#ai-q').addEventListener('keydown',function(e){ if(e.key==='Enter')ask(); });
+    panel.querySelector('#ai-gpt').onclick=function(){
+      var q=lastQ||(panel.querySelector('#ai-q').value||'').trim()||'CSWIP 3.1';
+      var p='Bạn là gia sư CSWIP 3.1 (Welding Inspector), trả lời song ngữ Việt–Anh, chính xác theo tiêu chuẩn TWI/ISO/ASME. Câu hỏi: '+q;
+      try{ navigator.clipboard.writeText(p); }catch(e){}
+      window.open('https://chatgpt.com/?q='+encodeURIComponent(p),'_blank');
+    };
+  }
+  if(document.body) build(); else window.addEventListener('load',build);
+})();
