@@ -23,11 +23,11 @@ const CONFIG = {
   bankCode: "",                  // VD: "VCB"
   accountNo: "",                 // VD: "0123456789"
   accountName: "",               // VD: "NGUYEN VAN A"
-  momo: "",                      // số MoMo (tùy chọn)
+  momo: "0937527670",                      // số MoMo (tùy chọn)
 
   /* ---- Liên hệ kích hoạt ---- */
   contactEmail: "dauthemy.oto@gmail.com",
-  contactZalo: "",               // số Zalo/điện thoại (tùy chọn)
+  contactZalo: "0937527670",               // số Zalo/điện thoại (tùy chọn)
 
   /* ---- Khóa sinh mã kích hoạt ---- */
   secret: "WELD-3x1-Th3My-2026-#kF9qLpZ",  // ĐỔI thành chuỗi bí mật của riêng bạn

@@ -221,9 +221,10 @@ function premiumCardHTML(){
       +'<p class="muted" style="font-size:13px;margin-top:6px">'+bili('Đã mở khóa toàn bộ công cụ Premium ở tab 🛠️ Công cụ.','All premium tools unlocked in the 🛠️ Tools tab.')+'</p></div>';
   }
   var qr=vietQRUrl();
-  var pay = qr
-    ? '<div style="text-align:center;margin-top:10px"><img src="'+qr+'" alt="QR" style="width:210px;max-width:80%;border-radius:12px;background:#fff;padding:6px"><div class="muted" style="font-size:12px;margin-top:4px">'+bili('Quét QR để chuyển khoản','Scan to pay')+' · '+CONFIG.bankCode+' '+CONFIG.accountNo+(CONFIG.accountName?' · '+CONFIG.accountName:'')+'</div></div>'
-    : '<p class="muted" style="font-size:13px;margin-top:8px">'+bili('Liên hệ để thanh toán & nhận mã','Contact to pay & get a code')+': <b>'+(CONFIG.contactEmail||'')+'</b>'+(CONFIG.contactZalo?' · Zalo '+CONFIG.contactZalo:'')+'</p>';
+  var momoBlock = CONFIG.momo ? '<div style="background:rgba(192,108,255,.1);border:1px solid rgba(192,108,255,.4);border-radius:10px;padding:10px;margin-top:10px;text-align:center"><b style="color:#c06cff">📲 MoMo</b><div style="font-size:20px;font-weight:800;margin-top:2px">'+CONFIG.momo+'</div><div class="muted" style="font-size:12px">'+bili('Mở MoMo → Chuyển tiền → nhập số trên → '+fmtPrice(),'MoMo → Transfer → number above → '+fmtPrice())+'</div></div>' : '';
+  var bankBlock = qr ? '<div style="text-align:center;margin-top:10px"><img src="'+qr+'" alt="QR" style="width:200px;max-width:80%;border-radius:12px;background:#fff;padding:6px"><div class="muted" style="font-size:12px;margin-top:4px">'+bili('Quét QR chuyển khoản','Scan to pay')+' · '+CONFIG.bankCode+' '+CONFIG.accountNo+(CONFIG.accountName?' · '+CONFIG.accountName:'')+'</div></div>' : '';
+  var contactBlock = '<p class="muted" style="font-size:12px;margin-top:8px">'+bili('Sau khi chuyển, gửi TÊN + biên lai để nhận mã','After paying, send your NAME + receipt')+': <b>'+(CONFIG.contactEmail||'')+'</b>'+(CONFIG.contactZalo?' · Zalo/MoMo '+CONFIG.contactZalo:'')+'</p>';
+  var pay = momoBlock + bankBlock + contactBlock;
   return '<div class="card" style="border-color:rgba(255,122,51,.45)">'
     +'<h3>⭐ '+CONFIG.premiumName+' — <span class="muted">'+bili('Nâng cấp','Upgrade')+'</span></h3>'
     +'<div style="font-size:24px;font-weight:800;color:var(--accent)">'+fmtPrice()+'</div>'
@@ -301,6 +302,59 @@ renderQuiz = function(){
   }catch(e){}
   return _origRenderQuiz.apply(this, arguments);
 };
+
+/* ================= FREEMIUM: Chương 1 FREE, chương 2+ cần PRO ================= */
+function chapFree(i){ return isPremium() || i===0; }
+function unlockBtn(){ return '<div class="row" style="margin-top:10px;justify-content:flex-start"><button class="btn" onclick="go(\'profile\')">⭐ '+bili('Mở khóa ngay','Unlock now')+' — '+fmtPrice()+'</button></div>'; }
+function lockUpsellHTML(nextVi,nextEn){
+  return '<div class="card" style="border-color:rgba(255,122,51,.55);text-align:center">'
+   +'<div style="font-size:42px;line-height:1">🔒</div>'
+   +'<h2 style="margin-top:6px">'+bili('Mở khóa để học tiếp','Unlock to continue')+'</h2>'
+   +'<p class="muted" style="font-size:14px;margin-top:6px">'+bili('Chương 1 miễn phí 👏. Mở khóa <b>17 chương còn lại</b> + ngân hàng quiz đầy đủ + công cụ Pro (PQR, qualify thợ, WPS) với <b>'+(CONFIG.premiumName||'PRO')+'</b>.','Chapter 1 is free. Unlock the other 17 chapters + full quiz bank + Pro tools.')+'</p>'
+   +(nextVi?'<p style="margin-top:8px;font-size:15px">'+bili('Tiếp theo','Up next')+': <b>'+nextVi+'</b> 🔓</p>':'')
+   +'<div style="font-size:24px;font-weight:800;color:var(--accent);margin-top:8px">'+fmtPrice()+'</div>'
+   +unlockBtn()+'</div>';
+}
+/* --- Bài học: list có khóa, chương 2+ mở ra màn nâng cấp --- */
+openChap=function(i){ CURCHAP=i; renderLearn(); window.scrollTo(0,0); };
+renderLearn=function(){
+  var el=document.getElementById('v-learn');
+  if(CURCHAP===null){
+    el.innerHTML='<div class="card"><h2>📚 '+bili('Chương trình học','Syllabus')+'</h2>'
+      +'<p class="muted">'+bili('Chương 1 học miễn phí. Hoàn thành rồi mở khóa toàn bộ để học tiếp.','Chapter 1 is free. Finish it, then unlock the rest.')+'</p></div>'
+      +'<div class="chap-list">'+DATA.chapters.map(function(c,i){
+        var locked=!chapFree(i);
+        return '<div class="chap" onclick="openChap('+i+')">'
+          +'<div class="num">'+(locked?'🔒':(i+1))+'</div>'
+          +'<div class="meta"><b>'+bili(c.vi,c.en)+'</b><div class="muted" style="font-size:12px">'+(locked?('⭐ '+bili('Cần PRO','PRO')):(c.lessons.length+' '+bili('mục','items')+' • '+c.quiz.length+' quiz'))+'</div></div>'
+          +'<div class="done">'+(locked?'':(PROG[i]?'✓':''))+'</div></div>';
+      }).join('')+'</div>';
+  } else {
+    var c=DATA.chapters[CURCHAP];
+    var back='<button class="back" onclick="CURCHAP=null;renderLearn()">← '+bili('Tất cả chương','All chapters')+'</button>';
+    if(!chapFree(CURCHAP)){ el.innerHTML=back+lockUpsellHTML(c.vi,c.en); window.scrollTo(0,0); return; }
+    el.innerHTML=back+'<div class="card"><span class="pill">'+bili('Chương','Chapter')+' '+(CURCHAP+1)+'</span><h2>'+bili(c.vi,c.en)+'</h2>'
+      +(c.intro?'<p class="muted" style="margin-top:8px">'+bili(c.intro.vi,c.intro.en)+'</p>':'')
+      +'<ul class="lesson">'+c.lessons.map(function(L){return '<li>'+bili('<span class="term">'+L.t_vi+':</span> '+L.vi,(L.t_en?L.t_en+': ':'')+L.en)+'</li>';}).join('')+'</ul>'
+      +(c.key?'<h3>🔑 '+bili('Điểm cần nhớ cho kỳ thi','Exam key points')+'</h3><ul class="lesson">'+c.key.map(function(k){return '<li>'+bili(k.vi,k.en)+'</li>';}).join('')+'</ul>':'')
+      +(c.deep?'<h3>🔬 '+bili('Phân tích chuyên sâu','In-depth analysis')+'</h3><div class="deep-wrap">'+c.deep.map(function(b){return '<div class="deep-block"><h4>'+bili(b.h_vi,b.h_en)+'</h4>'+(b.body?b.body.map(function(p){return '<p class="deep-p">'+bili(p.vi,p.en)+'</p>';}).join(''):'')+(b.rows?'<ul class="lesson">'+b.rows.map(function(r){return '<li>'+bili(r.vi,r.en)+'</li>';}).join('')+'</ul>':'')+(b.table?'<div class="tbl-wrap"><table class="deep-tbl"><thead><tr>'+b.table.cols.map(function(col){return '<th>'+bili(col.vi,col.en)+'</th>';}).join('')+'</tr></thead><tbody>'+b.table.data.map(function(row){return '<tr>'+row.map(function(cell){return '<td>'+bili(cell.vi,cell.en)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>':'')+(b.foot?'<p class="muted deep-foot">'+bili(b.foot.vi,b.foot.en)+'</p>':'')+'</div>';}).join('')+'</div>':'')
+      +'<div class="row" style="margin-top:16px;justify-content:flex-start"><button class="btn '+(PROG[CURCHAP]?'sec':'')+'" onclick="toggleDone('+CURCHAP+')">'+(PROG[CURCHAP]?'✓ '+bili('Đã hoàn thành','Done'):bili('Đánh dấu hoàn thành','Mark done'))+'</button><button class="btn sec" onclick="go(\'quiz\');startChap('+CURCHAP+')">'+bili('Làm quiz chương này','Quiz this chapter')+' →</button></div></div>'
+      +((!isPremium()&&CURCHAP===0)?'<div class="card" style="border-color:rgba(255,122,51,.55)"><h3>🎉 '+bili('Xong Chương 1! Còn 17 chương nữa','Chapter 1 done! 17 more')+'</h3><p class="muted" style="font-size:13px">'+bili('Chương 2 đang chờ — mở khóa để học tiếp toàn bộ + quiz đầy đủ + công cụ Pro.','Chapter 2 awaits — unlock to continue everything.')+'</p><div style="font-size:22px;font-weight:800;color:var(--accent)">'+fmtPrice()+'</div>'+unlockBtn()+'</div>':'');
+  }
+};
+/* --- Flashcard: free chỉ Chương 1 --- */
+buildFlash=function(){ FC=[]; DATA.chapters.forEach(function(c,ci){ if(isPremium()||ci===0){ c.lessons.forEach(function(L){ if(L.t_en)FC.push({q:L.t_en,a:L.t_vi+(L.vi?' — '+L.vi:''),c:c.vi}); }); } }); };
+/* --- Quiz: free chỉ Chương 1; phần còn lại hiện màn nâng cấp --- */
+function _quizLockView(){ var el=document.getElementById('v-quiz'); if(el) el.innerHTML=lockUpsellHTML('',''); }
+(function(){
+  var oChap=startChap,oCat=startCat,oFull=startFullMock,oReal=startReal,oCWI=startCWI,oTimed=startTimed;
+  startChap=function(ci){ if(!chapFree(ci)){ _quizLockView(); return; } return oChap(ci); };
+  startCat=function(c){ if(!isPremium()){ _quizLockView(); return; } return oCat(c); };
+  startFullMock=function(){ if(!isPremium()){ _quizLockView(); return; } return oFull(); };
+  startReal=function(){ if(!isPremium()){ _quizLockView(); return; } return oReal(); };
+  startCWI=function(){ if(!isPremium()){ _quizLockView(); return; } return oCWI(); };
+  startTimed=function(n,m){ if(!isPremium()){ _quizLockView(); return; } return oTimed(n,m); };
+})();
 
 /* ---------- first-run registration ---------- */
 try{ maybeRegister(); }catch(e){}
