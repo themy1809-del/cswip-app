@@ -1372,7 +1372,7 @@ DATA.planHTML = `
 DATA.tutorHTML = `
 <div class="card">
   <h2>🤖 AI Gia sư & Giám khảo CSWIP 3.1</h2>
-  <p class="muted">Copy prompt dưới đây, dán vào <b>Claude</b> hoặc <b>ChatGPT</b>. Nó vừa dạy bạn, vừa dịch chuẩn thuật ngữ Anh–Việt, vừa ra đề & chấm thi thử.</p>
+  <p class="muted">Copy prompt dưới đây, dán vào <b>ChatGPT</b> (hoặc <b>Google Gemini</b>, <b>Microsoft Copilot</b> — AI nào cũng được). Nó vừa dạy bạn, vừa dịch chuẩn thuật ngữ Anh–Việt, vừa ra đề & chấm thi thử.</p>
 </div>
 <div class="card">
   <h3>① Prompt GIA SƯ (dạy + dịch chuẩn)</h3>

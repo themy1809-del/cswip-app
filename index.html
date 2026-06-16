@@ -78,8 +78,6 @@ table.deep-tbl td:first-child{font-weight:700;color:var(--txt);white-space:nowra
 .score-cell{background:var(--panel2);border-radius:10px;padding:12px;text-align:center}
 .score-cell b{font-size:22px;display:block}
 .score-cell span{font-size:11px;color:var(--muted)}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,var(--accent),#ff5a1f);color:#1a1206;padding:11px 18px;border-radius:14px;font-weight:700;font-size:14px;box-shadow:0 8px 26px rgba(0,0,0,.45);opacity:0;transition:.35s;z-index:200;max-width:90vw;text-align:center}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .flash{perspective:1200px;height:230px;margin-bottom:14px}
 .flash-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
 .flash.flip .flash-inner{transform:rotateY(180deg)}
@@ -293,7 +291,7 @@ function renderHome(){
       <li>${bili('<b>Bước 1 — Đọc bài học</b>: học kỹ từng chương ở tab Bài học, hiểu khái niệm trước.','Step 1 — Read each chapter in Lessons.')}</li>
       <li>${bili('<b>Bước 2 — Lật flashcard</b>: ghi nhớ thuật ngữ Anh–Việt cho đến khi nhớ hết.','Step 2 — Drill flashcards for terminology.')}</li>
       <li>${bili('<b>Bước 3 — Làm quiz</b>: kiểm tra, làm lại các câu sai.','Step 3 — Take quizzes, redo wrong ones.')}</li>
-      <li>${bili('<b>Bước 4 — AI gia sư</b>: copy prompt sang Claude/ChatGPT để hỏi sâu & thi thử.','Step 4 — Use the AI tutor prompt for deep Q&A and mock exams.')}</li>
+      <li>${bili('<b>Bước 4 — AI gia sư</b>: copy prompt sang ChatGPT (hoặc Gemini, Copilot) để hỏi sâu & thi thử.','Step 4 — Use the AI tutor prompt for deep Q&A and mock exams.')}</li>
       <li>${bili('<b>Bước 5 — Bám lộ trình</b>: học theo tuần ở tab Lộ trình.','Step 5 — Follow the weekly plan.')}</li>
     </ul>
   </div>`;
@@ -446,7 +444,6 @@ function renderQuiz(){
   if(Qi>=Qz.length){
     if(QTIMER){clearInterval(QTIMER);QTIMER=null;}
     const pct=Qz.length?Math.round(Qscore/Qz.length*100):0;
-    if(Qmode==='timed')gameMock(pct);
     let review='';
     if(Qmode==='timed'){
       review=`<div class="card"><h3>${bili('Xem lại bài làm','Review')}</h3>`+Qz.map((q,i)=>{
@@ -476,7 +473,7 @@ function renderQuiz(){
 function answer(oi){
   const q=Qz[Qi];Qanswers[Qi]=oi;
   const right=oi===q.a;if(right)Qscore++;
-  if(q.id){QUIZSTATE[q.id]={correct:right};srsUpdate(q.id,right);}save();gameTick(right);
+  if(q.id){QUIZSTATE[q.id]={correct:right};srsUpdate(q.id,right);}save();
   if(Qmode==='timed'){Qi++;renderQuiz();return;}
   const opts=document.querySelectorAll('#opts .opt');
   opts.forEach((b,i)=>{b.classList.add('disabled');if(i===q.a)b.classList.add('correct');if(i===oi&&oi!==q.a)b.classList.add('wrong');});
@@ -503,55 +500,6 @@ function _scoreStats(){
 function _esc(s){return String(s||'').replace(/[<>"]/g,'');}
 function saveUserField(k,v){USER[k]=v;localStorage.setItem('cswip_user',JSON.stringify(USER));}
 function resetProgress(){if(confirm('Xóa toàn bộ tiến độ và điểm? / Clear all progress & scores?')){PROG={};QUIZSTATE={};save();renderAll();}}
-let GAME = JSON.parse(localStorage.getItem('cswip_game')||'{}');
-function saveGame(){localStorage.setItem('cswip_game',JSON.stringify(GAME));}
-function _today(){return new Date().toISOString().slice(0,10);}
-function gameLevel(){return Math.floor(Math.sqrt((GAME.xp||0)/40))+1;}
-function _answered(){return Object.keys(QUIZSTATE).length;}
-function _chaptersDone(){return Object.keys(PROG).filter(k=>PROG[k]).length;}
-function gameTick(right){
-  const today=_today();
-  GAME.xp=(GAME.xp||0)+(right?10:3);
-  if(!GAME.daily||GAME.daily.day!==today)GAME.daily={day:today,n:0};
-  GAME.daily.n++;
-  if(GAME.lastDay!==today){const y=new Date(Date.now()-86400000).toISOString().slice(0,10);GAME.streak=(GAME.lastDay===y)?(GAME.streak||0)+1:1;GAME.lastDay=today;}
-  saveGame();checkBadges();
-}
-function gameMock(pct){GAME.bestMock=Math.max(GAME.bestMock||0,pct);saveGame();checkBadges();}
-const BADGES=[
- {id:'first',ic:'🎯',vi:'Bắt đầu',t:()=>_answered()>=1},
- {id:'q50',ic:'5️⃣',vi:'50 câu',t:()=>_answered()>=50},
- {id:'q200',ic:'💯',vi:'200 câu',t:()=>_answered()>=200},
- {id:'q500',ic:'🌟',vi:'500 câu',t:()=>_answered()>=500},
- {id:'s3',ic:'🔥',vi:'Chuỗi 3 ngày',t:()=>(GAME.streak||0)>=3},
- {id:'s7',ic:'⚡',vi:'Chuỗi 7 ngày',t:()=>(GAME.streak||0)>=7},
- {id:'s30',ic:'🏆',vi:'Chuỗi 30 ngày',t:()=>(GAME.streak||0)>=30},
- {id:'daily20',ic:'📅',vi:'20 câu/ngày',t:()=>GAME.daily&&GAME.daily.n>=20},
- {id:'lvl5',ic:'🏅',vi:'Cấp 5',t:()=>gameLevel()>=5},
- {id:'lvl10',ic:'👑',vi:'Cấp 10',t:()=>gameLevel()>=10},
- {id:'chap1',ic:'📖',vi:'Xong 1 chương',t:()=>_chaptersDone()>=1},
- {id:'chapAll',ic:'🎓',vi:'Đủ 18 chương',t:()=>_chaptersDone()>=18},
- {id:'mock70',ic:'✅',vi:'Thi thử ≥70%',t:()=>(GAME.bestMock||0)>=70},
- {id:'mock90',ic:'💎',vi:'Thi thử ≥90%',t:()=>(GAME.bestMock||0)>=90}
-];
-function checkBadges(){GAME.badges=GAME.badges||{};let nw=[];BADGES.forEach(b=>{if(!GAME.badges[b.id]&&b.t()){GAME.badges[b.id]=Date.now();nw.push(b);}});if(nw.length){saveGame();nw.forEach(b=>toast('🏆 '+b.ic+' Mở khóa: '+b.vi));}}
-function toast(msg){const t=document.createElement('div');t.className='toast';t.innerHTML=msg;document.body.appendChild(t);requestAnimationFrame(function(){t.classList.add('show');});setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove();},350);},2800);}
-function _gameCards(){
-  const lvl=gameLevel(),xp=GAME.xp||0,streak=GAME.streak||0;
-  const nextXp=(lvl*lvl)*40,curBase=((lvl-1)*(lvl-1))*40,prog=Math.max(0,Math.min(100,Math.round((xp-curBase)/(nextXp-curBase)*100)));
-  const dn=(GAME.daily&&GAME.daily.day===_today())?GAME.daily.n:0,goal=20,gp=Math.min(100,Math.round(dn/goal*100));
-  GAME.badges=GAME.badges||{};
-  const earned=BADGES.filter(b=>GAME.badges[b.id]).length;
-  const grid=BADGES.map(function(b){const on=!!GAME.badges[b.id];return '<div style="text-align:center;opacity:'+(on?1:.3)+'"><div style="font-size:26px;filter:'+(on?'none':'grayscale(1)')+'">'+b.ic+'</div><div style="font-size:10px;color:var(--muted);margin-top:2px">'+b.vi+'</div></div>';}).join('');
-  return '<div class="card"><h3>🔥 '+bili('Chuỗi học & Cấp độ','Streak & Level')+'</h3>'
-    +'<div class="score-grid"><div class="score-cell"><b style="color:var(--accent)">'+streak+'</b><span>'+bili('Ngày liên tục','Day streak')+'</span></div>'
-    +'<div class="score-cell"><b>'+bili('Cấp ','Lvl ')+lvl+'</b><span>'+xp+' XP</span></div>'
-    +'<div class="score-cell"><b>'+earned+'/'+BADGES.length+'</b><span>'+bili('Huy hiệu','Badges')+'</span></div></div>'
-    +'<div style="margin-top:10px;font-size:12px" class="muted">'+bili('Mục tiêu hôm nay','Today goal')+': '+dn+'/'+goal+' • '+bili('Lên cấp','Next level')+' '+prog+'%</div>'
-    +'<div class="progress"><i style="width:'+gp+'%"></i></div></div>'
-    +'<div class="card"><h3>🏆 '+bili('Huy hiệu','Achievements')+'</h3>'
-    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:10px;margin-top:8px">'+grid+'</div></div>';
-}
 function renderProfile(){
   const s=_scoreStats();
   document.getElementById('v-profile').innerHTML=`
@@ -564,7 +512,6 @@ function renderProfile(){
       <label>Email/SĐT<input id="u_contact" value="${_esc(USER.contact)}" oninput="saveUserField('contact',this.value)"></label>
     </div>
   </div>
-  ${_gameCards()}
   <div class="card">
     <h3>📊 ${bili('Bảng điểm','Scorecard')}</h3>
     <div class="score-grid">
@@ -690,90 +637,9 @@ function renderTools(){
       <button class="btn sec" id="w_print" onclick="printWPS()" style="display:none">🖨️ ${bili('In / Lưu PDF','Print / Save PDF')}</button>
     </div>
     <div id="wps_doc" style="margin-top:10px"></div>
-  </div>
-  <div class="card">
-    <h3>⑦ ${bili('Phạm vi qualify thợ hàn (ASME IX)','Welder qualification range (ASME IX)')}</h3>
-    <p class="muted" style="font-size:12px">${bili('Nhập kết quả thi → phạm vi được phép hàn. THAM KHẢO — phải đối chiếu ASME IX QW-452/461 hoặc code áp dụng & WPS.','From the test result → the qualified range. INDICATIVE — verify against ASME IX QW-452/461 or the applicable code & WPS.')}</p>
-    <div class="tool-grid">
-      <label>${bili('Dạng mẫu','Coupon')}<select id="wq_form" onchange="calcWQ()"><option value="plate">${bili('Tấm','Plate')}</option><option value="pipe">${bili('Ống','Pipe')}</option></select></label>
-      <label>${bili('Vị trí thi','Test position')}<select id="wq_pos" onchange="calcWQ()"><option>1G</option><option>2G</option><option>3G</option><option>4G</option><option>3G+4G</option><option>5G</option><option>6G</option><option>2G+5G</option><option>1F</option><option>2F</option><option>3F</option><option>4F</option></select></label>
-      <label>${bili('Chiều dày mẫu','Coupon thk')} (mm)<input type="number" min="0" id="wq_t" value="10" oninput="calcWQ()"></label>
-      <label>${bili('ĐK ống','Pipe OD')} (mm)<input type="number" min="0" id="wq_d" value="60" oninput="calcWQ()"></label>
-      <label>${bili('Tấm lót','Backing')}<select id="wq_back" onchange="calcWQ()"><option value="no">${bili('Không lót','No backing')}</option><option value="yes">${bili('Có lót/đệm','With backing')}</option></select></label>
-    </div>
-    <div id="wq_out" class="tool-out">—</div>
-  </div>
-  <div class="card">
-    <h3>⑧ ${bili('Mẫu hồ sơ QA/QC (NCR / Báo cáo kiểm tra)','QA/QC forms (NCR / Inspection report)')}</h3>
-    <p class="muted" style="font-size:12px">${bili('Điền → tạo bản in (Lưu PDF). Mẫu tham khảo, điều chỉnh theo dự án.','Fill → printable (Save PDF). Indicative template, adapt to your project.')}</p>
-    <div class="tool-grid">
-      <label>${bili('Loại hồ sơ','Document')}<select id="dc_type"><option value="ncr">NCR (Non-Conformance)</option><option value="vt">${bili('Báo cáo kiểm tra hàn','Weld inspection report')}</option></select></label>
-      <label>${bili('Dự án','Project')}<input id="dc_proj" placeholder="—"></label>
-      <label>${bili('Số hồ sơ','Doc No.')}<input id="dc_no" placeholder="NCR-001"></label>
-      <label>${bili('Hạng mục/mối hàn','Item/Weld ID')}<input id="dc_item" placeholder="—"></label>
-      <label>${bili('Tiêu chuẩn','Code')}<input id="dc_code" value="ISO 5817"></label>
-      <label>${bili('Người kiểm tra','Inspector')}<input id="dc_insp" placeholder="—"></label>
-    </div>
-    <label style="font-size:12px;color:var(--muted);display:block;margin-top:8px">${bili('Yêu cầu (theo spec/code)','Requirement (per spec/code)')}<textarea id="dc_req" rows="2" style="width:100%;margin-top:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.11);border-radius:10px;color:var(--txt);padding:8px;font-size:14px;font-family:inherit"></textarea></label>
-    <label style="font-size:12px;color:var(--muted);display:block;margin-top:8px">${bili('Thực tế / không phù hợp quan sát được','Actual / non-conformance observed')}<textarea id="dc_act" rows="2" style="width:100%;margin-top:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.11);border-radius:10px;color:var(--txt);padding:8px;font-size:14px;font-family:inherit"></textarea></label>
-    <div class="tool-grid"><label>${bili('Đề xuất xử lý / Kết luận','Disposition / Result')}<input id="dc_disp" placeholder="Sửa / Làm lại / Loại / Nhân nhượng"></label></div>
-    <div class="row" style="margin-top:10px;gap:8px;justify-content:flex-start">
-      <button class="btn" onclick="genDoc()">${bili('Tạo hồ sơ','Generate')}</button>
-      <button class="btn sec" id="dc_print" onclick="printDoc()" style="display:none">🖨️ ${bili('In / Lưu PDF','Print / Save PDF')}</button>
-    </div>
-    <div id="dc_out" style="margin-top:10px"></div>
   </div>`;
-  calcCEV(); calcHI(); calcFillet('z'); calcPreheat(); calcWQ();
+  calcCEV(); calcHI(); calcFillet('z'); calcPreheat();
 }
-function calcWQ(){
-  const g=function(id){return document.getElementById(id);};
-  if(!g('wq_form'))return;
-  const form=g('wq_form').value, pos=g('wq_pos').value, back=g('wq_back').value;
-  const t=parseFloat(g('wq_t').value)||0, d=parseFloat(g('wq_d').value)||0;
-  const POS={'1G':['F'],'2G':['F','H'],'3G':['F','V'],'4G':['F','OH'],'3G+4G':['F','V','OH'],'5G':['F','V','OH'],'6G':['F','H','V','OH'],'2G+5G':['F','H','V','OH'],'1F':['F'],'2F':['F','H'],'3F':['F','V'],'4F':['F','OH']};
-  const isFillet=/F$/.test(pos);
-  const nm={F:'Bằng (F)',H:'Ngang (H)',V:'Đứng (V)',OH:'Trần (OH)'};
-  const posTxt=(POS[pos]||['?']).map(function(p){return nm[p]||p;}).join(', ');
-  let tmax = t<=0?'—' : (t<12.7? (2*t).toFixed(1)+' mm' : bili('Không giới hạn','Unlimited'));
-  const tTxt = isFillet ? bili('Mọi chiều dày (mối góc)','All thicknesses (fillet)') : ('1.5 mm → '+tmax);
-  let dTxt;
-  if(isFillet) dTxt=bili('Mọi đường kính','All diameters');
-  else if(form==='pipe') dTxt=(d<=0?'—':(d<25?d.toFixed(0)+' mm':'25 mm'))+' → '+bili('Không giới hạn','Unlimited');
-  else dTxt=bili('Tấm; và ống OD ≥ ~600 mm (24 in)','Plate; and pipe OD ≥ ~600 mm (24 in)');
-  const backTxt = back==='no' ? bili('Thi KHÔNG lót → hàn được CÓ và KHÔNG lót.','No backing → qualifies WITH and WITHOUT backing.') : bili('Thi CÓ lót → chỉ hàn CÓ lót.','With backing → qualifies WITH backing only.');
-  g('wq_out').innerHTML='<b>'+bili('Vị trí được hàn','Positions')+':</b> '+posTxt+(isFillet?' <span class="muted">('+bili('chỉ mối góc','fillets only')+')</span>':'')
-    +'<br><b>'+bili('Chiều dày','Thickness')+':</b> '+tTxt
-    +'<br><b>'+bili('Đường kính','Diameter')+':</b> '+dTxt
-    +'<br><span class="muted" style="font-size:12px">'+backTxt+' '+bili('Tham khảo ASME IX QW-452/461.','See ASME IX QW-452/461.')+'</span>';
-}
-function genDoc(){
-  const g=function(id){return (document.getElementById(id)&&document.getElementById(id).value||'').trim();};
-  const type=g('dc_type');
-  const title=type==='ncr'?'NON-CONFORMANCE REPORT (NCR)':'WELDING INSPECTION REPORT';
-  const today=new Date().toLocaleDateString('vi-VN');
-  const esc=function(s){return String(s||'—').replace(/[<>]/g,'');};
-  const rows=[
-    ['Dự án / Project', esc(g('dc_proj'))],
-    [type==='ncr'?'Số NCR / NCR No.':'Số báo cáo / Report No.', esc(g('dc_no'))],
-    ['Ngày / Date', today],
-    ['Hạng mục / Item / Weld ID', esc(g('dc_item'))],
-    ['Tiêu chuẩn / Code', esc(g('dc_code'))],
-    ['Yêu cầu / Requirement', esc(g('dc_req'))],
-    [type==='ncr'?'Thực tế / Non-conformance':'Quan sát / Finding', esc(g('dc_act'))],
-    [type==='ncr'?'Đề xuất xử lý / Disposition':'Kết luận / Result', esc(g('dc_disp'))],
-    ['Người kiểm tra / Inspector', esc(g('dc_insp'))]
-  ];
-  let h='<div id="dc_print_doc" style="background:#fff;color:#111;border:2px solid #111;border-radius:8px;padding:18px;font-family:Arial,sans-serif;max-width:640px">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:10px"><b style="font-size:16px">'+title+'</b><span style="font-size:12px;color:#555">'+today+'</span></div>'
-    +'<table style="width:100%;border-collapse:collapse;font-size:13px">'
-    +rows.map(function(r){return '<tr><td style="border:1px solid #bbb;padding:6px 8px;width:34%;color:#444;vertical-align:top">'+r[0]+'</td><td style="border:1px solid #bbb;padding:6px 8px;white-space:pre-wrap">'+r[1]+'</td></tr>';}).join('')
-    +'</table>'
-    +'<div style="display:flex;justify-content:space-between;margin-top:26px;font-size:12px;color:#444"><div>____________________<br>'+(type==='ncr'?'Người lập / Raised by':'Thanh tra / Inspector')+'</div><div>____________________<br>Duyệt / Approved</div></div>'
-    +'<p style="font-size:10px;color:#888;margin-top:10px">Mẫu tham khảo — điều chỉnh theo dự án. / Indicative template.</p></div>';
-  document.getElementById('dc_out').innerHTML=h;
-  document.getElementById('dc_print').style.display='';
-}
-function printDoc(){const el=document.getElementById('dc_print_doc');if(!el)return;const w=window.open('','_blank');if(!w){alert('Cho phép pop-up để in.');return;}w.document.write('<html><head><title>Doc</title><meta charset="utf-8"></head><body style="margin:16px">'+el.outerHTML+'</body></html>');w.document.close();w.focus();setTimeout(function(){w.print();},300);}
 function _wv(id){const el=document.getElementById(id);const v=(el&&el.value||'').trim();return v||'—';}
 function genWPS(){
   const proc=_wv('w_proc');
