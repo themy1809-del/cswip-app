@@ -223,7 +223,7 @@ function premiumCardHTML(){
   var qr=vietQRUrl();
   var momoBlock = CONFIG.momo ? '<div style="background:rgba(192,108,255,.1);border:1px solid rgba(192,108,255,.4);border-radius:10px;padding:10px;margin-top:10px;text-align:center"><b style="color:#c06cff">📲 MoMo</b><div style="font-size:20px;font-weight:800;margin-top:2px">'+CONFIG.momo+'</div><div class="muted" style="font-size:12px">'+bili('Mở MoMo → Chuyển tiền → nhập số trên → '+fmtPrice(),'MoMo → Transfer → number above → '+fmtPrice())+'</div></div>' : '';
   var bankBlock = qr ? '<div style="text-align:center;margin-top:10px"><img src="'+qr+'" alt="QR" style="width:200px;max-width:80%;border-radius:12px;background:#fff;padding:6px"><div class="muted" style="font-size:12px;margin-top:4px">'+bili('Quét QR chuyển khoản','Scan to pay')+' · '+CONFIG.bankCode+' '+CONFIG.accountNo+(CONFIG.accountName?' · '+CONFIG.accountName:'')+'</div></div>' : '';
-  var contactBlock = '<p class="muted" style="font-size:12px;margin-top:8px">'+bili('Sau khi chuyển, gửi TÊN + biên lai để nhận mã','After paying, send your NAME + receipt')+': <b>'+(CONFIG.contactEmail||'')+'</b>'+(CONFIG.contactZalo?' · Zalo/MoMo '+CONFIG.contactZalo:'')+'</p>';
+  var contactBlock = '<p class="muted" style="font-size:12px;margin-top:8px">'+bili('Sau khi chuyển, gửi SĐT + biên lai để nhận mã','After paying, send your PHONE + receipt')+': <b>'+(CONFIG.contactEmail||'')+'</b>'+(CONFIG.contactZalo?' · Zalo/MoMo '+CONFIG.contactZalo:'')+'</p>';
   var pay = momoBlock + bankBlock + contactBlock;
   return '<div class="card" style="border-color:rgba(255,122,51,.45)">'
     +'<h3>⭐ '+CONFIG.premiumName+' — <span class="muted">'+bili('Nâng cấp','Upgrade')+'</span></h3>'
@@ -238,9 +238,9 @@ function premiumCardHTML(){
     +'<div style="background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px">'
     +'<b style="font-size:14px">'+bili('Cách kích hoạt','How to activate')+'</b>'
     +'<ol class="muted" style="font-size:13px;margin:6px 0 0 18px;line-height:1.7">'
-    +'<li>'+bili('Đảm bảo đã nhập đúng <b>Họ tên</b> ở trên.','Make sure your <b>name</b> above is correct.')+'</li>'
+    +'<li>'+bili('Nhập đúng <b>Số điện thoại</b> ở trên (số bạn báo khi mua).','Enter your <b>phone</b> above (the one you gave when buying).')+'</li>'
     +'<li>'+bili('Chuyển khoản theo QR/thông tin bên dưới.','Pay via the QR/info below.')+'</li>'
-    +'<li>'+bili('Gửi tên + biên lai cho người bán để nhận <b>mã</b>.','Send name + receipt to get a <b>code</b>.')+'</li>'
+    +'<li>'+bili('Gửi <b>SĐT</b> + biên lai cho người bán để nhận <b>mã</b>.','Send your <b>phone</b> + receipt to get a <b>code</b>.')+'</li>'
     +'<li>'+bili('Dán mã vào ô dưới rồi bấm Kích hoạt.','Paste the code and tap Activate.')+'</li></ol>'
     +pay
     +'<div class="tool-grid" style="margin-top:12px;grid-template-columns:1fr"><label>'+bili('Mã kích hoạt','Activation code')+'<input id="act_code" placeholder="CSWIP-L-XXXXXXX"></label></div>'
@@ -274,6 +274,7 @@ renderProfile = function(){
     +'<p class="muted" style="font-size:13px">'+bili('Ghi tên để app chấm điểm theo bạn. Dữ liệu lưu trên máy bạn (riêng tư).','Enter your name so the app scores you. Stored privately on your device.')+'</p>'
     +'<div class="tool-grid">'
     +'<label>'+bili('Họ tên','Full name')+'<input id="u_name" value="'+_esc(u.name)+'" oninput="saveUserField(\'name\',this.value)"></label>'
+    +'<label>'+bili('SĐT (kích hoạt)','Phone (activation)')+'<input id="u_phone" value="'+_esc(u.phone)+'" oninput="saveUserField(\'phone\',this.value)"></label>'
     +'<label>'+bili('Đơn vị','Company')+'<input id="u_org" value="'+_esc(u.org)+'" oninput="saveUserField(\'org\',this.value)"></label>'
     +'<label>Email/SĐT<input id="u_contact" value="'+_esc(u.contact)+'" oninput="saveUserField(\'contact\',this.value)"></label>'
     +'</div></div>'
@@ -289,7 +290,8 @@ renderProfile = function(){
     +'<button class="btn sec" onclick="resetProgress()">'+bili('Đặt lại tiến độ','Reset progress')+'</button>'
     +'</div></div>'
     + examHistoryHTML()
-    + premiumCardHTML();
+    + premiumCardHTML()
+    + adminPanelHTML();
 };
 
 /* ---------- wrap renderQuiz to log mock-exam scores ---------- */
@@ -432,3 +434,29 @@ try{ maybeRegister(); }catch(e){}
   }
   if(document.body) build(); else window.addEventListener('load',build);
 })();
+
+
+/* ================= TRANG TẠO MÃ TRONG APP (chủ shop) ================= */
+function _isOwner(){
+  try{ var u=_curUser(); var op=(typeof CONFIG!=='undefined'&&CONFIG.ownerPhone)?CONFIG.ownerPhone:'';
+    if(op && u.phone && _normKey(u.phone)===_normKey(op)) return true; }catch(e){}
+  return (location.hash||'').toLowerCase().indexOf('admin')>=0;
+}
+function adminPanelHTML(){
+  if(!_isOwner()) return '';
+  return '<div class="card" style="border-color:rgba(255,214,10,.35)"><h3>🔐 '+bili('Tạo mã kích hoạt (chủ shop)','Generate codes (owner)')+'</h3>'
+   +'<p class="muted" style="font-size:12px">'+bili('Chỉ bạn thấy mục này. Nhập SĐT khách → tạo mã → gửi khách.','Owner-only. Enter customer phone → generate → send.')+'</p>'
+   +'<div id="adm_gate"><div class="tool-grid" style="grid-template-columns:1fr"><label>'+bili('Mật khẩu admin','Admin password')+'<input id="adm_pass" type="password" placeholder="••••"></label></div><div class="row" style="justify-content:flex-start;margin-top:6px"><button class="btn sec" onclick="admUnlock()">'+bili('Mở','Open')+'</button></div></div>'
+   +'<div id="adm_panel" style="display:none"><div class="tool-grid"><label>'+bili('SĐT khách','Customer phone')+'<input id="adm_phone" placeholder="09..." inputmode="tel" oninput="admGen()"></label><label>'+bili('Thời hạn','Validity')+'<select id="adm_exp" onchange="admGen()"><option value="L">'+bili('Vĩnh viễn','Lifetime')+'</option><option value="12">12 '+bili('tháng','mo')+'</option><option value="6">6 '+bili('tháng','mo')+'</option><option value="3">3 '+bili('tháng','mo')+'</option></select></label></div><div id="adm_out" class="tool-out" style="display:none"></div></div></div>';
+}
+function admUnlock(){ var p=(document.getElementById('adm_pass')||{}).value||''; if(p===CONFIG.adminPass){ document.getElementById('adm_gate').style.display='none'; document.getElementById('adm_panel').style.display=''; var ph=document.getElementById('adm_phone'); if(ph)ph.focus(); } else { alert('Sai mật khẩu / Wrong password'); } }
+function _admExp(){ var v=(document.getElementById('adm_exp')||{}).value||'L'; if(v==='L')return 'L'; var n=parseInt(v,10); var d=new Date(); d.setMonth(d.getMonth()+n); return (''+d.getFullYear()).slice(-2)+('0'+(d.getMonth()+1)).slice(-2); }
+function admGen(){
+  var phone=(document.getElementById('adm_phone')||{}).value||''; var out=document.getElementById('adm_out'); if(!out)return;
+  if(!phone.trim()){ out.style.display='none'; return; }
+  var exp=_admExp(); var code=makeCode(phone,exp);
+  var hsd=exp==='L'?bili('vĩnh viễn','lifetime'):('hết tháng '+exp.slice(2,4)+'/20'+exp.slice(0,2));
+  out.style.display='';
+  out.innerHTML='<div style="font-size:20px;font-weight:800;color:var(--yellow);word-break:break-all;text-align:center">'+code+'</div><div class="muted" style="font-size:12px;text-align:center">'+bili('cho SĐT','for')+' '+_esc(phone)+' · '+hsd+'</div><div class="row" style="justify-content:center;margin-top:6px"><button class="btn sec" onclick="admCopy(this,\''+code+'\')">📋 '+bili('Copy mã gửi khách','Copy code')+'</button></div>';
+}
+function admCopy(btn,c){ try{ navigator.clipboard.writeText(c); }catch(e){} var o=btn.textContent; btn.textContent='✓ Đã copy'; setTimeout(function(){btn.textContent=o;},1400); }

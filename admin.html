@@ -31,8 +31,8 @@
   </div>
 
   <div id="panel" style="display:none">
-    <label>Họ tên khách hàng (đúng như khách sẽ nhập trong app)</label>
-    <input id="name" placeholder="Nguyễn Văn A" oninput="gen()">
+    <label>Số điện thoại khách (đúng như khách nhập trong app)</label>
+    <input id="name" placeholder="09..." oninput="gen()">
     <label>Thời hạn</label>
     <select id="exp" onchange="gen()">
       <option value="L">Vĩnh viễn (lifetime)</option>
@@ -45,7 +45,7 @@
       <div class="code" id="code">—</div>
       <button class="copy" onclick="copyCode()">📋 Copy mã</button>
     </div>
-    <div class="warn">⚠️ Mã gắn theo TÊN — chỉ dùng được với đúng tên này (không phân biệt hoa/thường, dấu). Nhắc khách nhập tên y như khi mua.<br>
+    <div class="warn">⚠️ Mã gắn theo SỐ ĐIỆN THOẠI — chống nhầm tên/dấu. Nhắc khách nhập đúng SĐT đã báo khi mua.<br>
     ⚠️ KHÔNG đăng file <b>admin.html</b> lên web công khai nếu muốn giữ kín. Đổi <code>secret</code> & <code>adminPass</code> trong <b>config.js</b>.</div>
   </div>
 </div>

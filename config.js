@@ -31,5 +31,6 @@ const CONFIG = {
 
   /* ---- Khóa sinh mã kích hoạt ---- */
   secret: "WELD-3x1-Th3My-2026-#kF9qLpZ",  // ĐỔI thành chuỗi bí mật của riêng bạn
-  adminPass: "themy@admin"                 // mật khẩu mở trang tạo mã (admin.html)
+  adminPass: "themy@admin",
+  ownerPhone: "0937527670"   // SĐT chủ shop: tự hiện trang tạo mã trong app                 // mật khẩu mở trang tạo mã (admin.html)
 };
