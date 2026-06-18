@@ -471,7 +471,7 @@ function admCopy(btn,c){ try{ navigator.clipboard.writeText(c); }catch(e){} var 
     var items=[['home','🏠','Tổng quan'],['learn','📚','Bài học'],['flash','🃏','Thẻ'],['quiz','📝','Quiz'],['profile','👤','Hồ sơ']];
     var css='#botnav{display:none}'
       +'@media(max-width:860px){'
-      +'#botnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:120;background:rgba(11,15,23,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.1);padding:5px 4px;padding-bottom:calc(5px + env(safe-area-inset-bottom,0px));justify-content:space-around}'
+      +'#botnav{display:flex;position:fixed!important;left:0;right:0;bottom:0;top:auto!important;height:auto!important;z-index:120;background:rgba(11,15,23,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.1);border-bottom:none;overflow:visible;margin:0;padding:5px 4px;padding-bottom:calc(5px + env(safe-area-inset-bottom,0px));justify-content:space-around}'
       +'#botnav button{flex:1;background:none;border:none;color:#94a3bb;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;padding:5px 2px;cursor:pointer;border-radius:10px;line-height:1.15}'
       +'#botnav button .bi{font-size:20px;line-height:1}'
       +'#botnav button.on{color:#4ca8ff}'
