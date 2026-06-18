@@ -1,15 +1,20 @@
-/* Service worker — NETWORK-FIRST: luôn lấy bản mới nhất khi online,
+/* Service worker — NETWORK-FIRST + REVALIDATE: luôn lấy bản mới nhất khi online
+   (ép trình duyệt kiểm tra máy chủ mỗi lần -> không kẹt bản cache cũ),
    chỉ dùng cache khi offline. Tự cập nhật ngay (skipWaiting + claim).
    Bump CACHE khi muốn xóa sạch cache cũ. */
-const CACHE = 'cswip-v4';
+const CACHE = 'cswip-v5';
 const ASSETS = [
   './', './index.html', './config.js', './data.js', './bank.js', './realbank.js',
-  './cwibank.js', './auth.js', './premium.js',
+  './cwibank.js', './auth.js', './premium.js', './cloud.js',
   './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'
 ];
 self.addEventListener('install', e => {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).catch(() => {}));
+  e.waitUntil(
+    caches.open(CACHE)
+      .then(c => c.addAll(ASSETS.map(u => new Request(u, { cache: 'reload' }))))
+      .catch(() => {})
+  );
 });
 self.addEventListener('activate', e => {
   e.waitUntil(
@@ -22,16 +27,19 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   e.respondWith((async () => {
+    let fetchReq = req;
     try {
-      // NETWORK-FIRST: luôn thử mạng trước để có bản mới nhất
-      const fresh = await fetch(req);
+      // Cùng nguồn: ép revalidate với máy chủ (no-cache) -> 304 nếu chưa đổi (nhẹ),
+      // 200 + nội dung mới nếu vừa deploy. Tránh kẹt bản HTTP-cache cũ.
+      const sameOrigin = new URL(req.url).origin === self.location.origin;
+      if (sameOrigin) fetchReq = new Request(req.url, { cache: 'no-cache', credentials: 'same-origin' });
+      const fresh = await fetch(fetchReq);
       if (fresh && fresh.status === 200 && (fresh.type === 'basic' || fresh.type === 'cors')) {
         const c = await caches.open(CACHE);
         c.put(req, fresh.clone());
       }
       return fresh;
     } catch (err) {
-      // OFFLINE: fallback về cache
       const cached = await caches.match(req);
       if (cached) return cached;
       if (req.mode === 'navigate') {
