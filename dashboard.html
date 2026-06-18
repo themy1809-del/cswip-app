@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản trị user — CSWIP 3.1 PRO</title>
+<style>
+  :root{--bg:#0a0e17;--panel:#141b29;--line:#2a3550;--txt:#eaeff7;--muted:#94a3bb;--accent:#ff7a33;--accent2:#4ca8ff;--green:#34c759;--red:#ff453a;--yellow:#ffd60a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);padding:18px;line-height:1.5}
+  .wrap{max-width:1000px;margin:0 auto}
+  h1{font-size:20px;margin-bottom:4px}
+  .muted{color:var(--muted);font-size:13px}
+  .btn{background:linear-gradient(135deg,var(--accent2),#2f7fe0);color:#06121f;border:none;border-radius:10px;padding:11px 18px;font-weight:800;font-size:14px;cursor:pointer;margin-top:12px}
+  .btn.sec{background:rgba(255,255,255,.06);color:var(--txt);border:1px solid var(--line)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:14px}
+  .stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px}
+  .stat .b{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+  .stat .b b{font-size:22px;display:block;color:var(--accent)}
+  .stat .b span{font-size:11px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:rgba(76,168,255,.1);color:var(--accent2);font-weight:700;cursor:pointer;white-space:nowrap}
+  tr:hover td{background:rgba(255,255,255,.03)}
+  .pro{color:var(--green);font-weight:700}
+  .free{color:var(--muted)}
+  .bar{height:7px;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden;min-width:60px}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--yellow))}
+  input{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:8px 10px;font-size:14px;width:100%;max-width:320px;margin-top:8px}
+  .err{color:var(--red);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🛠️ Quản trị học viên — CSWIP 3.1 PRO</h1>
+  <p class="muted">Trang chỉ dành cho chủ shop. Đăng nhập bằng Google (email chủ shop) để xem ai đang học, học tới đâu.</p>
+
+  <div id="login" class="card">
+    <p>Đăng nhập để xem dữ liệu học viên.</p>
+    <button class="btn" id="googleBtn">🔑 Đăng nhập Google (chủ shop)</button>
+    <div id="msg" class="err"></div>
+  </div>
+
+  <div id="panel" style="display:none">
+    <div class="card">
+      <div class="stat" id="stats"></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input id="q" placeholder="🔎 Tìm theo SĐT / tên...">
+        <button class="btn sec" id="reload" style="margin-top:8px">↻ Tải lại</button>
+        <button class="btn sec" id="logout" style="margin-top:8px">Đăng xuất</button>
+      </div>
+    </div>
+    <div class="card">
+      <div id="tableWrap" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="config.js"></script>
+<script>
+firebase.initializeApp(CONFIG.firebase);
+var auth=firebase.auth(), db=firebase.firestore();
+var ALL=[];
+function esc(s){return (s||'').toString().replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});}
+function fmtTime(ts){ try{ if(!ts)return '—'; var d=ts.toDate?ts.toDate():new Date(ts); return d.toLocaleString('vi-VN'); }catch(e){ return '—'; } }
+
+document.getElementById('googleBtn').onclick=function(){
+  var p=new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(p).catch(function(e){ document.getElementById('msg').textContent='Lỗi đăng nhập: '+e.message; });
+};
+document.getElementById('logout').onclick=function(){ auth.signOut(); };
+document.getElementById('reload').onclick=function(){ load(); };
+document.getElementById('q').oninput=function(){ render(this.value.trim().toLowerCase()); };
+
+auth.onAuthStateChanged(function(u){
+  if(!u || u.isAnonymous){ show(false); return; }
+  if(CONFIG.ownerEmail && u.email!==CONFIG.ownerEmail){
+    document.getElementById('msg').textContent='Tài khoản '+u.email+' không có quyền. Hãy đăng nhập bằng email chủ shop ('+CONFIG.ownerEmail+').';
+    auth.signOut(); show(false); return;
+  }
+  show(true); load();
+});
+function show(on){
+  document.getElementById('login').style.display=on?'none':'';
+  document.getElementById('panel').style.display=on?'':'none';
+}
+function load(){
+  document.getElementById('tableWrap').innerHTML='<p class="muted">Đang tải...</p>';
+  db.collection('users').get().then(function(snap){
+    ALL=[]; snap.forEach(function(doc){ ALL.push(doc.data()); });
+    ALL.sort(function(a,b){ var x=a.lastActive&&a.lastActive.toMillis?a.lastActive.toMillis():0; var y=b.lastActive&&b.lastActive.toMillis?b.lastActive.toMillis():0; return y-x; });
+    stats(); render('');
+  }).catch(function(e){ document.getElementById('tableWrap').innerHTML='<p class="err">Lỗi đọc dữ liệu: '+esc(e.message)+'</p>'; });
+}
+function stats(){
+  var total=ALL.length, pro=0, active7=0, now=Date.now();
+  ALL.forEach(function(u){ if(u.premium)pro++; var t=u.lastActive&&u.lastActive.toMillis?u.lastActive.toMillis():0; if(now-t<7*864e5)active7++; });
+  document.getElementById('stats').innerHTML=
+    '<div class="b"><b>'+total+'</b><span>Tổng học viên</span></div>'+
+    '<div class="b"><b>'+pro+'</b><span>Đã mua PRO</span></div>'+
+    '<div class="b"><b>'+(total-pro)+'</b><span>Dùng free</span></div>'+
+    '<div class="b"><b>'+active7+'</b><span>Hoạt động 7 ngày</span></div>';
+}
+function render(filter){
+  var rows=ALL.filter(function(u){ if(!filter)return true; return ((u.phone||'')+' '+(u.name||'')).toLowerCase().indexOf(filter)>=0; });
+  if(!rows.length){ document.getElementById('tableWrap').innerHTML='<p class="muted">Chưa có học viên nào.</p>'; return; }
+  var h='<table><thead><tr><th>#</th><th>SĐT</th><th>Họ tên</th><th>Gói</th><th>Chương đã học</th><th>Quiz đúng/đã làm</th><th>Tỉ lệ</th><th>Thi thử (best)</th><th>Hoạt động cuối</th></tr></thead><tbody>';
+  rows.forEach(function(u,i){
+    h+='<tr><td>'+(i+1)+'</td>'
+     +'<td>'+esc(u.phone||'—')+'</td>'
+     +'<td>'+esc(u.name||'—')+'</td>'
+     +'<td>'+(u.premium?'<span class="pro">PRO'+(u.premiumText?' ('+esc(u.premiumText)+')':'')+'</span>':'<span class="free">Free</span>')+'</td>'
+     +'<td>'+(u.chaptersDone||0)+'/18</td>'
+     +'<td>'+(u.quizCorrect||0)+'/'+(u.quizDone||0)+'</td>'
+     +'<td><div style="display:flex;align-items:center;gap:6px"><div class="bar"><i style="width:'+(u.accuracy||0)+'%"></i></div>'+(u.accuracy||0)+'%</div></td>'
+     +'<td>'+(u.bestMock||0)+'%</td>'
+     +'<td>'+fmtTime(u.lastActive)+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  document.getElementById('tableWrap').innerHTML=h;
+}
+</script>
+</body>
+</html>

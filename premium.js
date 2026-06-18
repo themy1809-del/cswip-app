@@ -253,7 +253,7 @@ function doActivate(){
   var r=applyCode(c);
   var m=document.getElementById('act_msg');
   if(m) m.innerHTML='<span style="color:'+(r.ok?'var(--green)':'var(--red)')+'">'+r.msg+'</span>';
-  if(r.ok) setTimeout(function(){renderProfile();},900);
+  if(r.ok){ try{window.cloudSync&&window.cloudSync();}catch(e){} setTimeout(function(){renderProfile();},900); }
 }
 function buyNow(){
   var u=_curUser();
@@ -299,7 +299,7 @@ var _origRenderQuiz = (typeof renderQuiz==='function') ? renderQuiz : function()
 renderQuiz = function(){
   try{
     if(typeof Qmode!=='undefined' && Qmode!=='menu' && typeof Qi!=='undefined' && Qi>=Qz.length && Qsource && !Qsource._logged && Qz.length){
-      logExam(Qscore, Qz.length, Qsource.label||'Quiz'); Qsource._logged=true;
+      logExam(Qscore, Qz.length, Qsource.label||'Quiz'); Qsource._logged=true; try{window.cloudSync&&window.cloudSync();}catch(e){}
     }
   }catch(e){}
   return _origRenderQuiz.apply(this, arguments);
@@ -446,6 +446,7 @@ function adminPanelHTML(){
   if(!_isOwner()) return '';
   return '<div class="card" style="border-color:rgba(255,214,10,.35)"><h3>🔐 '+bili('Tạo mã kích hoạt (chủ shop)','Generate codes (owner)')+'</h3>'
    +'<p class="muted" style="font-size:12px">'+bili('Chỉ bạn thấy mục này. Nhập SĐT khách → tạo mã → gửi khách.','Owner-only. Enter customer phone → generate → send.')+'</p>'
+   +'<div class="row" style="justify-content:flex-start;margin:2px 0 10px"><button class="btn sec" onclick="window.open(\'dashboard.html\',\'_blank\')">📊 '+bili('Xem học viên đang dùng (cloud)','View active learners')+'</button></div>'
    +'<div id="adm_gate"><div class="tool-grid" style="grid-template-columns:1fr"><label>'+bili('Mật khẩu admin','Admin password')+'<input id="adm_pass" type="password" placeholder="••••"></label></div><div class="row" style="justify-content:flex-start;margin-top:6px"><button class="btn sec" onclick="admUnlock()">'+bili('Mở','Open')+'</button></div></div>'
    +'<div id="adm_panel" style="display:none"><div class="tool-grid"><label>'+bili('SĐT khách','Customer phone')+'<input id="adm_phone" placeholder="09..." inputmode="tel" oninput="admGen()"></label><label>'+bili('Thời hạn','Validity')+'<select id="adm_exp" onchange="admGen()"><option value="L">'+bili('Vĩnh viễn','Lifetime')+'</option><option value="12">12 '+bili('tháng','mo')+'</option><option value="6">6 '+bili('tháng','mo')+'</option><option value="3">3 '+bili('tháng','mo')+'</option></select></label></div><div id="adm_out" class="tool-out" style="display:none"></div></div></div>';
 }
