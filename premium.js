@@ -415,7 +415,7 @@ try{ maybeRegister(); }catch(e){}
     panel.innerHTML='<div class="ai-head"><span>🤖 '+bili('Trợ lý CSWIP','CSWIP assistant')+'</span><span style="cursor:pointer;font-size:18px" id="ai-x">✕</span></div>'
       +'<div class="ai-msgs" id="ai-msgs"></div>'
       +'<button class="ai-gpt" id="ai-gpt">💬 '+bili('Hỏi sâu hơn với ChatGPT','Ask ChatGPT for more')+'</button>'
-      +'<div class="ai-in"><input id="ai-q" placeholder="'+bili('vd: undercut là gì?','e.g. what is undercut?')+'"><button id="ai-send">'+bili('Gửi','Send')+'</button></div>';
+      +'<div class="ai-in"><input id="ai-q" placeholder="vd: undercut là gì? / e.g. undercut?"><button id="ai-send">'+bili('Gửi','Send')+'</button></div>';
     document.body.appendChild(fab); document.body.appendChild(panel);
     var msgs=panel.querySelector('#ai-msgs'); var lastQ='';
     function add(html,me){ var d=document.createElement('div'); if(me){d.className='ai-me'; d.textContent=html;} else {d.innerHTML=html;} msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; }
@@ -461,3 +461,32 @@ function admGen(){
   out.innerHTML='<div style="font-size:20px;font-weight:800;color:var(--yellow);word-break:break-all;text-align:center">'+code+'</div><div class="muted" style="font-size:12px;text-align:center">'+bili('cho SĐT','for')+' '+_esc(phone)+' · '+hsd+'</div><div class="row" style="justify-content:center;margin-top:6px"><button class="btn sec" onclick="admCopy(this,\''+code+'\')">📋 '+bili('Copy mã gửi khách','Copy code')+'</button></div>';
 }
 function admCopy(btn,c){ try{ navigator.clipboard.writeText(c); }catch(e){} var o=btn.textContent; btn.textContent='✓ Đã copy'; setTimeout(function(){btn.textContent=o;},1400); }
+
+
+/* ================= THANH ĐIỀU HƯỚNG DƯỚI (mobile) — dễ vào bài học ================= */
+(function(){
+  function build(){
+    if(document.getElementById('botnav')) return;
+    if(!document.body){ return; }
+    var items=[['home','🏠','Tổng quan'],['learn','📚','Bài học'],['flash','🃏','Thẻ'],['quiz','📝','Quiz'],['profile','👤','Hồ sơ']];
+    var css='#botnav{display:none}'
+      +'@media(max-width:860px){'
+      +'#botnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:120;background:rgba(11,15,23,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.1);padding:5px 4px;padding-bottom:calc(5px + env(safe-area-inset-bottom,0px));justify-content:space-around}'
+      +'#botnav button{flex:1;background:none;border:none;color:#94a3bb;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;padding:5px 2px;cursor:pointer;border-radius:10px;line-height:1.15}'
+      +'#botnav button .bi{font-size:20px;line-height:1}'
+      +'#botnav button.on{color:#4ca8ff}'
+      +'#ai-fab{bottom:78px!important}#ai-panel{bottom:144px!important;max-height:56vh!important}'
+      +'main{padding-bottom:84px!important}'
+      +'}';
+    var st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
+    var bar=document.createElement('nav'); bar.id='botnav';
+    bar.innerHTML=items.map(function(it){ return '<button data-bt="'+it[0]+'"><span class="bi">'+it[1]+'</span>'+it[2]+'</button>'; }).join('');
+    document.body.appendChild(bar);
+    function sync(){ var cur=(typeof CUR!=='undefined'&&CUR)?CUR:'home'; var bs=bar.querySelectorAll('button'); for(var i=0;i<bs.length;i++){ bs[i].classList.toggle('on', bs[i].getAttribute('data-bt')===cur); } }
+    var bs=bar.querySelectorAll('button');
+    for(var i=0;i<bs.length;i++){ (function(b){ b.onclick=function(){ try{ go(b.getAttribute('data-bt')); }catch(e){} }; })(bs[i]); }
+    if(typeof window.go==='function' && !window._goWrapped){ var og=window.go; window.go=function(t){ og(t); try{sync();}catch(e){} }; window._goWrapped=true; }
+    sync();
+  }
+  if(document.body) build(); else window.addEventListener('load', build);
+})();

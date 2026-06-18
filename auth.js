@@ -75,7 +75,7 @@ function vietQRUrl(){
 function fmtPrice(){ try{ return (CONFIG.price||0).toLocaleString('vi-VN')+(CONFIG.currency||'đ'); }catch(e){ return (CONFIG.price||0)+(CONFIG.currency||'đ'); } }
 
 /* ---------- Đăng ký BẮT BUỘC trước khi học (tên + SĐT + email) ---------- */
-function _regOK(u){ u=u||_curUser(); return !!(u.name && u.phone && u.email); }
+function _regOK(u){ u=u||_curUser(); return !!(u.name && u.phone); }
 function _vEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((e||'').trim()); }
 function _vPhone(p){ var d=(p||'').replace(/\D/g,''); if(d.indexOf('84')===0)d=d.slice(2); if(d.indexOf('0')===0)d=d.slice(1); return d.length>=9 && d.length<=10; }
 function maybeRegister(){ if(_regOK()) return; showRegister(false); }
@@ -93,8 +93,6 @@ function showRegister(force){
       '<input id="reg-name" value="'+(u.name||'').replace(/"/g,'&quot;')+'" placeholder="Nguyễn Văn A" style="'+inS+'">'+
       '<label style="font-size:12px;color:#94a3bb">Số điện thoại / Phone *</label>'+
       '<input id="reg-phone" value="'+(u.phone||'').replace(/"/g,'&quot;')+'" placeholder="09..." inputmode="tel" style="'+inS+'">'+
-      '<label style="font-size:12px;color:#94a3bb">Email *</label>'+
-      '<input id="reg-email" value="'+(u.email||'').replace(/"/g,'&quot;')+'" placeholder="ban@email.com" inputmode="email" style="'+inS+'">'+
       '<div id="reg-err" style="color:#ff6b6b;font-size:12.5px;min-height:15px;margin:-4px 0 8px"></div>'+
       '<button onclick="submitRegister()" style="width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#4ca8ff,#2f7fe0);color:#06121f;font-weight:800;font-size:15px;cursor:pointer">Bắt đầu học →</button>'+
       (force?'<button onclick="(function(){var e=document.getElementById(\'reg-overlay\');if(e)e.remove();})()" style="width:100%;margin-top:8px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:none;color:#94a3bb;cursor:pointer">Đóng</button>':'')+
@@ -106,16 +104,15 @@ function submitRegister(){
   var err=document.getElementById('reg-err'); function E(m){ if(err){err.textContent=m;} else {alert(m);} }
   var name=((document.getElementById('reg-name')||{}).value||'').trim();
   var phone=((document.getElementById('reg-phone')||{}).value||'').trim();
-  var email=((document.getElementById('reg-email')||{}).value||'').trim();
   if(!name){ E('Vui lòng nhập họ tên. / Please enter your name.'); return; }
   if(!_vPhone(phone)){ E('Số điện thoại chưa đúng (VD: 0912345678). / Invalid phone.'); return; }
-  if(!_vEmail(email)){ E('Email chưa đúng (VD: ban@email.com). / Invalid email.'); return; }
-  var u=_curUser(); u.name=name; u.phone=phone; u.email=email;
+  var u=_curUser(); u.name=name; u.phone=phone;
   localStorage.setItem('cswip_user',JSON.stringify(u));
   try{ USER=u; }catch(e){}
   var ov=document.getElementById('reg-overlay'); if(ov) ov.remove();
   try{ if(window.cloudSync) window.cloudSync(); }catch(e2){}
   try{ renderAll(); }catch(e3){}
+  try{ if(typeof go==='function') go('learn'); }catch(e4){}
 }
 /* Bắt buộc hiện form đăng ký ngay khi mở app (nhiều hook cho chắc) */
 function _bootRegister(){ try{ maybeRegister(); }catch(e){} }
