@@ -45,7 +45,7 @@
     <div class="card">
       <div class="stat" id="stats"></div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <input id="q" placeholder="🔎 Tìm theo SĐT / tên...">
+        <input id="q" placeholder="🔎 Tìm theo SĐT / tên / email...">
         <button class="btn sec" id="reload" style="margin-top:8px">↻ Tải lại</button>
         <button class="btn sec" id="logout" style="margin-top:8px">Đăng xuất</button>
       </div>
@@ -105,13 +105,14 @@ function stats(){
     '<div class="b"><b>'+active7+'</b><span>Hoạt động 7 ngày</span></div>';
 }
 function render(filter){
-  var rows=ALL.filter(function(u){ if(!filter)return true; return ((u.phone||'')+' '+(u.name||'')).toLowerCase().indexOf(filter)>=0; });
+  var rows=ALL.filter(function(u){ if(!filter)return true; return ((u.phone||'')+' '+(u.name||'')+' '+(u.email||'')).toLowerCase().indexOf(filter)>=0; });
   if(!rows.length){ document.getElementById('tableWrap').innerHTML='<p class="muted">Chưa có học viên nào.</p>'; return; }
-  var h='<table><thead><tr><th>#</th><th>SĐT</th><th>Họ tên</th><th>Gói</th><th>Chương đã học</th><th>Quiz đúng/đã làm</th><th>Tỉ lệ</th><th>Thi thử (best)</th><th>Hoạt động cuối</th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>#</th><th>SĐT</th><th>Họ tên</th><th>Email</th><th>Gói</th><th>Chương đã học</th><th>Quiz đúng/đã làm</th><th>Tỉ lệ</th><th>Thi thử (best)</th><th>Hoạt động cuối</th></tr></thead><tbody>';
   rows.forEach(function(u,i){
     h+='<tr><td>'+(i+1)+'</td>'
      +'<td>'+esc(u.phone||'—')+'</td>'
      +'<td>'+esc(u.name||'—')+'</td>'
+     +'<td>'+esc(u.email||'—')+'</td>'
      +'<td>'+(u.premium?'<span class="pro">PRO'+(u.premiumText?' ('+esc(u.premiumText)+')':'')+'</span>':'<span class="free">Free</span>')+'</td>'
      +'<td>'+(u.chaptersDone||0)+'/18</td>'
      +'<td>'+(u.quizCorrect||0)+'/'+(u.quizDone||0)+'</td>'

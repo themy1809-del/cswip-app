@@ -25,7 +25,7 @@
     var best=0; try{ (u.history||[]).forEach(function(h){ if(h.p>best)best=h.p; }); }catch(e){}
     return {
       uid: auth.currentUser?auth.currentUser.uid:'',
-      phone: (u.phone||''), name: (u.name||''), org: (u.org||''),
+      phone: (u.phone||''), name: (u.name||''), email: (u.email||''), org: (u.org||''),
       premium: prem, premiumText: exp,
       chaptersDone: done, quizDone: ans, quizCorrect: correct,
       accuracy: ans?Math.round(correct/ans*100):0,

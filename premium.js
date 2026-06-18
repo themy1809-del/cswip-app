@@ -276,7 +276,7 @@ renderProfile = function(){
     +'<label>'+bili('Họ tên','Full name')+'<input id="u_name" value="'+_esc(u.name)+'" oninput="saveUserField(\'name\',this.value)"></label>'
     +'<label>'+bili('SĐT (kích hoạt)','Phone (activation)')+'<input id="u_phone" value="'+_esc(u.phone)+'" oninput="saveUserField(\'phone\',this.value)"></label>'
     +'<label>'+bili('Đơn vị','Company')+'<input id="u_org" value="'+_esc(u.org)+'" oninput="saveUserField(\'org\',this.value)"></label>'
-    +'<label>Email/SĐT<input id="u_contact" value="'+_esc(u.contact)+'" oninput="saveUserField(\'contact\',this.value)"></label>'
+    +'<label>Email<input id="u_email" value="'+_esc(u.email)+'" oninput="saveUserField(\'email\',this.value)"></label>'
     +'</div></div>'
     +'<div class="card"><h3>📊 '+bili('Bảng điểm','Scorecard')+'</h3>'
     +'<div class="score-grid">'
