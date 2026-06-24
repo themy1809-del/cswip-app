@@ -333,18 +333,27 @@ function recordChapExam(ci,pct,correct,total){
 }
 /* Đề thi chương = câu của chương (sát bài học) + câu đề thật cùng chủ đề (nâng cao) */
 var CHAP_CATS={0:['Duties'],1:['Processes','Heat input'],2:['Consumables'],3:['Symbols'],4:['Defects'],5:['DT'],6:['NDT'],7:['WPS/PQR'],8:['Materials'],9:['Heat treatment'],10:['Defects','Materials'],11:['Symbols','Codes'],12:['Codes'],13:['Equipment','Calculation'],14:['Safety'],15:['Terminology'],16:['Thermal cutting'],17:['In-service']};
-function _validQ(q){ return !!(q && q.ov && q.oe && q.ov.length && q.oe.length===q.ov.length && q.a<q.oe.length && q.ov[q.a]!=null && q.oe[q.a]!=null && q.qe!=null); }
-/* Lọc bỏ câu lỗi (thiếu lựa chọn) khỏi mọi ngân hàng -> không quiz nào bị crash */
-(function(){ ['poolBank','poolReal','poolCWI'].forEach(function(fn){ try{ if(typeof window[fn]==='function'){ var _o=window[fn]; window[fn]=function(){ try{ return _o().filter(_validQ); }catch(e){ return _o(); } }; } }catch(e){} }); })();
+/* Chuẩn hóa câu hỏi: điền ov rỗng nếu thiếu -> không quiz nào crash, dùng được cả câu English-only (CWI) */
+function _qOK(q){ return !!(q && q.qe!=null && Array.isArray(q.oe) && q.oe.length && q.a<q.oe.length && q.oe[q.a]!=null); }
+function _fixQ(q){ if(!q) return q; if(!Array.isArray(q.ov) || q.ov.length!==((q.oe&&q.oe.length)||0)){ q.ov=((q.oe)||[]).map(function(){return '';}); } if(q.qv==null) q.qv=''; if(q.ev==null) q.ev=''; return q; }
+(function(){ ['poolBank','poolReal','poolCWI'].forEach(function(fn){ try{ if(typeof window[fn]==='function'){ var _o=window[fn]; window[fn]=function(){ try{ return _o().filter(_qOK).map(_fixQ); }catch(e){ return _o(); } }; } }catch(e){} }); })();
+/* Chuyển câu hỏi sang CHỈ TIẾNG ANH (thi sát đề thật, đề thi thật bằng tiếng Anh) */
+function _toEN(q){ return {qv:'', qe:q.qe, ov:((q.oe)||[]).map(function(){return '';}), oe:q.oe, a:q.a, ev:'', ee:(q.ee||''), id:q.id, cat:q.cat}; }
+/* Số câu thi theo độ quan trọng (chương trọng tâm thi: nhiều câu + khó hơn) */
+function examTarget(ci){ var imp={1:40,2:40,4:40,5:40,6:40,7:40,8:40}, med={3:30,9:30,10:30,11:30,12:30}; return imp[ci]||med[ci]||25; }
 function examPool(ci){
-  var own=[]; try{ own=poolChapters().filter(function(q){ return q.id && q.id.indexOf('c'+ci+'-')===0 && _validQ(q); }); }catch(e){}
-  var cats=CHAP_CATS[ci]||[]; var extra=[];
-  if(cats.length){ try{ extra=poolAll().filter(function(q){ return q.id && q.id.charAt(0)!=='c' && q.cat && cats.indexOf(q.cat)>=0; }); }catch(e){} }
-  try{ extra=shuffle(extra.slice()); }catch(e){}
-  var target=18, pool=own.slice();
-  var need=Math.max(0, target-pool.length);
-  pool=pool.concat(extra.slice(0,need));
-  if(pool.length>24) pool=pool.slice(0,24);
+  var cats=CHAP_CATS[ci]||[];
+  var own=[]; try{ own=poolChapters().filter(function(q){ return q.id && q.id.indexOf('c'+ci+'-')===0 && _qOK(q); }); }catch(e){}
+  var matched=[]; try{ matched=poolAll().filter(function(q){ return q.id && q.id.charAt(0)!=='c' && q.cat && cats.indexOf(q.cat)>=0 && _qOK(q); }); }catch(e){}
+  var hard=[]; try{ hard=poolCWI().filter(_qOK); }catch(e){}
+  try{ matched=shuffle(matched.slice()); own=shuffle(own.slice()); hard=shuffle(hard.slice()); }catch(e){}
+  var target=examTarget(ci);
+  var seen={}, pool=[];
+  function add(arr){ for(var i=0;i<arr.length && pool.length<target;i++){ var q=arr[i]; var k=q.id||((q.qe||'')+'').slice(0,40); if(!seen[k]){ seen[k]=1; pool.push(q); } } }
+  add(matched);  /* câu đề thật cùng chủ đề (khó, sát đề) */
+  add(own);      /* câu của chương (liên quan bài học) */
+  add(hard);     /* câu CWI khó để đủ số lượng + tăng độ khó */
+  pool=pool.map(_toEN);
   try{ pool=shuffle(pool); }catch(e){}
   return pool;
 }
@@ -353,7 +362,7 @@ function examChap(ci){
   var pool=examPool(ci);
   if(!pool||!pool.length){ alert('Chương này chưa có câu hỏi thi.'); return; }
   go('quiz');
-  var mins=Math.max(8, Math.round(pool.length*1.2));
+  var mins=Math.max(20, Math.round(pool.length*1.1));
   startSet(pool, mins*60, '📝 '+bili('Thi Chương ','Exam Ch.')+(ci+1));
   try{ if(Qsource) Qsource._exam=ci; }catch(e){}
 }
