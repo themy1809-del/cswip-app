@@ -333,8 +333,11 @@ function recordChapExam(ci,pct,correct,total){
 }
 /* Đề thi chương = câu của chương (sát bài học) + câu đề thật cùng chủ đề (nâng cao) */
 var CHAP_CATS={0:['Duties'],1:['Processes','Heat input'],2:['Consumables'],3:['Symbols'],4:['Defects'],5:['DT'],6:['NDT'],7:['WPS/PQR'],8:['Materials'],9:['Heat treatment'],10:['Defects','Materials'],11:['Symbols','Codes'],12:['Codes'],13:['Equipment','Calculation'],14:['Safety'],15:['Terminology'],16:['Thermal cutting'],17:['In-service']};
+function _validQ(q){ return !!(q && q.ov && q.oe && q.ov.length && q.oe.length===q.ov.length && q.a<q.oe.length && q.ov[q.a]!=null && q.oe[q.a]!=null && q.qe!=null); }
+/* Lọc bỏ câu lỗi (thiếu lựa chọn) khỏi mọi ngân hàng -> không quiz nào bị crash */
+(function(){ ['poolBank','poolReal','poolCWI'].forEach(function(fn){ try{ if(typeof window[fn]==='function'){ var _o=window[fn]; window[fn]=function(){ try{ return _o().filter(_validQ); }catch(e){ return _o(); } }; } }catch(e){} }); })();
 function examPool(ci){
-  var own=[]; try{ own=poolChapters().filter(function(q){ return q.id && q.id.indexOf('c'+ci+'-')===0; }); }catch(e){}
+  var own=[]; try{ own=poolChapters().filter(function(q){ return q.id && q.id.indexOf('c'+ci+'-')===0 && _validQ(q); }); }catch(e){}
   var cats=CHAP_CATS[ci]||[]; var extra=[];
   if(cats.length){ try{ extra=poolAll().filter(function(q){ return q.id && q.id.charAt(0)!=='c' && q.cat && cats.indexOf(q.cat)>=0; }); }catch(e){} }
   try{ extra=shuffle(extra.slice()); }catch(e){}
