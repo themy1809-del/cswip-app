@@ -18,6 +18,7 @@
     try{ prog=JSON.parse(localStorage.getItem('cswip_prog')||'{}'); }catch(e){}
     try{ qs=JSON.parse(localStorage.getItem('cswip_quiz')||'{}'); }catch(e){}
     var done=0; for(var k in prog){ if(prog[k]) done++; }
+    var passed=0; try{ var ex=JSON.parse(localStorage.getItem('cswip_exam')||'{}'); for(var ek in ex){ if(ex[ek]&&ex[ek].best>=70) passed++; } }catch(e){}
     var ans=0, correct=0; for(var q in qs){ ans++; if(qs[q]&&qs[q].correct) correct++; }
     var prem=false, exp='';
     try{ prem=(typeof isPremium==='function')?!!isPremium():false; }catch(e){}
@@ -27,7 +28,7 @@
       uid: auth.currentUser?auth.currentUser.uid:'',
       phone: (u.phone||''), name: (u.name||''), email: (u.email||''), org: (u.org||''),
       premium: prem, premiumText: exp,
-      chaptersDone: done, quizDone: ans, quizCorrect: correct,
+      chaptersDone: done, chaptersPassed: passed, quizDone: ans, quizCorrect: correct,
       accuracy: ans?Math.round(correct/ans*100):0,
       bestMock: best,
       exams: (u.history&&u.history.length)||0,

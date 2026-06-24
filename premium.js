@@ -289,6 +289,7 @@ renderProfile = function(){
     +'<button class="btn" onclick="printScorecard()">🖨️ '+bili('In bảng điểm','Print scorecard')+'</button>'
     +'<button class="btn sec" onclick="resetProgress()">'+bili('Đặt lại tiến độ','Reset progress')+'</button>'
     +'</div></div>'
+    + examResultsHTML()
     + examHistoryHTML()
     + premiumCardHTML()
     + adminPanelHTML();
@@ -297,16 +298,96 @@ renderProfile = function(){
 /* ---------- wrap renderQuiz to log mock-exam scores ---------- */
 var _origRenderQuiz = (typeof renderQuiz==='function') ? renderQuiz : function(){};
 renderQuiz = function(){
+  var _justExam=null;
   try{
-    if(typeof Qmode!=='undefined' && Qmode!=='menu' && typeof Qi!=='undefined' && Qi>=Qz.length && Qsource && !Qsource._logged && Qz.length){
+    var _atEnd=(typeof Qmode!=='undefined' && Qmode!=='menu' && typeof Qi!=='undefined' && Qi>=Qz.length && Qz.length);
+    if(_atEnd && Qsource && !Qsource._logged){
       logExam(Qscore, Qz.length, Qsource.label||'Quiz'); Qsource._logged=true; try{window.cloudSync&&window.cloudSync();}catch(e){}
     }
+    if(_atEnd && Qsource && Qsource._exam!==undefined && Qsource._exam!==null && !Qsource._examLogged){
+      var _pct=Math.round(Qscore/Qz.length*100);
+      recordChapExam(Qsource._exam, _pct, Qscore, Qz.length);
+      Qsource._examLogged=true; _justExam={ci:Qsource._exam,pct:_pct};
+      try{window.cloudSync&&window.cloudSync();}catch(e){}
+    }
   }catch(e){}
-  return _origRenderQuiz.apply(this, arguments);
+  var _ret=_origRenderQuiz.apply(this, arguments);
+  if(_justExam){ try{ _appendExamBanner(_justExam.ci, _justExam.pct); }catch(e){} }
+  return _ret;
 };
 
 /* ================= FREEMIUM: Chương 1 FREE, chương 2+ cần PRO ================= */
-function chapFree(i){ return isPremium() || i===0; }
+/* ============== LỘ TRÌNH THI: đậu ≥70% chương trước + PRO mới mở chương sau ============== */
+var PASS_MARK=70;
+function examData(){ try{ return JSON.parse(localStorage.getItem('cswip_exam')||'{}'); }catch(e){ return {}; } }
+function saveExamData(d){ try{ localStorage.setItem('cswip_exam', JSON.stringify(d)); }catch(e){} }
+function chapResult(i){ var d=examData(); return d[i]||null; }
+function chapPassed(i){ var e=chapResult(i); return !!(e && e.best>=PASS_MARK); }
+function chaptersPassedCount(){ var d=examData(),n=0; for(var k in d){ if(d[k]&&d[k].best>=PASS_MARK) n++; } return n; }
+function recordChapExam(ci,pct,correct,total){
+  var d=examData(); var e=d[ci]||{best:0,attempts:0};
+  e.attempts=(e.attempts||0)+1; e.last=pct; e.lastCorrect=correct; e.lastTotal=total;
+  if(pct>(e.best||0)) e.best=pct;
+  e.passed=e.best>=PASS_MARK; e.date=new Date().toISOString().slice(0,10);
+  d[ci]=e; saveExamData(d);
+}
+/* Đề thi chương = câu của chương (sát bài học) + câu đề thật cùng chủ đề (nâng cao) */
+var CHAP_CATS={0:['Duties'],1:['Processes','Heat input'],2:['Consumables'],3:['Symbols'],4:['Defects'],5:['DT'],6:['NDT'],7:['WPS/PQR'],8:['Materials'],9:['Heat treatment'],10:['Defects','Materials'],11:['Symbols','Codes'],12:['Codes'],13:['Equipment','Calculation'],14:['Safety'],15:['Terminology'],16:['Thermal cutting'],17:['In-service']};
+function examPool(ci){
+  var own=[]; try{ own=poolChapters().filter(function(q){ return q.id && q.id.indexOf('c'+ci+'-')===0; }); }catch(e){}
+  var cats=CHAP_CATS[ci]||[]; var extra=[];
+  if(cats.length){ try{ extra=poolAll().filter(function(q){ return q.id && q.id.charAt(0)!=='c' && q.cat && cats.indexOf(q.cat)>=0; }); }catch(e){} }
+  try{ extra=shuffle(extra.slice()); }catch(e){}
+  var target=18, pool=own.slice();
+  var need=Math.max(0, target-pool.length);
+  pool=pool.concat(extra.slice(0,need));
+  if(pool.length>24) pool=pool.slice(0,24);
+  try{ pool=shuffle(pool); }catch(e){}
+  return pool;
+}
+function examChap(ci){
+  if(typeof chapFree==='function' && !chapFree(ci)){ go('learn'); openChap(ci); return; }
+  var pool=examPool(ci);
+  if(!pool||!pool.length){ alert('Chương này chưa có câu hỏi thi.'); return; }
+  go('quiz');
+  var mins=Math.max(8, Math.round(pool.length*1.2));
+  startSet(pool, mins*60, '📝 '+bili('Thi Chương ','Exam Ch.')+(ci+1));
+  try{ if(Qsource) Qsource._exam=ci; }catch(e){}
+}
+function _appendExamBanner(ci, pct){
+  var el=document.getElementById('v-quiz'); if(!el) return;
+  var pass=pct>=PASS_MARK, nextI=ci+1, hasNext=nextI<DATA.chapters.length, msg;
+  if(pass){
+    msg='<div class="card" style="border-color:rgba(52,199,89,.55);text-align:center"><div style="font-size:36px">🎉</div><h3 style="color:var(--green)">'+bili('Đậu Chương '+(ci+1)+'!','Passed Chapter '+(ci+1)+'!')+'</h3>';
+    if(hasNext){
+      if(typeof isPremium==='function' && isPremium()) msg+='<p class="muted">'+bili('Đã mở Chương '+(nextI+1)+'. Học tiếp nhé!','Chapter '+(nextI+1)+' unlocked!')+'</p><button class="btn" onclick="go(\'learn\');openChap('+nextI+')">'+bili('Vào Chương ','Go to Ch ')+(nextI+1)+' →</button>';
+      else msg+='<p class="muted">'+bili('Mở khóa PRO để học tiếp Chương '+(nextI+1)+' + toàn bộ.','Unlock PRO to continue.')+'</p>'+unlockBtn();
+    } else { msg+='<p class="muted">'+bili('Bạn đã hoàn thành chương cuối! 👏','You finished the last chapter!')+'</p>'; }
+    msg+='</div>';
+  } else {
+    msg='<div class="card" style="border-color:rgba(255,122,51,.5);text-align:center"><div style="font-size:36px">💪</div><h3>'+bili('Chưa đạt (cần ≥70%)','Not passed (need ≥70%)')+'</h3><p class="muted">'+bili('Ôn lại Chương '+(ci+1)+' rồi thi lại để mở chương sau.','Review and retry.')+'</p><button class="btn" onclick="examChap('+ci+')">🔁 '+bili('Thi lại','Retry')+'</button> <button class="btn sec" onclick="go(\'learn\');openChap('+ci+')">'+bili('Ôn lại chương','Review')+'</button></div>';
+  }
+  el.insertAdjacentHTML('beforeend', msg);
+}
+function examLockHTML(i){
+  var prev=DATA.chapters[i-1], r=chapResult(i-1);
+  return '<div class="card" style="border-color:rgba(76,168,255,.5);text-align:center"><div style="font-size:42px">🔐</div>'
+   +'<h2 style="margin-top:6px">'+bili('Cần thi đậu chương trước','Pass the previous chapter')+'</h2>'
+   +'<p class="muted" style="font-size:14px;margin-top:6px">'+bili('Bạn cần thi đậu (≥70%) Chương '+i+': <b>'+prev.vi+'</b> mới mở được chương này. Học theo lộ trình giúp chắc kiến thức, sát đề thi thật.','Pass Chapter '+i+' (≥70%) first.')+'</p>'
+   +(r?('<p style="font-size:14px;margin-top:6px">'+bili('Điểm cao nhất','Best')+': <b style="color:'+(r.best>=PASS_MARK?'var(--green)':'var(--accent)')+'">'+r.best+'%</b></p>'):'')
+   +'<div class="row" style="margin-top:12px;justify-content:center"><button class="btn" onclick="examChap('+(i-1)+')">📝 '+bili('Thi Chương ','Take Chapter ')+i+'</button></div></div>';
+}
+function examResultsHTML(){
+  var d=examData(), rows='';
+  for(var i=0;i<DATA.chapters.length;i++){ var r=d[i]; if(!r) continue; var pass=r.best>=PASS_MARK;
+    rows+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px;gap:8px"><span>'+bili('Chương ','Ch ')+(i+1)+'. '+_esc(DATA.chapters[i].vi)+'</span><span style="color:'+(pass?'var(--green)':'var(--accent)')+';font-weight:700;white-space:nowrap">'+(pass?'✅ ':'⚠️ ')+r.best+'%</span></div>';
+  }
+  if(!rows) rows='<p class="muted" style="font-size:13px">'+bili('Chưa thi chương nào. Vào Bài học rồi bấm "Thi chương" để bắt đầu.','No chapter exams yet.')+'</p>';
+  return '<div class="card"><h3>🎯 '+bili('Kết quả thi từng chương','Chapter exam results')+'</h3><p class="muted" style="font-size:12px">'+bili('Đã đậu ','Passed ')+'<b>'+chaptersPassedCount()+'/'+DATA.chapters.length+'</b> '+bili('chương (mốc 70%)','chapters (70%)')+'</p>'+rows+'</div>';
+}
+/* ===== Cổng chương: Ch1 free; Ch2+ cần PRO + đậu chương liền trước ===== */
+function chapFree(i){ if(i===0) return true; if(!isPremium()) return false; return chapPassed(i-1); }
+function chapLockReason(i){ if(chapFree(i)) return null; if(!isPremium()) return 'pro'; return 'exam'; }
 function unlockBtn(){ return '<div class="row" style="margin-top:10px;justify-content:flex-start"><button class="btn" onclick="go(\'profile\')">⭐ '+bili('Mở khóa ngay','Unlock now')+' — '+fmtPrice()+'</button></div>'; }
 function lockUpsellHTML(nextVi,nextEn){
   return '<div class="card" style="border-color:rgba(255,122,51,.55);text-align:center">'
@@ -325,22 +406,33 @@ renderLearn=function(){
     el.innerHTML='<div class="card"><h2>📚 '+bili('Chương trình học','Syllabus')+'</h2>'
       +'<p class="muted">'+bili('Chương 1 học miễn phí. Hoàn thành rồi mở khóa toàn bộ để học tiếp.','Chapter 1 is free. Finish it, then unlock the rest.')+'</p></div>'
       +'<div class="chap-list">'+DATA.chapters.map(function(c,i){
-        var locked=!chapFree(i);
-        return '<div class="chap" onclick="openChap('+i+')">'
-          +'<div class="num">'+(locked?'🔒':(i+1))+'</div>'
-          +'<div class="meta"><b>'+bili(c.vi,c.en)+'</b><div class="muted" style="font-size:12px">'+(locked?('⭐ '+bili('Cần PRO','PRO')):(c.lessons.length+' '+bili('mục','items')+' • '+c.quiz.length+' quiz'))+'</div></div>'
-          +'<div class="done">'+(locked?'':(PROG[i]?'✓':''))+'</div></div>';
+        var free=chapFree(i), r=chapResult(i), num, sub, done='';
+        if(!free){
+          if(!isPremium()){ num='🔒'; sub='⭐ '+bili('Cần PRO','PRO'); }
+          else { num='🔐'; sub=bili('Đậu Chương '+i+' để mở','Pass Ch '+i); }
+        } else {
+          num=(i+1);
+          if(r && r.best>=PASS_MARK){ sub='✅ '+bili('Đậu ','Pass ')+r.best+'%'; done='✓'; }
+          else if(r){ sub='⚠️ '+bili('Chưa đạt ','Below ')+r.best+'%'; }
+          else { sub=c.lessons.length+' '+bili('mục','items')+' • '+c.quiz.length+' '+bili('câu thi','Q'); }
+        }
+        return '<div class="chap" onclick="openChap('+i+')"><div class="num">'+num+'</div>'
+          +'<div class="meta"><b>'+bili(c.vi,c.en)+'</b><div class="muted" style="font-size:12px">'+sub+'</div></div>'
+          +'<div class="done">'+done+'</div></div>';
       }).join('')+'</div>';
   } else {
     var c=DATA.chapters[CURCHAP];
     var back='<button class="back" onclick="CURCHAP=null;renderLearn()">← '+bili('Tất cả chương','All chapters')+'</button>';
-    if(!chapFree(CURCHAP)){ el.innerHTML=back+lockUpsellHTML(c.vi,c.en); window.scrollTo(0,0); return; }
+    var _reason=chapLockReason(CURCHAP);
+    if(_reason==='pro'){ el.innerHTML=back+lockUpsellHTML(c.vi,c.en); window.scrollTo(0,0); return; }
+    if(_reason==='exam'){ el.innerHTML=back+examLockHTML(CURCHAP); window.scrollTo(0,0); return; }
     el.innerHTML=back+'<div class="card"><span class="pill">'+bili('Chương','Chapter')+' '+(CURCHAP+1)+'</span><h2>'+bili(c.vi,c.en)+'</h2>'
       +(c.intro?'<p class="muted" style="margin-top:8px">'+bili(c.intro.vi,c.intro.en)+'</p>':'')
       +'<ul class="lesson">'+c.lessons.map(function(L){return '<li>'+bili('<span class="term">'+L.t_vi+':</span> '+L.vi,(L.t_en?L.t_en+': ':'')+L.en)+'</li>';}).join('')+'</ul>'
       +(c.key?'<h3>🔑 '+bili('Điểm cần nhớ cho kỳ thi','Exam key points')+'</h3><ul class="lesson">'+c.key.map(function(k){return '<li>'+bili(k.vi,k.en)+'</li>';}).join('')+'</ul>':'')
       +(c.deep?'<h3>🔬 '+bili('Phân tích chuyên sâu','In-depth analysis')+'</h3><div class="deep-wrap">'+c.deep.map(function(b){return '<div class="deep-block"><h4>'+bili(b.h_vi,b.h_en)+'</h4>'+(b.body?b.body.map(function(p){return '<p class="deep-p">'+bili(p.vi,p.en)+'</p>';}).join(''):'')+(b.rows?'<ul class="lesson">'+b.rows.map(function(r){return '<li>'+bili(r.vi,r.en)+'</li>';}).join('')+'</ul>':'')+(b.table?'<div class="tbl-wrap"><table class="deep-tbl"><thead><tr>'+b.table.cols.map(function(col){return '<th>'+bili(col.vi,col.en)+'</th>';}).join('')+'</tr></thead><tbody>'+b.table.data.map(function(row){return '<tr>'+row.map(function(cell){return '<td>'+bili(cell.vi,cell.en)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>':'')+(b.foot?'<p class="muted deep-foot">'+bili(b.foot.vi,b.foot.en)+'</p>':'')+'</div>';}).join('')+'</div>':'')
-      +'<div class="row" style="margin-top:16px;justify-content:flex-start"><button class="btn '+(PROG[CURCHAP]?'sec':'')+'" onclick="toggleDone('+CURCHAP+')">'+(PROG[CURCHAP]?'✓ '+bili('Đã hoàn thành','Done'):bili('Đánh dấu hoàn thành','Mark done'))+'</button><button class="btn sec" onclick="go(\'quiz\');startChap('+CURCHAP+')">'+bili('Làm quiz chương này','Quiz this chapter')+' →</button></div></div>'
+      +'<div class="row" style="margin-top:16px;justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="btn '+(PROG[CURCHAP]?'sec':'')+'" onclick="toggleDone('+CURCHAP+')">'+(PROG[CURCHAP]?'✓ '+bili('Đã hoàn thành','Done'):bili('Đánh dấu hoàn thành','Mark done'))+'</button><button class="btn sec" onclick="go(\'quiz\');startChap('+CURCHAP+')">'+bili('Ôn quiz (hiện đáp án)','Practice')+'</button><button class="btn" onclick="examChap('+CURCHAP+')">📝 '+bili('Thi chương (chấm điểm)','Take exam')+'</button></div></div>'
+      +(function(){ var r=chapResult(CURCHAP); if(!r) return ''; var p=r.best>=PASS_MARK; return '<div class="card" style="border-color:'+(p?'rgba(52,199,89,.5)':'rgba(255,122,51,.5)')+'"><b>'+(p?'✅ '+bili('Đã đậu chương này','Passed'):'⚠️ '+bili('Chưa đạt — thi lại để mở chương sau','Not passed yet'))+'</b><div class="muted" style="font-size:12px;margin-top:4px">'+bili('Điểm cao nhất','Best')+': '+r.best+'% · '+bili('gần nhất','last')+': '+(r.last||0)+'% · '+bili('số lần thi','attempts')+': '+(r.attempts||0)+'</div></div>'; })()
       +((!isPremium()&&CURCHAP===0)?'<div class="card" style="border-color:rgba(255,122,51,.55)"><h3>🎉 '+bili('Xong Chương 1! Còn 17 chương nữa','Chapter 1 done! 17 more')+'</h3><p class="muted" style="font-size:13px">'+bili('Chương 2 đang chờ — mở khóa để học tiếp toàn bộ + quiz đầy đủ + công cụ Pro.','Chapter 2 awaits — unlock to continue everything.')+'</p><div style="font-size:22px;font-weight:800;color:var(--accent)">'+fmtPrice()+'</div>'+unlockBtn()+'</div>':'');
   }
 };

@@ -110,7 +110,7 @@ function stats(){
 function render(filter){
   var rows=ALL.filter(function(u){ if(!filter)return true; return ((u.phone||'')+' '+(u.name||'')+' '+(u.email||'')).toLowerCase().indexOf(filter)>=0; });
   if(!rows.length){ document.getElementById('tableWrap').innerHTML='<p class="muted">Chưa có học viên nào.</p>'; return; }
-  var h='<table><thead><tr><th>#</th><th>Xóa</th><th>SĐT</th><th>Họ tên</th><th>Email</th><th>Gói</th><th>Chương đã học</th><th>Quiz đúng/đã làm</th><th>Tỉ lệ</th><th>Thi thử (best)</th><th>Hoạt động cuối</th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>#</th><th>Xóa</th><th>SĐT</th><th>Họ tên</th><th>Email</th><th>Gói</th><th>Chương đã học</th><th>Chương đậu</th><th>Quiz đúng/đã làm</th><th>Tỉ lệ</th><th>Thi thử (best)</th><th>Hoạt động cuối</th></tr></thead><tbody>';
   rows.forEach(function(u,i){
     h+='<tr><td>'+(i+1)+'</td>'
      +'<td><button class="del" onclick="delUser(\''+esc(u._id||'')+'\',this)">🗑 Xóa</button></td>'
@@ -118,7 +118,7 @@ function render(filter){
      +'<td>'+esc(u.name||'—')+'</td>'
      +'<td>'+esc(u.email||'—')+'</td>'
      +'<td>'+(u.premium?'<span class="pro">PRO'+(u.premiumText?' ('+esc(u.premiumText)+')':'')+'</span>':'<span class="free">Free</span>')+'</td>'
-     +'<td>'+(u.chaptersDone||0)+'/18</td>'
+     +'<td>'+(u.chaptersDone||0)+'/18</td>'+'<td>'+(u.chaptersPassed||0)+'/18</td>'
      +'<td>'+(u.quizCorrect||0)+'/'+(u.quizDone||0)+'</td>'
      +'<td><div style="display:flex;align-items:center;gap:6px"><div class="bar"><i style="width:'+(u.accuracy||0)+'%"></i></div>'+(u.accuracy||0)+'%</div></td>'
      +'<td>'+(u.bestMock||0)+'%</td>'
