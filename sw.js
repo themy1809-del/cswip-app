@@ -2,12 +2,12 @@
    (ép trình duyệt kiểm tra máy chủ mỗi lần -> không kẹt bản cache cũ),
    chỉ dùng cache khi offline. Tự cập nhật ngay (skipWaiting + claim).
    Bump CACHE khi muốn xóa sạch cache cũ. */
-const CACHE = 'cswip-v8';
+const CACHE = 'cswip-v9';
 const ASSETS = [
   './', './index.html', './config.js', './data.js', './bank.js', './realbank.js',
   './cwibank.js', './auth.js', './premium.js', './cloud.js',
   './thibank1.js', './thibank2.js', './thibank3.js', './thibank4.js',
-  './thibank5.js', './thibank6.js', './thi.js',
+  './thibank5.js', './thibank6.js', './thi.js', './mock.js',
   './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'
 ];
 self.addEventListener('install', e => {
