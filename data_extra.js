@@ -65,6 +65,87 @@ add(ch('terms'), [
  en:"PA flat; PB horizontal-vertical fillet; PC horizontal; PD overhead fillet; PE overhead; PF vertical UP; PG vertical DOWN. 45° inclined pipe: H-L045 = inclined upwards; J-L045 = inclined DOWNWARDS. 'All positions except PG and J-L045' = downward progressions excluded."}
 ]);
 
+/* ========== ĐỢT 2 (vá nốt 8% câu hỏi còn thiếu nền) ========== */
+
+/* --- Ch: Processes — hồ quang, TIG, CTWD --- */
+add(ch('processes'), [
+{t_vi:"Kéo dài hồ quang — hậu quả", t_en:"Lengthening the arc — effects",
+ vi:"Hồ quang dài hơn → điện áp TĂNG, dòng giảm nhẹ → hồ quang kém ổn định, khí bảo vệ kém (không khí lọt vào), nhiều bắn tóe, dễ rỗ khí, mối hàn rộng và phẳng hơn, ngấu giảm. Đề rất hay hỏi: 'lengthening the arc' → tăng voltage.",
+ en:"Longer arc → voltage INCREASES, slight current drop → unstable arc, poorer gas shielding (air entrainment), more spatter, porosity risk, wider flatter bead, less penetration. Exam favourite: lengthening arc → higher arc voltage."},
+{t_vi:"TIG: pre-flow, post-flow, mồi HF vs quẹt", t_en:"TIG: pre-flow, post-flow, HF vs scratch start",
+ vi:"PRE-FLOW: xả khí trước khi mồi để đuổi không khí khỏi chụp khí. POST-FLOW: duy trì khí sau khi tắt hồ quang để bảo vệ vũng hàn và ĐIỆN CỰC đang nguội (chống oxy hóa vonfram). Mồi HF (cao tần): không chạm — không ngậm vonfram; nhược điểm: nhiễu điện tử thiết bị xung quanh. Mồi quẹt (scratch): dễ ngậm vonfram vào mối hàn.",
+ en:"PRE-FLOW purges air from the nozzle before arc start. POST-FLOW shields the cooling pool AND tungsten after arc stop (prevents oxidation). HF start: no touch — no tungsten inclusion; drawback: electrical interference. Scratch start risks tungsten inclusion."},
+{t_vi:"CTWD — khoảng cách bép tới vật hàn", t_en:"CTWD (contact tip to work distance)",
+ vi:"MIG/MAG: khoảng cách từ bép tiếp điện đến bề mặt vật hàn = phần dây nhô + chiều dài hồ quang. CTWD TĂNG → điện trở dây tăng → dòng GIẢM → ngấu giảm; CTWD giảm → dòng tăng. Đây là cách máy CV tự điều chỉnh.",
+ en:"MIG/MAG: distance from contact tip to workpiece = stick-out + arc length. Longer CTWD → more wire resistance → current DROPS → less penetration; shorter CTWD → current rises. This is how the self-adjusting CV arc works."},
+{t_vi:"Hàn autogenous (không dây phụ)", t_en:"Autogenous weld",
+ vi:"Mối hàn TIG/plasma/laser KHÔNG dùng kim loại điền đầy — chỉ nung chảy hai mép và để tự liền. Chỉ phù hợp tấm mỏng; rủi ro lõm bề mặt và nứt kết tinh cao hơn vì không có kim loại bù.",
+ en:"A fusion weld made WITHOUT filler metal (TIG/plasma/laser) — the edges melt and fuse. Thin sections only; higher risk of underfill and solidification cracking as no filler compensates."}
+]);
+
+/* --- Ch: Consumables — ISO 2560, ISO 14175 --- */
+add(ch('consumables'), [
+{t_vi:"Đọc ký hiệu que ISO 2560-A: E 35 4 B", t_en:"ISO 2560-A electrode designation (E 35 4 B)",
+ vi:"E = que hàn hồ quang tay; 35 = giới hạn chảy tối thiểu 350 MPa; số tiếp = độ dai va đập: 4 nghĩa là đạt 47J ở −40°C (0=+20°C, 2=−20°C, 4=−40°C, 6=−60°C); chữ cuối = vỏ bọc: A=axit, C=xenlulo, R=rutil, RR=rutil dày, B=bazơ. Khác AWS: AWS E70xx tính theo độ bền kéo (ksi), ISO tính theo giới hạn chảy (MPa).",
+ en:"E = MMA electrode; 35 = min yield 350 MPa; next digit = impact toughness temperature for 47J (4 = −40°C); final letter = covering: A acid, C cellulosic, R rutile, RR thick rutile, B basic. Note: AWS classifies by UTS in ksi; ISO by YIELD in MPa."},
+{t_vi:"Ký hiệu khí bảo vệ ISO 14175", t_en:"ISO 14175 shielding gas groups",
+ vi:"Nhóm I = khí trơ (I1 argon, I2 heli, I3 Ar+He — VD 'I3 ArHe'); nhóm M1/M2/M3 = hỗn hợp oxy hóa nhẹ→mạnh (Ar + CO2/O2, VD M12 = Ar + 0,5–5% CO2, có thể thêm He → 'M12 HeArC'); C = CO2 thuần; R = khử (có H2). Argon là khí TRƠ vì lớp vỏ điện tử ngoài cùng đã bão hòa — không phản ứng hóa học với kim loại nóng chảy.",
+ en:"Group I = inert (I1 Ar, I2 He, I3 Ar+He); M1–M3 = increasingly oxidising mixtures (M12 = Ar + 0.5–5% CO2, may contain He); C = pure CO2; R = reducing. Argon is INERT because its outer electron shell is full — it cannot react with the molten metal."},
+{t_vi:"Khí cho hàn trần & vật liệu đặc biệt", t_en:"Gas choice: overhead & stainless",
+ vi:"Hàn trần thường ưu tiên hỗn hợp giàu ARGON (nặng hơn không khí nhưng cho hồ quang ổn định, vũng hàn nhỏ dễ khống chế). Thép không gỉ: TIG dùng Ar; MAG dùng Ar + 1–2% O2/CO2 (không dùng CO2 thuần — tăng cacbon). NDT tối ưu cho inox austenit: PT (thấm màu) + RT/UT — KHÔNG dùng MPI vì austenit không nhiễm từ.",
+ en:"Overhead welding favours argon-rich mixtures (stable arc, small controllable pool). Stainless: TIG pure Ar; MAG Ar + 1–2% O2/CO2 (never pure CO2 — carbon pickup). For austenitic stainless, use PT + RT/UT — MPI is impossible (non-magnetic austenite)."}
+]);
+
+/* --- Ch: NDT — nguyên lý MPI, MT vs PT, RT vs UT --- */
+add(ch('non-destructive'), [
+{t_vi:"Nguyên lý MPI: rò rỉ từ thông", t_en:"MPI principle: magnetic flux leakage",
+ vi:"Từ hóa chi tiết → khuyết tật NẰM NGANG đường sức từ làm từ thông 'rò' ra bề mặt → bột từ bám vào chỗ rò tạo chỉ thị. Chỉ dùng cho vật liệu SẮT TỪ (thép ferit); phát hiện khuyết tật bề mặt và ngay sát bề mặt. Khuyết tật song song đường sức → không hiện → phải từ hóa 2 hướng.",
+ en:"Magnetise the part → a defect ACROSS the flux lines causes flux LEAKAGE at the surface → magnetic particles gather at the leak. Ferromagnetic materials only; finds surface and slightly sub-surface defects. Defects parallel to flux don't show → magnetise in two directions."},
+{t_vi:"MT vs PT — chọn cái nào?", t_en:"MT vs PT — which to choose?",
+ vi:"Trên thép sắt từ, MT thường NHANH và NHẠY hơn PT với nứt hẹp (kể cả nứt bị bịt nhẹ bề mặt), ít phụ thuộc làm sạch. PT 'phổ dụng' hơn vì dùng được cho MỌI vật liệu không xốp (inox austenit, nhôm, đồng) nhưng chỉ thấy khuyết tật HỞ ra bề mặt và cần bề mặt rất sạch.",
+ en:"On ferritic steel, MT is faster and more sensitive to tight cracks (even slightly bridged ones) and tolerates surface condition better. PT is more UNIVERSAL — any non-porous material (austenitic SS, aluminium) — but only shows defects OPEN to the surface and needs a very clean surface."},
+{t_vi:"RT vs UT — ưu nhược điểm", t_en:"RT vs UT — pros & cons",
+ vi:"RT: cho ảnh lưu hồ sơ, giỏi khuyết tật KHỐI (rỗ, ngậm xỉ); NHƯỢC: nguy hiểm phóng xạ, kém với khuyết tật PHẲNG (nứt, không ngấu) nếu không thẳng hướng tia, khó đo chiều sâu khuyết tật, chậm và đắt. UT: giỏi khuyết tật phẳng, đo được độ sâu, an toàn; nhược: phụ thuộc tay nghề, khó với vật liệu hạt thô/mỏng, hồ sơ kém trực quan (trừ PAUT).",
+ en:"RT: permanent image record, good for VOLUMETRIC defects; CONS: radiation hazard, poor for PLANAR defects unless aligned with the beam, no depth sizing, slow, costly. UT: excellent for planar defects, gives depth, safe; cons: operator-dependent, hard on coarse-grain/thin material, poorer record (unless PAUT)."},
+{t_vi:"RT không phát hiện được gì?", t_en:"What RT misses",
+ vi:"Khuyết tật phẳng vuông góc chiều dày nhưng LỆCH hướng tia: nứt mảnh, không ngấu thành rãnh, tách lớp (lamination — nằm ngang, gần như vô hình với RT). Ghi nhớ: lamination → dùng UT; nứt bề mặt → MT/PT.",
+ en:"Planar defects mis-aligned with the beam: tight cracks, lack of sidewall fusion, and LAMINATIONS (lying parallel to the plate surface — nearly invisible to RT). Remember: laminations → UT; surface cracks → MT/PT."}
+]);
+
+/* --- Ch: Metallurgy — hot shortness, nguyên tố hợp kim --- */
+add(ch('materials'), [
+{t_vi:"Hot shortness (giòn nóng)", t_en:"Hot shortness",
+ vi:"Hiện tượng kim loại bị GIÒN Ở NHIỆT ĐỘ CAO do tạp chất điểm chảy thấp (chủ yếu LƯU HUỲNH tạo FeS) nằm ở biên hạt — khi kết tinh, màng lỏng này bị ứng suất co ngót xé ra → nứt kết tinh (nứt nóng). Mangan 'giải cứu' bằng cách tạo MnS vô hại; vì thế tỷ lệ Mn/S quan trọng.",
+ en:"Brittleness AT HIGH TEMPERATURE caused by low-melting-point impurity films (mainly sulphur as FeS) at grain boundaries — shrinkage stress tears the liquid film → solidification (hot) cracking. Manganese counters it by forming harmless MnS; hence the Mn/S ratio matters."},
+{t_vi:"Tác dụng các nguyên tố hợp kim", t_en:"Alloying elements & their effects",
+ vi:"C: tăng bền/cứng, tăng nguy cơ nứt nguội. Mn: bền + dai, khử S. Si: khử oxy. Cr: chống ăn mòn, chịu nhiệt (≥12% → không gỉ). Ni: tăng độ dai (nhất là nhiệt độ thấp), ổn định austenit. Mo: bền nhiệt, chống dão, chống rỗ ăn mòn. V/Nb/Ti: làm mịn hạt. S, P: tạp chất có hại (giòn nóng, giòn nguội).",
+ en:"C: strength/hardness but cold-crack risk. Mn: strength + toughness, ties up S. Si: deoxidiser. Cr: corrosion & heat resistance (≥12% → stainless). Ni: toughness (esp. low temp), austenite stabiliser. Mo: creep & pitting resistance. V/Nb/Ti: grain refiners. S, P: harmful impurities."}
+]);
+
+/* --- Ch: Joint design — J-groove, mối hàn hỗn hợp --- */
+add(ch('joint'), [
+{t_vi:"Rãnh chữ J & góc vát điển hình", t_en:"J-groove geometry",
+ vi:"Rãnh J: vát một phía dạng cong, góc vát nhỏ (thường 10–20°/phía) + bán kính đáy ~5–10 mm → tốn ít kim loại đắp hơn chữ V ở tấm dày, nhưng gia công đắt (phải phay). So sánh: V đơn thường 60–70° góc rãnh (30–35°/phía); U đôi/J dùng cho tấm dày để giảm co ngót và vật liệu hàn.",
+ en:"J-prep: curved single-side bevel, small bevel angle (typically 10–20°) + root radius ~5–10 mm → less weld metal than a V on thick plate, but costly machining. Compare: single-V included angle usually 60–70°; U/J preps suit thick sections to cut shrinkage and consumables."},
+{t_vi:"Mối hàn hỗn hợp (compound weld)", t_en:"Compound weld",
+ vi:"Mối hàn kết hợp GIÁP MỐI + GÓC trên cùng một liên kết — điển hình: liên kết chữ T ngấu hoàn toàn có vát mép, sau đó phủ thêm lớp hàn góc hai bên. Chiều cao tính toán lấy theo tiết diện tổng.",
+ en:"A weld combining BUTT + FILLET in one joint — typically a bevelled full-penetration T-joint finished with fillet reinforcement each side. Design throat considers the combined section."}
+]);
+
+/* --- Ch: Thermal cutting — dũi hồ quang khí nén --- */
+add(ch('cutting'), [
+{t_vi:"Dũi carbon khí nén: dòng & nguyên lý", t_en:"Air-arc gouging: current & principle",
+ vi:"Dùng điện cực CARBON (bọc đồng) + hồ quang nung chảy kim loại, KHÍ NÉN thổi bay kim loại lỏng. Dòng: DC điện cực DƯƠNG (DCEP) — electron đi từ vật hàn vào điện cực, ion dương bắn vào vật hàn tạo nhiệt tập trung. Sau dũi trên thép hợp kim/C cao phải MÀI sạch lớp thấm cacbon trước khi hàn.",
+ en:"A copper-coated CARBON electrode melts the metal; COMPRESSED AIR blows it away. Current: DC electrode POSITIVE (DCEP). After gouging alloy/high-C steel, GRIND off the carburised layer before welding."}
+]);
+
+/* --- Ch: Heat treatment — giảm preheat --- */
+add(ch('heat treatment'), [
+{t_vi:"Giảm preheat thì sao?", t_en:"Effect of decreasing preheat",
+ vi:"Preheat giảm → tốc độ nguội TĂNG → HAZ cứng hơn (dễ tạo mactenxit) + hydro ít thời gian thoát ra → nguy cơ NỨT NGUỘI DO HYDRO tăng mạnh. Đây là đáp án chuẩn cho mọi câu 'preheat decreased/what happens'.",
+ en:"Lower preheat → FASTER cooling → harder HAZ (martensite risk) + less time for hydrogen to escape → much higher risk of HYDROGEN COLD CRACKING. Standard answer for every 'preheat decreased' question."}
+]);
+
 /* --- Ch: Codes & Docs — work pack --- */
 add(ch('codes'), [
 {t_vi:"Work pack (bộ hồ sơ công việc)", t_en:"Work pack",
