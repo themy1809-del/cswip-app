@@ -146,6 +146,38 @@ add(ch('heat treatment'), [
  en:"Lower preheat → FASTER cooling → harder HAZ (martensite risk) + less time for hydrogen to escape → much higher risk of HYDROGEN COLD CRACKING. Standard answer for every 'preheat decreased' question."}
 ]);
 
+/* ========== ĐỢT 3 (đối chiếu giáo trình 637 trang) ========== */
+
+add(ch('processes'), [
+{t_vi:"FCAW: dây tự bảo vệ vs dây dùng khí", t_en:"FCAW: self-shielded vs gas-shielded (Innershield/Outershield)",
+ vi:"Dây lõi thuốc GAS-SHIELDED ('Outershield'): cần khí bảo vệ ngoài (CO2/hỗn hợp), cơ tính tốt, dùng trong xưởng. Dây SELF-SHIELDED ('Innershield'): thuốc trong lõi tự sinh khí + xỉ bảo vệ, KHÔNG cần chai khí → hợp công trường có gió; nhược: nhiều khói, ngoại quan kém hơn.",
+ en:"GAS-SHIELDED flux-cored wire ('Outershield') needs external gas — better properties, shop use. SELF-SHIELDED wire ('Innershield') generates its own shielding from core ingredients — no gas bottle, ideal for windy site work; drawbacks: more fume, rougher appearance."},
+{t_vi:"Các biến thể SAW & ưu điểm", t_en:"SAW variants & advantages",
+ vi:"SAW ưu điểm: tốc độ đắp rất cao, ngấu sâu, không hồ quang hở (an toàn tia), ít khói, chất lượng đều. Biến thể tăng năng suất: TANDEM (2+ dây, 2 nguồn riêng), TWIN-WIRE (2 dây chung 1 nguồn), thêm bột sắt vào thuốc. Hạn chế: chủ yếu tư thế sấp/ngang, không nhìn thấy vũng hàn.",
+ en:"SAW pros: very high deposition, deep penetration, no visible arc, little fume, consistent quality. Productivity variants: TANDEM (2+ wires, separate power sources), TWIN-WIRE (2 wires, one source), iron-powder flux additions. Limits: flat/horizontal mainly, pool not visible."},
+{t_vi:"Kết thúc hồ quang & xử lý sự cố MMA", t_en:"Terminating the arc & MMA troubleshooting",
+ vi:"Kết thúc đường hàn phải ĐIỀN ĐẦY HÕM CUỐI (dừng từ từ/quay ngược lại) — ngắt đột ngột gây crater pipe/nứt hõm. Sự cố MMA thường gặp: hồ quang thổi lệch (arc blow — do từ trường, đổi sang AC/dời kẹp mát), que dính (dòng thấp/hồ quang ngắn), bắn tóe nhiều (dòng cao/hồ quang dài/que ẩm).",
+ en:"Always FILL THE CRATER when terminating (pause/step back) — abrupt stops cause crater pipes/cracks. Common MMA troubles: arc blow (magnetic — switch to AC or move the return clamp), electrode sticking (low current/short arc), heavy spatter (high current/long arc/damp electrodes)."}
+]);
+
+add(ch('materials'), [
+{t_vi:"Weldability (tính hàn) là gì", t_en:"Weldability — definition",
+ vi:"Khả năng của vật liệu được hàn bằng quy trình thông thường mà VẪN GIỮ được cơ tính và không nứt. Tính hàn giảm khi: C và CEV cao, chiều dày lớn (combined thickness — hiệu ứng nguội nhanh của tổng các đường thoát nhiệt), độ kìm hãm cao, tạp chất S/P cao. Thép HSLA cũng có thể nứt hydro trong KIM LOẠI HÀN chứ không chỉ HAZ.",
+ en:"The ability of a material to be welded by normal processes and RETAIN its properties without cracking. Weldability drops with: higher C/CEV, greater combined thickness (more heat-sink paths = faster cooling), high restraint, high S/P. In HSLA steels hydrogen cracking can occur in the WELD METAL, not just the HAZ."}
+]);
+
+add(ch('equipment'), [
+{t_vi:"Giám sát thông số hàn (PAMS)", t_en:"Monitoring welding parameters (PAMS)",
+ vi:"Thanh tra kiểm tra thông số bằng: ampe kìm (tong tester) kẹp quanh cáp đo dòng, vôn kế đo càng gần hồ quang càng tốt, đồng hồ bấm giờ + thước đo tốc độ hàn, PAMS (thiết bị giám sát hồ quang di động) ghi đồng thời A/V/tốc độ. Thiết bị đo cũng phải được HIỆU CHUẨN định kỳ.",
+ en:"Verify parameters with: tong tester (clamp meter) round the cable for current, voltmeter measured as near the arc as possible, stopwatch + rule for travel speed, or PAMS (Portable Arc Monitoring System) logging A/V/speed together. The measuring kit itself must be CALIBRATED."}
+]);
+
+add(ch('joint'), [
+{t_vi:"Sai lệch gá lắp (set-up irregularities)", t_en:"Set-up irregularities",
+ vi:"Kiểm tra TRƯỚC khi hàn: lệch mép (hi-lo), khe hở đáy sai (rộng → cháy thủng, hẹp → không thấu), góc vát sai, mặt đáy sai, đính hàn nứt/sai vị trí, bề mặt bẩn (dầu/gỉ/sơn), sai vật liệu. Phát hiện ở khâu fit-up rẻ hơn nhiều so với sửa sau khi hàn.",
+ en:"Check at fit-up BEFORE welding: linear misalignment (hi-lo), wrong root gap (wide → burn-through, tight → lack of penetration), wrong bevel angle or root face, cracked/misplaced tacks, contamination (oil/rust/paint), wrong material. Catching these at fit-up is far cheaper than repairing welds."}
+]);
+
 /* --- Ch: Codes & Docs — work pack --- */
 add(ch('codes'), [
 {t_vi:"Work pack (bộ hồ sơ công việc)", t_en:"Work pack",
