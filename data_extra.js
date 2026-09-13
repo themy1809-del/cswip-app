@@ -184,4 +184,153 @@ add(ch('codes'), [
  vi:"Bộ tài liệu phát cho một hạng mục hàn: bản vẽ, WPS áp dụng, chứng chỉ vật liệu, yêu cầu NDT, ITP, biểu mẫu nghiệm thu. Thanh tra hàn phải đối chiếu công việc thực tế với TOÀN BỘ work pack — đề thi CSWIP có nguyên phần 'Work Pack Exam' kiểm tra kỹ năng tra cứu này.",
  en:"The document set issued for a welding task: drawings, applicable WPSs, material certs, NDT requirements, ITP, acceptance forms. The inspector must verify the work against the WHOLE work pack — CSWIP has a dedicated Work Pack Exam testing this cross-referencing skill."}
 ]);
+/* ========== GIẢNG GIẢI THEO ĐỀ THI (đợt 1: Khuyết tật hàn) ==========
+   Viết từ giáo trình 637 trang + đối chiếu cách 510 câu đề thật hay hỏi.
+   Đẩy vào chapter.deep → hiện trong mục "Phân tích chuyên sâu". */
+function deep(c, arr){ if (c){ c.deep = c.deep || []; c.deep.push.apply(c.deep, arr); } }
+
+deep(ch('defects'), [
+{h_vi:"🎓 Cách đề thi hỏi về khuyết tật — đọc phần này trước",
+ h_en:"🎓 How the exam asks about defects — read this first",
+ body:[
+ {vi:"Đề CSWIP gần như không bao giờ hỏi 'undercut là gì'. Nó hỏi theo 4 kiểu: (1) nguyên nhân nào gây ra khuyết tật X, (2) khuyết tật nào sinh ra từ điều kiện Y, (3) phương pháp NDT nào tìm được X, (4) X thuộc loại phẳng hay khối. Vì vậy với MỖI khuyết tật, bạn chỉ cần thuộc đúng 4 ô: là gì — do đâu — tìm bằng gì — xếp loại gì. Thuộc đủ 4 ô của ~10 khuyết tật chính là làm được phần lớn câu hỏi chương này.",
+  en:"CSWIP rarely asks 'what is undercut'. It asks 4 ways: (1) which cause produces defect X, (2) which defect results from condition Y, (3) which NDT method finds X, (4) is X planar or volumetric. For EACH defect memorise 4 boxes: what — cause — detection — classification."},
+ {vi:"Quy tắc xếp loại phải thuộc lòng: khuyết tật PHẲNG (nứt mọi loại, không ngấu, không thấu) là nguy hiểm nhất vì tạo điểm tập trung ứng suất sắc — tìm bằng UT (trong lòng) hoặc MT/PT (bề mặt). Khuyết tật KHỐI (rỗ khí, ngậm xỉ, ngậm vonfram) tròn tù, ít nguy hiểm hơn — RT tìm rất giỏi. Đề đảo qua đảo lại đúng ý này.",
+  en:"Classification rule to memorise: PLANAR defects (all cracks, lack of fusion, lack of penetration) are most dangerous — sharp stress raisers — found by UT (internal) or MT/PT (surface). VOLUMETRIC defects (porosity, slag, tungsten inclusions) are blunt — RT excels at finding them."}]},
+
+{h_vi:"🎓 Nứt nguội do hydro (HICC) — con bài tủ của đề thi",
+ h_en:"🎓 Hydrogen cold cracking — the exam's favourite",
+ body:[
+ {vi:"Hình dung: khi hàn, hydro (từ hơi ẩm trong vỏ que, gỉ, dầu mỡ) hòa tan vào vũng hàn nóng chảy. Khi kim loại nguội và co lại, hydro bị 'nhốt' bên trong và chui vào các khe nguyên tử. Nếu vùng đó lại CỨNG (mactenxit trong HAZ) và đang chịu ỨNG SUẤT co ngót, các nguyên tử hydro gom lại thành áp lực đủ xé kim loại ra — thường 24–72 GIỜ SAU khi hàn xong. Vì vậy nó còn tên 'nứt trễ' và NDT phải chờ ít nhất 24–48h với thép dễ nứt.",
+  en:"Picture it: hydrogen (from moisture in coatings, rust, grease) dissolves into the molten pool. On cooling the metal contracts and traps hydrogen, which migrates into lattice gaps. If that region is HARD (HAZ martensite) and under shrinkage STRESS, hydrogen accumulates until it tears the metal — typically 24–72 HOURS after welding. Hence 'delayed cracking', and NDT must wait 24–48h on susceptible steels."},
+ {vi:"Đề thi hỏi đi hỏi lại: cần đủ 4 YẾU TỐ đồng thời — (1) hydro, (2) tổ chức cứng nhạy cảm (CEV cao, nguội nhanh), (3) ứng suất, (4) nhiệt độ dưới ~300°C. Bỏ được MỘT yếu tố là hết nứt → đó chính là logic của mọi biện pháp phòng: que bazơ sấy khô (bớt hydro), gia nhiệt trước + nhiệt lượng đủ (nguội chậm → bớt cứng, hydro kịp thoát), trình tự hàn hợp lý (bớt ứng suất).",
+  en:"The exam loops on this: FOUR factors must coexist — (1) hydrogen, (2) susceptible hard microstructure (high CEV, fast cooling), (3) stress, (4) temperature below ~300°C. Remove ONE and no cracking — which is exactly why every prevention works: baked basic electrodes (less H), preheat + adequate heat input (slower cooling → softer HAZ, H escapes), sensible weld sequence (less stress)."}],
+ rows:[
+ {vi:"Bẫy hay gặp: 'nứt xảy ra ở đâu?' → HAZ là kinh điển, nhưng thép HSLA hiện đại có thể nứt ngay TRONG kim loại hàn.",
+  en:"Common trap: 'where does it occur?' → classically HAZ, but in modern HSLA steels it can occur IN the weld metal."},
+ {vi:"'Preheat giảm thì sao?' → nguội nhanh hơn → HAZ cứng hơn + hydro không kịp thoát → nguy cơ nứt TĂNG. Câu này xuất hiện ở cả 3 bộ đề.",
+  en:"'Preheat decreased?' → faster cooling → harder HAZ + trapped hydrogen → HIGHER risk. Appears in all three exam sets."}]},
+
+{h_vi:"🎓 Nứt nóng / nứt kết tinh — nhớ bằng Mn/S",
+ h_en:"🎓 Hot / solidification cracking — remember via Mn/S",
+ body:[
+ {vi:"Hình dung: kim loại đông đặc từ hai mép rãnh vào giữa tâm. Tạp chất điểm chảy thấp (chủ yếu LƯU HUỲNH tạo FeS) bị 'đẩy' vào giữa, tạo một màng lỏng mỏng nằm đúng TÂM mối hàn khi mọi thứ xung quanh đã cứng. Ứng suất co ngót kéo hai bên → màng lỏng bị xé → nứt DỌC GIỮA TÂM, thường hở ra bề mặt. Vì xảy ra lúc còn nóng nên gọi là nứt nóng.",
+  en:"Picture solidification advancing from both fusion faces to the centreline. Low-melting impurities (mainly SULPHUR as FeS) get pushed ahead, leaving a thin liquid film at the CENTRELINE when everything else is solid. Shrinkage pulls both sides → the film tears → a LONGITUDINAL CENTRELINE crack, often surface-breaking."},
+ {vi:"Yếu tố làm nặng thêm mà đề hay gài: hàn dòng cao tạo mối hàn SÂU-HẸP (tỷ lệ sâu/rộng lớn) → màng tạp chất càng tập trung giữa tâm; độ kìm hãm lớn; thép nhiều S/P (thép dễ cắt gọt!). Phòng: chọn vật liệu hàn đủ MANGAN (Mn 'bắt' S thành MnS vô hại — nhớ tỷ lệ Mn/S), giảm dòng, mối hàn rộng hơn sâu.",
+  en:"Aggravators the exam loves: high current giving DEEP-NARROW beads (high depth/width ratio) concentrates the film; high restraint; high-S/P steels (free-machining!). Prevention: enough MANGANESE in consumables (Mn ties S up as harmless MnS — the Mn/S ratio), lower current, width ≥ depth."}]},
+
+{h_vi:"🎓 Không ngấu (LOF) vs không thấu (LOP) — đề rất thích đánh tráo",
+ h_en:"🎓 Lack of fusion vs lack of penetration — the exam swaps them",
+ body:[
+ {vi:"KHÔNG NGẤU (lack of fusion): kim loại đắp KHÔNG CHẢY DÍNH vào thành rãnh hoặc lớp trước — do nhiệt không đủ ngay tại chỗ đó: dòng thấp, hồ quang lệch khỏi mép, tốc độ quá nhanh, que quá to so với rãnh hẹp, hoặc vũng hàn 'chạy trước' hồ quang ở kiểu hàn tụt. Nằm ẨN trong lòng ở thành rãnh → RT khó thấy (phẳng, lệch tia) → UT là lựa chọn đúng.",
+  en:"LACK OF FUSION: deposited metal FAILS TO FUSE with the sidewall or previous pass — local heat starvation: low current, arc off the joint face, excessive speed, oversized electrode in a narrow prep, or the pool flooding ahead of the arc in vertical-down. Hidden on the sidewall → poorly shown by RT (planar, mis-aligned) → UT is the right call."},
+ {vi:"KHÔNG THẤU (incomplete/lack of penetration): đường hàn ĐÁY không xuyên hết chiều dày cần thiết — nhìn từ mặt sau thấy mép chưa chảy. Nguyên nhân nằm ở CHUẨN BỊ MÉP + thông số đáy: khe hở quá hẹp, mặt đáy quá dày, dòng đáy thấp, que quá to chọc không tới đáy. Mẹo phân biệt khi làm bài: cứ thấy 'root' + 'not penetrated/not fused at root' là LOP; thấy 'sidewall/inter-run' là LOF.",
+  en:"LACK OF PENETRATION: the root run fails to penetrate the required depth. Causes live in JOINT PREP + root parameters: root gap too tight, root face too thick, low root current, electrode too large to reach the root. Exam tell: 'root not penetrated' → LOP; 'sidewall/inter-run' → LOF."}]},
+
+{h_vi:"🎓 Undercut, rỗ khí, ngậm xỉ — bộ ba 'nguyên nhân nào?'",
+ h_en:"🎓 Undercut, porosity, slag — the 'which cause?' trio",
+ body:[
+ {vi:"UNDERCUT (cháy chân): hồ quang KHOÉT kim loại mép ra mà kim loại đắp không điền lại kịp → rãnh khuyết chạy dọc chân mối hàn. Ba thủ phạm kinh điển: dòng/điện áp QUÁ CAO, tốc độ QUÁ NHANH, góc que sai (nghiêng khoét vào mép). Nhớ ngược: đắp chờm (overlap) là 'anh em đối nghịch' — dòng QUÁ THẤP, tốc độ QUÁ CHẬM, kim loại tràn phủ lên mà không ngấu.",
+  en:"UNDERCUT: the arc GOUGES the parent metal at the toe and filler fails to refill it → a groove along the toe. Classic trio: current/voltage TOO HIGH, travel TOO FAST, wrong electrode angle. Mirror image: OVERLAP — current TOO LOW, travel TOO SLOW, metal rolls over without fusing."},
+ {vi:"RỖ KHÍ: khí (chủ yếu nitơ/hydro từ không khí, hơi ẩm, dầu, sơn, mạ kẽm) hòa vào vũng hàn rồi không thoát kịp khi đông đặc. Mọi đáp án đúng đều quy về 'khí lọt vào': mất khí bảo vệ, gió, lưu lượng khí sai (thấp QUÁ hay cao QUÁ đều rỗ), que ẩm, bề mặt bẩn, hồ quang dài. NGẬM XỈ: xỉ lớp trước không gõ/mài sạch bị lớp sau phủ lên — đặc trưng của hàn NHIỀU LỚP bằng que/dây có xỉ (MMA, FCAW, SAW); TIG/MIG không có thuốc → không thể ngậm xỉ (bẫy kinh điển!).",
+  en:"POROSITY: gas (air nitrogen/hydrogen, moisture, oil, paint, galvanising) dissolves in the pool and can't escape during freezing. Every correct answer reduces to 'gas got in': lost shielding, wind, wrong flow rate (too LOW or too HIGH), damp electrodes, dirty surface, long arc. SLAG INCLUSIONS: unremoved slag between passes — a MULTI-PASS defect of flux processes (MMA, FCAW, SAW); TIG/MIG have no flux → cannot give slag inclusions (classic trap!)."}]},
+
+{h_vi:"🎓 Khuyết tật vùng đáy & hõm cuối — bộ câu hình vẽ",
+ h_en:"🎓 Root-area & crater defects — the picture questions",
+ body:[
+ {vi:"Bốn khuyết tật đáy dễ lẫn nhau khi đề đưa hình: NGẤU QUÁ (excess penetration) — đáy lồi quá mức, do khe hở rộng/dòng cao; CHÁY THỦNG (burn-through) — thủng hẳn lỗ, phiên bản nặng của ngấu quá; LÕM ĐÁY (root concavity) — đáy hụt lõm vào trong nhưng vẫn ngấu, hay gặp khi hàn có lót khí/tư thế trần; HỤT ĐÁY (root suck-back) — co lõm do khí bảo vệ đáy hoặc kỹ thuật. CRATER PIPE: lỗ co ngót giữa HÕM CUỐI đường hàn do ngắt hồ quang đột ngột — phòng bằng cách điền đầy hõm/lùi que trước khi ngắt.",
+  en:"Four root defects the picture questions mix up: EXCESS PENETRATION — bulging root from wide gap/high current; BURN-THROUGH — an actual hole, its severe extreme; ROOT CONCAVITY — a fused but sunken root, common with purge/overhead; SUCK-BACK — shrinkage-related concavity. CRATER PIPE: a shrinkage pipe in the END CRATER from abrupt arc extinction — prevent by filling the crater/stepping back before breaking the arc."}],
+ foot:{vi:"Học xong 6 khối trên, quay lại tab Tài liệu thi lọc các câu về khuyết tật — bạn sẽ thấy hầu hết đáp án tự 'sáng' ra.",
+       en:"After these 6 blocks, revisit the defect questions in the exam tab — most answers should now be obvious."}}
+]);
+
+/* ========== GIẢNG GIẢI đợt 2: Quá trình hàn ========== */
+deep(ch('processes'), [
+{h_vi:"🎓 Cách đề thi hỏi về quá trình hàn",
+ h_en:"🎓 How the exam asks about processes",
+ body:[
+ {vi:"Chương này đề xoay quanh 4 nhóm câu: (1) đặc tính nguồn hàn — quá trình nào dùng CC, quá trình nào dùng CV; (2) cực tính — DCEP/DCEN/AC cho từng quá trình; (3) 'điều gì xảy ra nếu...' — thay đổi một biến số (dòng, áp, tốc độ, chiều dài hồ quang) thì mối hàn thay đổi thế nào; (4) chọn quá trình nào cho ứng dụng nào. Nắm 4 nhóm này là quét gần hết câu chương Processes.",
+  en:"Four question groups: (1) power-source characteristic — which process uses CC vs CV; (2) polarity per process; (3) 'what happens if…' one variable changes; (4) which process suits which application. Master these and you cover nearly every Processes question."}]},
+
+{h_vi:"🎓 CC vs CV — hiểu một lần là nhớ mãi",
+ h_en:"🎓 CC vs CV — understand once, remember forever",
+ body:[
+ {vi:"Vì sao MMA và TIG dùng nguồn DÒNG KHÔNG ĐỔI (CC, đặc tính rơi)? Vì tay người run: chiều dài hồ quang dao động liên tục → điện áp dao động theo. Nguồn CC được thiết kế để khi áp thay đổi thì DÒNG gần như đứng yên — mà dòng quyết định độ ngấu và tốc độ chảy que. Kết quả: tay run nhưng mối hàn vẫn đều. Ngược lại MIG/MAG cấp dây bằng MÔ TƠ đều tăm tắp, thứ cần giữ ổn định là CHIỀU DÀI HỒ QUANG → dùng nguồn ÁP KHÔNG ĐỔI (CV): dây chìa ngắn lại → dòng tự vọt lên đốt dây nhanh hơn → hồ quang tự trở về chiều dài cũ. Đó chính là 'hồ quang tự điều chỉnh' (self-adjusting arc) — cụm từ đề rất hay hỏi.",
+  en:"Why do MMA and TIG use CONSTANT CURRENT (drooping)? The human hand wobbles: arc length (and thus voltage) fluctuates. A CC source keeps CURRENT nearly unchanged as voltage swings — and current governs penetration and burn-off. Result: shaky hand, consistent weld. MIG/MAG instead feeds wire by MOTOR at constant speed; what must stay constant is ARC LENGTH → CONSTANT VOLTAGE source: stick-out shortens → current surges → wire burns faster → arc restores itself. That is the SELF-ADJUSTING ARC — an exam favourite phrase."}],
+ rows:[
+ {vi:"Bẫy: 'self-adjusting arc xảy ra với thiết bị nào?' → MIG/MAG trên nguồn CV. Không phải MMA, không phải TIG.",
+  en:"Trap: 'self-adjusting arc occurs with?' → MIG/MAG on CV. Not MMA, not TIG."},
+ {vi:"OCV (điện áp không tải) thuộc nhóm an toàn: là áp giữa hai cực khi CHƯA hàn, giúp mồi hồ quang; MMA thường 50–90V.",
+  en:"OCV belongs with safety too: voltage across terminals BEFORE striking, enables arc initiation; typically 50–90V for MMA."}]},
+
+{h_vi:"🎓 Cực tính — bảng nhớ 30 giây",
+ h_en:"🎓 Polarity — the 30-second table",
+ body:[
+ {vi:"Quy tắc vật lý gốc: khoảng 2/3 nhiệt hồ quang DC tập trung ở CỰC DƯƠNG. Từ đó suy ra tất cả: TIG hàn thép dùng DCEN (điện cực âm → nhiệt dồn vào vật hàn, ngấu sâu, điện cực vonfram mát không chảy). TIG hàn NHÔM dùng AC (nửa chu kỳ EP phá màng oxit — 'làm sạch', nửa EN ngấu). MIG/MAG hầu như luôn DCEP (hồ quang ổn định, chuyển dịch giọt đều). MMA tùy que: que bazơ E7018 chạy DCEP ngấu tốt; que xenlulo chạy được cả hai. SAW dùng cả DC lẫn AC (AC chống thổi lệch hồ quang khi dòng lớn).",
+  en:"Root physics: about two-thirds of DC arc heat concentrates at the POSITIVE pole. Everything follows: TIG on steel = DCEN (heat into the work, deep penetration, cool tungsten). TIG on ALUMINIUM = AC (EP half-cycle strips the oxide — 'cleaning action'; EN half penetrates). MIG/MAG = almost always DCEP (stable arc, even transfer). MMA depends on electrode: E7018 runs well DCEP; cellulosic runs both. SAW uses DC or AC (AC resists arc blow at high current)."}]},
+
+{h_vi:"🎓 'Điều gì xảy ra nếu...' — bảng nhân quả biến số",
+ h_en:"🎓 'What happens if…' — the cause-effect table",
+ table:{cols:[{vi:"Thay đổi",en:"Change"},{vi:"Hệ quả lên mối hàn",en:"Effect on weld"}],
+ data:[
+ [{vi:"Tăng DÒNG điện",en:"Increase CURRENT"},{vi:"Ngấu sâu hơn, đắp nhanh hơn; quá cao → bắn tóe, cháy chân, nứt nóng (mối sâu-hẹp)",en:"Deeper penetration, faster deposition; too high → spatter, undercut, hot cracking (deep-narrow bead)"}],
+ [{vi:"Tăng ÁP / kéo dài hồ quang",en:"Increase VOLTAGE / longer arc"},{vi:"Mối rộng và phẳng hơn, ngấu giảm; quá dài → mất khí bảo vệ, rỗ, bắn tóe",en:"Wider flatter bead, less penetration; too long → shielding lost, porosity, spatter"}],
+ [{vi:"Tăng TỐC ĐỘ hàn",en:"Increase TRAVEL SPEED"},{vi:"Mối hẹp, ngấu giảm, dễ cháy chân; nhiệt lượng (HI) giảm → nguội nhanh → HAZ cứng",en:"Narrower bead, less penetration, undercut risk; heat input drops → faster cooling → harder HAZ"}],
+ [{vi:"Giảm TỐC ĐỘ hàn",en:"Decrease TRAVEL SPEED"},{vi:"HI tăng → HAZ rộng, hạt thô, độ dai giảm; dễ đắp chờm",en:"Higher HI → wide HAZ, grain growth, lower toughness; overlap risk"}],
+ [{vi:"Tăng phần dây nhô (stick-out) MIG",en:"Longer stick-out (MIG)"},{vi:"Điện trở tăng → dòng GIẢM → ngấu giảm (nhớ cho câu CTWD)",en:"More resistance → current DROPS → less penetration (CTWD questions)"}]]},
+ rows:[
+ {vi:"Công thức phải thuộc: HI (kJ/mm) = (U × I × 60) / (1000 × tốc độ mm/phút) × hệ số k (SAW 1.0; MMA/MIG 0.8; TIG 0.6).",
+  en:"Formula to memorise: HI (kJ/mm) = (V × A × 60)/(1000 × travel mm/min) × k (SAW 1.0; MMA/MIG 0.8; TIG 0.6)."}]},
+
+{h_vi:"🎓 Chọn quá trình nào? — logic một câu cho mỗi quá trình",
+ h_en:"🎓 Which process? — one-line logic each",
+ rows:[
+ {vi:"MMA: 'con dao đa năng' — mọi tư thế, ngoài trời, thiết bị rẻ; chậm vì phải thay que + gõ xỉ.",
+  en:"MMA: the all-rounder — all positions, outdoors, cheap kit; slow (electrode changes + slag)."},
+ {vi:"TIG: chất lượng cao nhất, kiểm soát tốt nhất — lớp lót ống, tấm mỏng, inox/nhôm; chậm nhất, đòi hỏi thợ giỏi, kỵ gió.",
+  en:"TIG: highest quality and control — root runs, thin sheet, stainless/aluminium; slowest, most skill, hates wind."},
+ {vi:"MIG/MAG: năng suất trong xưởng, dễ tự động hóa; kỵ gió, rủi ro không ngấu ở chế độ dip nếu thông số sai.",
+  en:"MIG/MAG: shop productivity, easy to mechanise; wind-sensitive, lack-of-fusion risk in dip mode with poor settings."},
+ {vi:"FCAW tự bảo vệ: công trường có gió — không cần chai khí; nhiều khói.",
+  en:"Self-shielded FCAW: windy site work — no gas bottle; heavy fume."},
+ {vi:"SAW: tốc độ đắp vô địch, mối dài thẳng, tấm dày, chủ yếu tư thế sấp; không nhìn thấy vũng hàn nên phụ thuộc cữ dẫn.",
+  en:"SAW: unbeatable deposition on long straight thick-plate seams, mainly flat; pool invisible so guidance-dependent."},
+ {vi:"Electroslag: cực dày, một lượt thẳng đứng; hạt rất thô → thường phải thường hóa sau hàn.",
+  en:"Electroslag: very thick sections, single vertical pass; very coarse grain → usually needs normalising."}]}
+]);
+
+/* ========== GIẢNG GIẢI đợt 2: Vật liệu hàn ========== */
+deep(ch('consumables'), [
+{h_vi:"🎓 Cách đề thi hỏi về vật liệu hàn",
+ h_en:"🎓 How the exam asks about consumables",
+ body:[
+ {vi:"Bốn nhóm câu: (1) ba loại vỏ bọc que — đặc tính và khi nào dùng; (2) SẤY và bảo quản que (hỏi nhiều nhất!); (3) đọc ký hiệu que AWS/ISO; (4) khí bảo vệ — trơ hay hoạt tính, chọn khí nào cho vật liệu nào. Với thanh tra hàn, mọi câu đều quy về một mối lo duy nhất: HYDRO và NHIỄM BẨN lọt vào mối hàn.",
+  en:"Four groups: (1) the three coating types — properties and use; (2) BAKING and storage (most asked!); (3) reading AWS/ISO designations; (4) shielding gases. For an inspector every answer reduces to one worry: HYDROGEN and CONTAMINATION entering the weld."}]},
+
+{h_vi:"🎓 Ba loại vỏ bọc — ba tính cách",
+ h_en:"🎓 Three coatings — three personalities",
+ body:[
+ {vi:"XENLULO (E6010/7010): vỏ chứa bột gỗ — cháy sinh nhiều HYDRO → hồ quang mạnh, NGẤU SÂU, đi tụt nhanh trên đường ống; đổi lại hydro cao → không được sấy khô kiệt (cần ~3–5% ẩm để hoạt động!) và không dùng nơi lo nứt hydro. RUTIL (E6013): vỏ TiO2 — 'que quốc dân', mồi dễ, hồ quang êm, xỉ tự bong, hợp hàn trang trí/kết cấu thường; cơ tính và hydro ở mức trung bình. BAZƠ (E7016/7018): vỏ CaCO3+CaF2 — HYDRO THẤP nhất, cơ tính và độ dai cao nhất, chống nứt tốt nhất → bắt buộc cho kết cấu quan trọng, thép dày, CEV cao; đổi lại khó hàn hơn và PHẢI quản lý sấy nghiêm ngặt.",
+  en:"CELLULOSIC (E6010/7010): wood-flour coating — burns to hydrogen-rich gas → forceful arc, DEEP PENETRATION, fast stovepipe welding on pipelines; but high hydrogen → never bake dry (needs ~3–5% moisture to work!) and never where hydrogen cracking is a worry. RUTILE (E6013): TiO2 — the friendly all-purpose rod: easy strike, smooth arc, self-detaching slag; moderate properties. BASIC (E7016/7018): CaCO3+CaF2 — LOWEST hydrogen, best strength/toughness, best crack resistance → mandatory for critical structures, thick or high-CEV steel; harder to run and demands strict baking control."}],
+ rows:[
+ {vi:"Chu trình sấy que bazơ phải thuộc: SẤY 300–350°C / 1–2h → tủ GIỮ 120–150°C → ống QUIVER ~70°C bên người thợ → quá 4h ngoài trời phải sấy lại (tối đa ~3 lần tùy hãng). Que hút ẩm trở lại = nguồn hydro!",
+  en:"Basic-electrode cycle by heart: BAKE 300–350°C/1–2h → HOLDING oven 120–150°C → heated QUIVER ~70°C at the welder → re-bake after ~4h exposure (limited re-bakes). A re-moistened electrode = a hydrogen source!"},
+ {vi:"Bẫy: 'que nào KHÔNG được sấy khô hoàn toàn?' → xenlulo. 'Que nào cho kết cấu quan trọng?' → bazơ.",
+  en:"Traps: 'which must NOT be fully dried?' → cellulosic. 'Which for critical work?' → basic."}]},
+
+{h_vi:"🎓 Đọc ký hiệu que khi làm bài — AWS 10 giây, ISO 10 giây",
+ h_en:"🎓 Decoding designations fast — AWS in 10s, ISO in 10s",
+ body:[
+ {vi:"AWS E7018: E = que hàn; 70 = độ bền KÉO tối thiểu 70 ksi (~485 MPa); 1 = mọi tư thế (2 = chỉ sấp/góc ngang); 8 = vỏ bazơ bột sắt, chạy AC/DCEP. ISO 2560-A E 35 4 B: 35 = giới hạn CHẢY tối thiểu 350 MPa; 4 = đạt 47J ở −40°C; B = bazơ. Bẫy lớn nhất mà đề khai thác: AWS đo theo ĐỘ BỀN KÉO (ksi), ISO đo theo GIỚI HẠN CHẢY (MPa) — đừng để hai hệ lẫn nhau. H5/H10/H15 sau ký hiệu = ml hydro/100g kim loại đắp (H5 = hydro rất thấp).",
+  en:"AWS E7018: E = electrode; 70 = min TENSILE 70 ksi; 1 = all-positional; 8 = iron-powder basic, AC/DCEP. ISO 2560-A E 35 4 B: 35 = min YIELD 350 MPa; 4 = 47J at −40°C; B = basic. The big exam trap: AWS classifies by TENSILE (ksi), ISO by YIELD (MPa). H5/H10/H15 suffixes = ml hydrogen per 100 g deposit (H5 = very low)."}]},
+
+{h_vi:"🎓 Khí bảo vệ — chọn theo một câu hỏi: 'có phản ứng không?'",
+ h_en:"🎓 Shielding gases — one question: 'does it react?'",
+ body:[
+ {vi:"Khí TRƠ (argon, heli) không phản ứng với kim loại lỏng → bắt buộc cho TIG (bảo vệ cả vonfram) và cho nhôm/titan/inox TIG. Khí HOẠT TÍNH (CO2, hoặc Ar pha CO2/O2) phản ứng nhẹ → tốt cho MAG thép: thêm CO2 tăng ngấu và ổn định, nhưng CO2 THUẦN chỉ chạy được dip/globular (không spray được) và bắn tóe nhiều. Trộn heli vào argon → hồ quang nóng hơn (heli dẫn nhiệt tốt) — dùng cho nhôm dày. Nhớ nhanh: TIG = trơ tuyệt đối; MAG thép = Ar + 5–20% CO2; inox MAG = Ar + 1–2% O2/CO2 (không CO2 thuần — thấm cacbon).",
+  en:"INERT gases (argon, helium) don't react → mandatory for TIG (protects tungsten too) and for Al/Ti/stainless TIG. ACTIVE gases (CO2 or Ar+CO2/O2) react mildly → good for MAG on steel: CO2 adds penetration and stability, but PURE CO2 cannot do spray transfer and spatters. Helium additions → hotter arc (high conductivity) for thick aluminium. Quick recall: TIG = purely inert; steel MAG = Ar + 5–20% CO2; stainless MAG = Ar + 1–2% O2/CO2 (never pure CO2 — carbon pickup)."}],
+ foot:{vi:"Góc nhìn thanh tra: kiểm tra vật liệu hàn = đúng chủng loại theo WPS + chứng chỉ lô + tình trạng bảo quản/sấy + bề mặt dây sạch. Sai một trong bốn là có quyền dừng.",
+       en:"Inspector's angle: consumable control = right classification per WPS + batch certificate + storage/baking condition + clean wire surface. Any one wrong justifies stopping."}}
+]);
+
 })();
