@@ -408,4 +408,75 @@ deep(ch('destructive'), [
   en:"Exam skill: map PROPERTY ↔ SPECIMEN. Translate the property to its essence: 'toughness at −20°C' → only Charpy tests sub-zero; 'root-surface ductility' → root bend; 'is the joint weaker than parent' → transverse tensile; 'did the HAZ harden' → hardness survey. And why Charpy matters: ferritic steel EMBRITTLES with cold (ductile-brittle transition curve); austenitics show no transition."}]}
 ]);
 
+/* ========== GIẢNG GIẢI đợt 4: Luyện kim ========== */
+deep(ch('materials'), [
+{h_vi:"🎓 Nguội nhanh → mactenxit — cái gốc của nửa chương này",
+ h_en:"🎓 Fast cooling → martensite — the root of half this chapter",
+ body:[
+ {vi:"Thép là sắt + cacbon. Khi nguội CHẬM từ nhiệt độ hàn, nguyên tử cacbon có thời gian di chuyển ra chỗ 'ở đúng' → tổ chức ferit/peclit mềm, dẻo. Khi nguội NHANH (tấm dày hút nhiệt, không preheat, nhiệt lượng thấp), cacbon bị KHÓA KẸT trong mạng tinh thể → MACTENXIT: rất cứng, rất giòn, và là điều kiện số 2 của nứt hydro. Toàn bộ logic preheat/nhiệt lượng/CEV đều xoay quanh một việc: LÀM CHẬM TỐC ĐỘ NGUỘI để tránh mactenxit.",
+  en:"Steel is iron + carbon. Cooled SLOWLY, carbon atoms have time to move where they belong → soft ductile ferrite/pearlite. Cooled FAST (thick heat-sink, no preheat, low heat input), carbon is TRAPPED in the lattice → MARTENSITE: very hard, very brittle, and factor #2 of hydrogen cracking. Preheat, heat input and CEV all exist for one job: SLOW THE COOLING to avoid martensite."},
+ {vi:"CEV (đương lượng cacbon, công thức IIW: C + Mn/6 + (Cr+Mo+V)/5 + (Ni+Cu)/15) là thước đo 'thép này DỄ TÔI CỨNG đến đâu'. CEV càng cao → càng dễ sinh mactenxit → càng cần preheat. Ngưỡng nhớ cho đề: CEV dưới ~0,40 = tính hàn tốt; trên đó phải cân nhắc preheat/hydro thấp.",
+  en:"CEV (IIW: C + Mn/6 + (Cr+Mo+V)/5 + (Ni+Cu)/15) measures 'how hardenable is this steel'. Higher CEV → easier martensite → more preheat needed. Exam threshold: below ~0.40 = good weldability; above it, consider preheat + low-hydrogen practice."}]},
+
+{h_vi:"🎓 Lamellar tearing — nứt bậc thang dưới mối hàn góc",
+ h_en:"🎓 Lamellar tearing — the staircase crack under fillets",
+ body:[
+ {vi:"Thép cán chứa tạp chất dạng DẢI MỎNG nằm song song mặt tấm (thiên tích khi cán). Cơ tính theo CHIỀU DÀY tấm vì thế rất yếu. Khi mối hàn chữ T/góc co ngót KÉO VUÔNG GÓC qua chiều dày, các dải tạp chất bị tách → nứt hình BẬC THANG chạy dưới HAZ, song song mặt tấm. Ba chữ ký nhận dạng trong đề: liên kết chữ T/góc chịu co theo chiều dày + nứt bậc thang + ngay dưới mối hàn. Phòng: thép Z-grade (đã thử kéo theo chiều dày, Z25/Z35), sửa thiết kế để co ngót không kéo qua chiều dày, lớp đắp lót (buttering).",
+  en:"Rolled steel carries THIN BANDS of inclusions parallel to the plate surface, so THROUGH-THICKNESS properties are weak. When a T/corner joint's shrinkage pulls ACROSS the thickness, those bands decohere → a STAIRCASE crack under the HAZ, parallel to the surface. Exam signature: T-joint + through-thickness strain + step-like crack just below the weld. Prevention: Z-grade plate (through-thickness tested, Z25/Z35), redesign to avoid through-thickness strain, buttering layers."}]},
+
+{h_vi:"🎓 Weld decay (inox) — mất crom ở biên hạt",
+ h_en:"🎓 Weld decay (stainless) — chromium theft at grain boundaries",
+ body:[
+ {vi:"Inox chống gỉ nhờ ≥12% CROM tạo màng oxit tự lành. Nhưng nếu vùng HAZ bị giữ ở 600–850°C đủ lâu (chính là dải nhiệt khi hàn!), cacbon 'bắt cóc' crom tạo carbide Cr23C6 ở BIÊN HẠT → vùng sát biên hạt nghèo crom dưới 12% → ăn mòn dọc biên hạt (nhạy hóa/sensitisation), xảy ra ở dải HAZ cách mối hàn một đoạn. Ba cách phòng đề hay hỏi: dùng inox cacbon thấp (304L/316L — ít C thì ít carbide), inox ổn định hóa (Ti trong 321, Nb trong 347 — 'hy sinh' bắt C thay crom), hoặc giảm nhiệt vào.",
+  en:"Stainless resists corrosion via ≥12% CHROMIUM forming a self-healing oxide. If the HAZ sits at 600–850°C long enough (exactly the welding band!), carbon 'kidnaps' chromium as Cr23C6 carbides at GRAIN BOUNDARIES → adjacent zones drop below 12% Cr → intergranular corrosion (sensitisation) in a HAZ band offset from the weld. Three preventions the exam asks: low-carbon grades (304L/316L), stabilised grades (Ti in 321, Nb in 347 — sacrificial carbide formers), or lower heat input."}]}
+]);
+
+/* ========== GIẢNG GIẢI đợt 4: Nhiệt luyện ========== */
+deep(ch('heat treatment'), [
+{h_vi:"🎓 Năm kiểu nhiệt luyện — nhớ bằng mục đích, không nhớ bằng nhiệt độ",
+ h_en:"🎓 Five heat treatments — remember by purpose, not temperature",
+ table:{cols:[{vi:"Nhiệt luyện",en:"Treatment"},{vi:"Mục đích một câu",en:"One-line purpose"}],
+ data:[
+ [{vi:"Ủ (annealing) — nung cao, nguội TRONG LÒ",en:"Annealing — heat high, cool IN FURNACE"},{vi:"Mềm nhất, dẻo nhất, xóa mọi 'ký ức' biến cứng; đổi lại hạt thô, bền thấp",en:"Softest, most ductile, erases work-hardening; coarse grain, low strength"}],
+ [{vi:"Thường hóa (normalising) — nung cao, nguội NGOÀI KHÔNG KHÍ",en:"Normalising — heat high, cool IN AIR"},{vi:"LÀM MỊN HẠT, cơ tính đồng đều — chuẩn cho thép C-Mn sau cán/hàn điện xỉ",en:"REFINES GRAIN, uniform properties — standard for C-Mn after rolling/electroslag"}],
+ [{vi:"Tôi (quench) — nung cao, nguội NƯỚC/DẦU",en:"Quenching — cool in WATER/OIL"},{vi:"Tạo mactenxit cứng (cố ý!) — luôn đi kèm ram ngay sau",en:"Deliberate martensite — always followed by tempering"}],
+ [{vi:"Ram (temper) — nung LẠI 550–700°C sau tôi",en:"Tempering — reheat 550–700°C after quench"},{vi:"Đổi bớt độ cứng lấy độ dai → thép Q&T bền + dai",en:"Trades hardness for toughness → strong AND tough Q&T steel"}],
+ [{vi:"Khử ứng suất / PWHT (~550–620°C thép C-Mn)",en:"Stress relief / PWHT (~550–620°C C-Mn)"},{vi:"DƯỚI nhiệt độ chuyển pha: chỉ thả ứng suất dư + ram mềm HAZ + đuổi hydro",en:"BELOW transformation: releases residual stress + tempers HAZ + drives off hydrogen"}]]},
+ body:[
+ {vi:"Mẹo phân biệt nhanh khi làm bài: ủ với thường hóa chỉ khác nhau ở CÁCH NGUỘI (lò vs không khí) → ủ mềm hơn, thường hóa mịn hạt hơn. PWHT khác cả nhóm còn lại vì KHÔNG lên tới vùng chuyển pha — nó không thay đổi tổ chức, chỉ 'xoa dịu' những gì hàn để lại.",
+  en:"Quick exam separator: annealing vs normalising differ only in COOLING (furnace vs air) → annealing softer, normalising finer-grained. PWHT stands apart: it never reaches transformation — it changes no structure, it only soothes what welding left behind."}]},
+
+{h_vi:"🎓 PWHT — thanh tra phải soi những gì",
+ h_en:"🎓 PWHT — what the inspector checks",
+ body:[
+ {vi:"Vì sao PWHT: (1) thả ứng suất dư (giảm nguy cơ nứt, ổn định kích thước khi gia công), (2) ram mềm vùng HAZ cứng, (3) đuổi nốt hydro. Thanh tra soi 5 thứ trên biểu đồ lò: nhiệt độ VÀO lò, TỐC ĐỘ NÂNG nhiệt (quá nhanh → chênh nhiệt → nứt/biến dạng), nhiệt độ + THỜI GIAN GIỮ (soak — thường tính theo chiều dày), TỐC ĐỘ HẠ, nhiệt độ RA lò. Cặp nhiệt điện phải gắn đúng vị trí quy định. Hai bẫy đề: thép Q&T — PWHT phải DƯỚI nhiệt độ ram gốc (không thì phá cơ tính); thép hợp kim Cr-Mo-V có thể REHEAT CRACKING ngay trong lúc PWHT.",
+  en:"Why PWHT: (1) release residual stress, (2) temper hard HAZ, (3) drive off hydrogen. The inspector checks five things on the furnace chart: loading temperature, HEATING RATE (too fast → thermal gradients → cracking/distortion), soak temperature + TIME (thickness-based), COOLING RATE, unloading temperature. Thermocouples at specified locations. Two traps: Q&T steels — PWHT must stay BELOW the original tempering temperature; Cr-Mo-V steels can suffer REHEAT CRACKING during PWHT itself."}]},
+
+{h_vi:"🎓 Preheat & interpass — đo ở đâu, bằng gì",
+ h_en:"🎓 Preheat & interpass — where and how to measure",
+ rows:[
+ {vi:"Preheat đo TRƯỚC khi hàn, ở khoảng cách quy định từ mép rãnh (quy ước hay gặp: 75 mm hoặc 4×chiều dày), tốt nhất đo mặt ĐỐI DIỆN nguồn nhiệt sau khi chờ nhiệt thấm đều.",
+  en:"Measure preheat BEFORE welding, at the specified distance from the joint (commonly 75 mm or 4×thickness), ideally on the face OPPOSITE the heating after soak-through."},
+ {vi:"Interpass là nhiệt độ NGAY TRƯỚC KHI HÀN LỚP TIẾP — có giới hạn TRÊN (quá nóng → hạt thô, giảm dai; inox austenit thường ≤150–175°C).",
+  en:"Interpass is the temperature JUST BEFORE THE NEXT PASS — it has an UPPER limit (too hot → grain growth, lower toughness; austenitics often ≤150–175°C)."},
+ {vi:"Dụng cụ: bút chì nhiệt (chảy ở nhiệt độ định trước), cặp nhiệt tiếp xúc, hỏa kế. Đề hỏi 'kiểm soát preheat bằng gì' → temperature indicating crayon là đáp án kinh điển.",
+  en:"Tools: temperature-indicating crayons, contact thermocouples, pyrometers. 'How is preheat checked?' → the crayon is the classic answer."}]}
+]);
+
+/* ========== GIẢNG GIẢI đợt 4: Ký hiệu hàn ========== */
+deep(ch('symbols'), [
+{h_vi:"🎓 Đọc ký hiệu hàn ISO 2553 theo 4 bước cố định",
+ h_en:"🎓 Read ISO 2553 symbols in 4 fixed steps",
+ body:[
+ {vi:"Bước 1 — MŨI TÊN chỉ vào mối ghép: phía mũi tên chạm = 'arrow side', phía sau lưng = 'other side'. Bước 2 — ĐƯỜNG CHUẨN kép của ISO: ký hiệu đặt trên nét LIỀN = yêu cầu cho PHÍA MŨI TÊN; đặt trên nét ĐỨT = cho PHÍA BÊN KIA. (Đây là khác biệt chết người với AWS: AWS không có nét đứt — dưới đường = arrow side, trên đường = other side. Đề CSWIP theo ISO!). Bước 3 — HÌNH ký hiệu vẽ đúng tiết diện rãnh: tam giác = hàn góc, V, ½V (bevel), U, J... Bước 4 — CON SỐ: bên trái ký hiệu = kích thước tiết diện (a5/z7 với hàn góc, s = độ sâu ngấu), bên phải = chiều dài/số đoạn.",
+  en:"Step 1 — the ARROW touches the joint: touched side = arrow side, far side = other side. Step 2 — ISO's DOUBLE reference line: symbol on the SOLID line = arrow side; on the DASHED line = other side. (Deadly difference from AWS, which has no dashed line — below = arrow side, above = other side. CSWIP follows ISO!) Step 3 — the symbol shape mirrors the groove cross-section: triangle = fillet, V, ½V bevel, U, J… Step 4 — numbers: left of symbol = throat/size (a5/z7 for fillets, s = penetration depth), right = length/number of segments."}],
+ rows:[
+ {vi:"Hàn góc phải thuộc: a = chiều cao tính toán (throat), z = cạnh (leg), z ≈ 1,4×a. Ghi a5 và z7 là gần tương đương — đề thích đổi qua lại.",
+  en:"Fillets by heart: a = design throat, z = leg, z ≈ 1.4×a. a5 ≈ z7 — the exam flips between them."},
+ {vi:"Ký hiệu phụ: vòng tròn tại khuỷu = hàn VÒNG QUANH; cờ = hàn CÔNG TRƯỜNG; đuôi = ghi quy trình/tham chiếu. Hàn ngắt quãng: z n×l (e) = cạnh, số đoạn × dài mỗi đoạn (khoảng hở).",
+  en:"Supplementary: circle at the elbow = weld ALL ROUND; flag = SITE weld; tail = process/reference notes. Intermittent: z n×l (e) = leg, number × length (gap)."},
+ {vi:"Bẫy tam giác hàn góc: đỉnh tam giác luôn vẽ về BÊN PHẢI trong ISO; và một ký hiệu trên cả nét liền lẫn nét đứt = hàn HAI PHÍA.",
+  en:"Fillet triangle trap: symbols on both solid and dashed lines = welded BOTH SIDES."}]}
+]);
+
 })();
