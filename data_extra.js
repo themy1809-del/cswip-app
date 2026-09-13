@@ -479,4 +479,87 @@ deep(ch('symbols'), [
   en:"Fillet triangle trap: symbols on both solid and dashed lines = welded BOTH SIDES."}]}
 ]);
 
+/* ========== GIẢNG GIẢI đợt 5: 9 chương còn lại ========== */
+
+deep(ch('duties'), [
+{h_vi:"🎓 Tư duy làm bài chương Nhiệm vụ thanh tra",
+ h_en:"🎓 Exam mindset for Inspector Duties",
+ body:[
+ {vi:"Chìa khóa của cả chương: thanh tra hàn làm việc THEO TÀI LIỆU — mọi đáp án đúng đều dẫn về 'kiểm tra theo tiêu chuẩn/spec/WPS được duyệt', mọi đáp án sai thường mang mùi 'tự quyết theo kinh nghiệm'. Gặp câu tình huống, chọn phương án: đối chiếu tài liệu → ghi nhận → BÁO CÁO đúng cấp; thanh tra KHÔNG tự sửa, không tự chấp nhận sai lệch (đó là việc của welding engineer/khách hàng qua concession). Ba giai đoạn nhiệm vụ trước/trong/sau hàn phải thuộc như bảng cửu chương — đề liệt kê một việc và hỏi nó thuộc giai đoạn nào.",
+  en:"The chapter's master key: the welding inspector works TO DOCUMENTS — every correct answer traces to 'check against the approved code/spec/WPS'; wrong answers usually smell of 'decide from experience'. In scenario questions choose: verify against documents → record → REPORT to the right level; the inspector never self-approves deviations (that's engineering/client via concession). Know the before/during/after duty lists cold — the exam names a task and asks which stage."}],
+ rows:[
+ {vi:"Phẩm chất đề hay hỏi: trung thực, công bằng, thị lực đạt (kiểm tra định kỳ — thường 6 tháng/lần theo yêu cầu gần), ghi chép chính xác.",
+  en:"Qualities asked: integrity, impartiality, eyesight (regular near-vision tests, commonly 6-monthly), accurate records."}]}
+]);
+
+deep(ch('joint'), [
+{h_vi:"🎓 Vì sao rãnh có hình dạng đó — logic thay vì học thuộc",
+ h_en:"🎓 Why preps look like that — logic over rote",
+ body:[
+ {vi:"Mọi thiết kế rãnh là bài toán cân đối 3 thứ: ĐỦ LỐI VÀO cho que/ngọn hồ quang chạm đáy — ÍT KIM LOẠI ĐẮP nhất (rẻ, ít co ngót) — GIA CÔNG rẻ. Suy ra: tấm mỏng ≤3mm hàn giáp mối vuông không vát; dày vừa → chữ V (~60–70° góc rãnh, gia công rẻ bằng cắt khí); dày hơn → V KÉP (giảm nửa kim loại đắp, co ngót đối xứng đỡ vênh — nhưng phải hàn được 2 phía); rất dày → U/J (tốn phay nhưng tiết kiệm que hơn nhiều). Khe hở đáy + mặt đáy là cặp 'van điều chỉnh' độ ngấu: hở rộng/mặt mỏng = dễ thấu nhưng dễ cháy thủng; và ngược lại.",
+  en:"Every prep balances three things: ACCESS for the arc to reach the root — LEAST FILLER (cheap, least shrinkage) — cheap PREPARATION. Hence: ≤3mm square butt; medium → single-V (60–70° included, flame-cut cheaply); thicker → DOUBLE-V (half the filler, symmetric shrinkage — needs two-side access); very thick → U/J (machining cost buys big filler savings). Root gap + root face are the penetration 'control valves': wide gap/thin face = easy penetration but burn-through risk; vice versa."}]}
+]);
+
+deep(ch('distortion'), [
+{h_vi:"🎓 Biến dạng — một nguyên nhân, năm mặt biểu hiện",
+ h_en:"🎓 Distortion — one cause, five faces",
+ body:[
+ {vi:"Nguyên nhân duy nhất: kim loại hàn NGUỘI VÀ CO nhưng bị phần nguội xung quanh GHÌM lại. Co dọc → cong dọc; co ngang → hụt ngang; co không đều theo chiều dày (mặt trên nguội sau) → BIẾN DẠNG GÓC (hai cánh V khép lại) — đây là loại đề hỏi nhiều nhất; tấm mỏng → nhăn sóng (buckling). Mọi biện pháp phòng đều đánh vào một trong ba: GIẢM lượng nhiệt/kim loại đắp (rãnh hẹp hơn, V kép, hàn ngắt quãng), CÂN đối co ngót (hàn đối xứng, trình tự giật lùi, V kép hai phía luân phiên), hoặc KHÓA TRƯỚC (đặt nghiêng sẵn ngược chiều — presetting, kẹp cứng — nhưng kẹp cứng đổi biến dạng lấy ỨNG SUẤT DƯ cao hơn: cặp đánh đổi kinh điển của đề).",
+  en:"Single cause: weld metal COOLS AND CONTRACTS while restrained by cold surroundings. Longitudinal shrinkage → bowing; transverse → width loss; uneven through thickness → ANGULAR DISTORTION (V faces closing) — the most-asked type; thin plate → buckling. Every control hits one of three: REDUCE heat/filler (narrower prep, double-V, intermittent welds), BALANCE shrinkage (symmetric welding, back-step, alternating double-V), or PRE-LOCK (presetting opposite, rigid clamping — which trades distortion for higher RESIDUAL STRESS: the exam's classic trade-off)."}]}
+]);
+
+deep(ch('terms'), [
+{h_vi:"🎓 Tư thế hàn — giải mã ký hiệu trong 20 giây",
+ h_en:"🎓 Welding positions — decode in 20 seconds",
+ body:[
+ {vi:"Hệ ISO: P + chữ cái tăng dần theo độ khó: PA sấp → PB góc ngang → PC ngang → PD góc trần → PE trần → PF hàn LEO → PG hàn TỤT. Ống nghiêng 45°: H-L045 leo, J-L045 tụt. Hệ Mỹ: số (1=sấp, 2=ngang, 3=đứng, 4=trần, 5=ống cố định ngang, 6=ống nghiêng 45°) + chữ (G=rãnh, F=góc). Mẹo quy đổi nhanh trong phòng thi: 1G=PA, 2G=PC, 3G=PF/PG, 4G=PE, 5G=PF/PG quanh ống, 6G=H-L045/J-L045. Nhớ thêm: 6G là tư thế 'vua' — đậu 6G phủ mọi tư thế trong welder qualification.",
+  en:"ISO: P + letters by difficulty: PA flat → PB HV fillet → PC horizontal → PD overhead fillet → PE overhead → PF vertical UP → PG vertical DOWN. 45° pipe: H-L045 up, J-L045 down. US: number (1 flat…6 = 45° pipe) + letter (G groove, F fillet). Fast conversion: 1G=PA, 2G=PC, 3G=PF/PG, 4G=PE, 6G=H-L045/J-L045. And 6G is king — passing it covers all positions in welder qualification."}]}
+]);
+
+deep(ch('codes'), [
+{h_vi:"🎓 Phân cấp tài liệu — ai to hơn ai",
+ h_en:"🎓 Document hierarchy — who outranks whom",
+ body:[
+ {vi:"Thứ tự hiệu lực đề hay kiểm tra: HỢP ĐỒNG/SPEC của khách hàng đứng TRÊN tiêu chuẩn chung (spec được phép nghiêm hơn code); code/tiêu chuẩn áp dụng → WPS đã duyệt → bản vẽ thi công. Gặp mâu thuẫn giữa hai tài liệu? Đáp án đúng luôn là 'DỪNG và làm rõ với cấp có thẩm quyền', không tự chọn theo tài liệu 'dễ'. Từ vựng phải phân biệt: CODE (bắt buộc khi được viện dẫn), SPECIFICATION (yêu cầu cụ thể của dự án), STANDARD (phương pháp/quy cách chung), GUIDELINE (khuyến nghị). Truy xuất nguồn gốc: mọi vật liệu/mối hàn phải lần ngược được về chứng chỉ và người thực hiện — đó là mục đích của toàn bộ hồ sơ.",
+  en:"Precedence the exam tests: the client CONTRACT/SPEC sits ABOVE the general code (a spec may be stricter); applicable code → approved WPS → construction drawings. Conflict between documents? The right answer is always 'STOP and clarify with the authority', never pick the convenient one. Vocabulary: CODE (mandatory when invoked), SPECIFICATION (project-specific), STANDARD (agreed methods), GUIDELINE (advisory). Traceability: every material/weld must trace back to certificates and the person who made it — that is what all the paperwork exists for."}]}
+]);
+
+deep(ch('equipment'), [
+{h_vi:"🎓 Hiệu chuẩn — vì sao và cái gì",
+ h_en:"🎓 Calibration — why and what",
+ body:[
+ {vi:"Nguyên tắc một câu: SỐ ĐO CHỈ CÓ GIÁ TRỊ KHI THIẾT BỊ ĐO ĐƯỢC HIỆU CHUẨN — có tem còn hạn, lần theo được chuẩn quốc gia. Đề hỏi 'cái gì phải hiệu chuẩn': ampe kìm, vôn kế, máy đo nhiệt/cặp nhiệt, đồng hồ áp lực chai khí, cả ĐỒNG HỒ TRÊN MÁY HÀN (validation định kỳ theo BS 7570). Dưỡng đo mối hàn không 'hiệu chuẩn điện' nhưng phải kiểm tra tình trạng. Bẫy: bút chì nhiệt không cần hiệu chuẩn (nó là vật tư tiêu hao có nhiệt độ chảy cố định) — nhưng phải đúng chủng loại, còn hạn.",
+  en:"One-line principle: A MEASUREMENT ONLY COUNTS IF THE INSTRUMENT IS CALIBRATED — valid sticker, traceable to national standards. What needs it: tong testers, voltmeters, thermometers/thermocouples, gas regulators' gauges, and the WELDING MACHINE meters themselves (periodic validation per BS 7570). Weld gauges need condition checks. Trap: temperature crayons aren't 'calibrated' (consumables with fixed melting points) — but must be the right grade and in date."}]}
+]);
+
+deep(ch('safety'), [
+{h_vi:"🎓 An toàn — ghép đúng mối nguy với tác hại",
+ h_en:"🎓 Safety — match hazard to harm",
+ rows:[
+ {vi:"Tia hồ quang (UV) → 'arc eye' (viêm giác mạc, xuất hiện sau vài giờ, đau như cát trong mắt) + bỏng da kiểu cháy nắng. Kính lọc chọn theo dòng hàn.",
+  en:"Arc rays (UV) → arc eye (keratitis, onset hours later, sand-in-eye pain) + sunburn-like skin burns. Filter shade per welding current."},
+ {vi:"Điện giật: nguy hiểm nhất lúc THAY QUE (chạm cực khi hở tay ướt) — vì vậy OCV bị giới hạn và có thiết bị giảm áp (VRD); môi trường kín/ẩm dùng nguồn DC áp thấp.",
+  en:"Electric shock: worst when CHANGING ELECTRODES (bare wet hands on a live holder) — hence OCV limits and voltage-reducing devices; confined/damp work favours low-OCV DC."},
+ {vi:"Khói hàn: hút cục bộ đặt GẦN và DƯỚI hướng gió của vũng hàn; inox/mạ kẽm/cadmium là khói nguy hiểm đặc biệt. Không gian kín: khí trơ GÂY NGẠT không mùi — phải đo oxy + giấy phép + người canh.",
+  en:"Fume: local extraction CLOSE to and downwind of the pool; stainless/galvanised/cadmium fumes are special hazards. Confined spaces: inert gases ASPHYXIATE without smell — oxygen monitoring + permit + attendant."},
+ {vi:"Chai khí: đứng-xích cố định, nắp khi vận chuyển, dầu mỡ tránh xa oxy, axetylen ≤1½ vòng mở van. RT đang chụp → rào chắn + biển + máy đo liều.",
+  en:"Cylinders: upright & chained, caps on transport, no oil near oxygen, acetylene valve ≤1½ turns. Radiography in progress → barriers + signs + dosimetry."}]}
+]);
+
+deep(ch('cutting'), [
+{h_vi:"🎓 Cắt oxy — vì sao thép cắt được mà inox thì không",
+ h_en:"🎓 Oxy cutting — why steel cuts and stainless won't",
+ body:[
+ {vi:"Cắt oxy KHÔNG phải nung chảy: ngọn lửa chỉ nung mồi thép tới ~900°C (màu đỏ anh đào), rồi TIA OXY tinh khiết thổi vào — sắt CHÁY trong oxy (phản ứng tỏa nhiệt tự duy trì), oxit sắt lỏng bị thổi bay thành rãnh cắt. Ba điều kiện: kim loại phải cháy được trong oxy, nhiệt độ bắt cháy THẤP HƠN điểm chảy, và oxit phải chảy lỏng dễ thổi. Thép C-Mn đạt cả ba. INOX và NHÔM thất bại ở điều kiện cuối: oxit crom/nhôm có điểm chảy CỰC CAO, tạo màng che chắn → phải dùng plasma/laser hoặc cắt bột. Chất lượng rãnh cắt đọc qua 'drag lines' — vệt cong nhiều = tốc độ quá nhanh.",
+  en:"Oxy cutting is NOT melting: the flame only preheats steel to ~900°C (cherry red), then a pure OXYGEN jet makes the iron BURN (self-sustaining exothermic reaction); liquid oxide is blown clear as the kerf. Three conditions: metal must burn in oxygen, ignition temperature BELOW melting point, oxide fluid enough to blow away. C-Mn steel meets all three. STAINLESS and ALUMINIUM fail the last: chromium/aluminium oxides melt far too high and shield the metal → plasma/laser or powder cutting instead. Read cut quality from drag lines — heavily swept lines = travel too fast."}]}
+]);
+
+deep(ch('in-service'), [
+{h_vi:"🎓 Hỏng hóc khi vận hành & hàn sửa chữa — khác gì hàn mới?",
+ h_en:"🎓 In-service failure & repair — how it differs from new work",
+ body:[
+ {vi:"Hai họ hỏng hóc chính khi vận hành: MỎI (tải lặp — vết nứt mọc từ điểm tập trung ứng suất như chân mối hàn, mặt gãy nhẵn có 'vân sò' beach marks) và ĂN MÒN các kiểu. Đề nhận dạng qua mô tả mặt gãy: nhẵn + vân sò = mỏi; hạt lấp lánh + chevron = giòn; xơ dai = dẻo. HÀN SỬA khó hơn hàn mới vì: vật liệu đã nhiễm bẩn/thấm (dầu, sản phẩm ăn mòn, hydro), khó nhận diện đúng mác thép cũ, chi tiết bị KÌM HÃM cứng (kết cấu xung quanh không cho co giãn), có khi phải sửa TRONG lúc thiết bị còn vận hành. Vì vậy quy trình sửa chữa cần: xác định nguyên nhân gốc trước khi sửa, moi hết khuyết tật (MT/PT xác nhận sạch), WPS sửa chữa RIÊNG được chứng nhận, và NDT lại sau sửa.",
+  en:"Two in-service failure families: FATIGUE (cyclic load — cracks grow from stress raisers like weld toes; smooth fracture with beach marks) and CORROSION in its many forms. The exam identifies by fracture description: smooth + beach marks = fatigue; sparkling grains + chevrons = brittle; fibrous = ductile. REPAIR welding is harder than new work: contaminated/soaked material (oil, corrosion products, hydrogen), uncertain old material grade, heavy RESTRAINT from surrounding structure, sometimes repair on live equipment. So a repair sequence needs: find the root cause first, excavate fully (confirm clean by MT/PT), a dedicated QUALIFIED repair WPS, and post-repair NDT."}]}
+]);
+
 })();
