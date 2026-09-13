@@ -333,4 +333,79 @@ deep(ch('consumables'), [
        en:"Inspector's angle: consumable control = right classification per WPS + batch certificate + storage/baking condition + clean wire surface. Any one wrong justifies stopping."}}
 ]);
 
+/* ========== GIẢNG GIẢI đợt 3: NDT ========== */
+deep(ch('non-destructive'), [
+{h_vi:"🎓 Cách đề thi hỏi về NDT — hai câu hỏi lọc",
+ h_en:"🎓 How the exam asks about NDT — two filter questions",
+ body:[
+ {vi:"Hầu hết câu NDT quy về việc CHỌN ĐÚNG PHƯƠNG PHÁP. Trước mỗi câu, tự hỏi 2 câu lọc: (1) khuyết tật nằm BỀ MẶT hay TRONG LÒNG? (2) vật liệu CÓ nhiễm từ không (thép ferit = có; inox austenit, nhôm, đồng = không)? Trả lời xong hai câu là loại được một nửa đáp án. Câu lọc phụ thứ ba: khuyết tật PHẲNG (nứt, LOF) hay KHỐI (rỗ, xỉ)? — phẳng thiên về UT, khối thiên về RT.",
+  en:"Most NDT questions reduce to CHOOSING THE METHOD. Ask two filters: (1) is the defect SURFACE or INTERNAL? (2) is the material MAGNETIC (ferritic steel yes; austenitic stainless, aluminium, copper no)? That kills half the options. Third filter: PLANAR (cracks, LOF) leans UT; VOLUMETRIC (porosity, slag) leans RT."}],
+ table:{cols:[{vi:"Tình huống",en:"Situation"},{vi:"Phương pháp đúng",en:"Right method"}],
+ data:[
+ [{vi:"Nứt bề mặt trên thép ferit",en:"Surface crack, ferritic steel"},{vi:"MT (nhanh, nhạy, thấy cả nứt sát bề mặt)",en:"MT (fast, sensitive, sees slightly sub-surface)"}],
+ [{vi:"Nứt bề mặt trên inox austenit / nhôm",en:"Surface crack, austenitic SS / aluminium"},{vi:"PT (MT bất lực vì không nhiễm từ)",en:"PT (MT impossible — non-magnetic)"}],
+ [{vi:"Khuyết tật PHẲNG trong lòng (LOF, nứt)",en:"Internal PLANAR (LOF, cracks)"},{vi:"UT (đo được cả độ sâu)",en:"UT (also gives depth)"}],
+ [{vi:"Khuyết tật KHỐI trong lòng (rỗ, xỉ)",en:"Internal VOLUMETRIC (porosity, slag)"},{vi:"RT (cho ảnh lưu hồ sơ)",en:"RT (permanent record)"}],
+ [{vi:"Tách lớp (lamination) trong tấm cán",en:"Lamination in rolled plate"},{vi:"UT sóng nén — RT gần như vô hình",en:"UT compression wave — nearly invisible to RT"}]]}},
+
+{h_vi:"🎓 RT — các con số và khái niệm đề hay soi",
+ h_en:"🎓 RT — the numbers and concepts the exam probes",
+ body:[
+ {vi:"IQI (chỉ thị chất lượng ảnh — dây hoặc bậc lỗ) KHÔNG đo kích thước khuyết tật; nó chứng minh ĐỘ NHẠY của phim: nhìn thấy dây càng mảnh, kỹ thuật chụp càng tốt. Độ đen phim (density) phải nằm trong dải quy định (thường ~2–3) — phim quá nhạt/quá đậm đều không đọc được. Nguồn: tia X từ máy (tắt được, ảnh nét hơn), tia gamma từ đồng vị Ir-192 (gọn, chụp hiện trường, KHÔNG tắt được — an toàn nghiêm ngặt hơn). Nhược điểm cốt lõi phải nhớ: RT kém với khuyết tật PHẲNG lệch hướng tia và KHÔNG cho biết độ sâu khuyết tật.",
+  en:"The IQI (wire or step-hole) does NOT size defects; it proves film SENSITIVITY — the thinner the visible wire, the better the technique. Film density must sit in the specified band (~2–3). Sources: X-ray sets (switch-off, sharper) vs gamma Ir-192 (portable, field use, CANNOT be switched off — stricter safety). Core weaknesses to memorise: poor on mis-aligned PLANAR defects and gives NO depth information."}]},
+
+{h_vi:"🎓 UT / MT / PT — mỗi phương pháp một 'điều kiện sống'",
+ h_en:"🎓 UT / MT / PT — each method's survival condition",
+ rows:[
+ {vi:"UT sống nhờ TIẾP ÂM: phải có couplant (mỡ, gel, nước) giữa đầu dò và bề mặt — không couplant là sóng không vào. Phải HIỆU CHUẨN trên khối chuẩn trước khi quét. Sóng nén (0°) đo chiều dày/tách lớp; sóng ngang (góc 45/60/70°) dò mối hàn.",
+  en:"UT lives on COUPLING: couplant (grease, gel, water) between probe and surface or no sound enters. Must CALIBRATE on reference blocks first. Compression (0°) for thickness/laminations; shear (angled) probes for welds."},
+ {vi:"MT sống nhờ TỪ TRƯỜNG cắt ngang khuyết tật: phải từ hóa HAI HƯỚNG (khuyết tật song song đường sức thì vô hình). Chỉ vật liệu sắt từ; thấy được khuyết tật sát dưới bề mặt (khác PT).",
+  en:"MT lives on flux CROSSING the defect: magnetise in TWO directions (parallel defects are invisible). Ferromagnetic only; can reveal slightly sub-surface defects (unlike PT)."},
+ {vi:"PT sống nhờ MAO DẪN: khuyết tật phải HỞ ra bề mặt và bề mặt phải SẠCH KHÔ. Trình tự thuộc lòng: làm sạch → thấm (chờ dwell 5–20 phút) → lau trung gian → chất hiện → đọc. Dùng được cho MỌI vật liệu không xốp.",
+  en:"PT lives on CAPILLARY action: the defect must be OPEN to a CLEAN, DRY surface. Sequence by heart: clean → apply penetrant (dwell 5–20 min) → intermediate clean → developer → inspect. Works on any non-porous material."}],
+ foot:{vi:"Vai trò thanh tra hàn với NDT: hiểu nguyên lý + giới hạn để chọn/giám sát, KHÔNG tự phán định kết quả — người đọc phim/chỉ thị phải có chứng chỉ NDT tương ứng.",
+       en:"The welding inspector's role: understand principles and limits to select/witness — interpretation belongs to certified NDT personnel."}}
+]);
+
+/* ========== GIẢNG GIẢI đợt 3: WPS / PQR ========== */
+deep(ch('wps'), [
+{h_vi:"🎓 Câu chuyện pWPS → PQR → WPS — vì sao phải lòng vòng vậy?",
+ h_en:"🎓 The pWPS → PQR → WPS story — why the detour?",
+ body:[
+ {vi:"Mục đích duy nhất của cả hệ thống: CHỨNG MINH BẰNG THỬ NGHIỆM rằng cách hàn này cho mối hàn đủ cơ tính. Trình tự: kỹ sư soạn pWPS (bản quy trình DỰ KIẾN — chưa được chứng minh) → thợ hàn giỏi hàn PHÔI THỬ theo đúng pWPS, có giám sát → phôi đem đi thử kéo/uốn/va đập/độ cứng/macro → nếu ĐẠT, toàn bộ số liệu thật ghi vào PQR (biên bản chứng nhận — bằng chứng gốc, KHÔNG dùng để hàn) → từ PQR viết ra WPS (bản hướng dẫn phát cho thợ hàn sản xuất, có dải thông số cho phép). Đề hay hỏi xoáy: 'thợ hàn đọc tài liệu nào?' → WPS. 'Tài liệu nào chứa kết quả thử?' → PQR. 'Tài liệu nào chưa được chứng minh?' → pWPS.",
+  en:"The whole system exists to PROVE BY TEST that a welding method gives adequate properties. Sequence: engineer drafts the pWPS (proposed, unproven) → a competent welder welds a TEST COUPON to it, witnessed → coupon is tensile/bend/impact/hardness/macro tested → if it PASSES, the actual data is recorded in the PQR (the evidence — never issued for production) → from the PQR a WPS is written for production welders with allowed ranges. Exam angles: 'what does the welder read?' → WPS. 'Which holds test results?' → PQR. 'Which is unproven?' → pWPS."}]},
+
+{h_vi:"🎓 Biến số thiết yếu — logic 'đổi cái gì thì cơ tính đổi?'",
+ h_en:"🎓 Essential variables — 'what change alters properties?'",
+ body:[
+ {vi:"Biến số THIẾT YẾU = thay đổi nó vượt giới hạn thì cơ tính mối hàn có thể thay đổi → PHẢI làm lại chứng nhận (PQR mới). Cách nhớ không cần học vẹt: cứ hỏi 'cái này có ảnh hưởng đến luyện kim/cơ tính không?' — Vật liệu nền (nhóm khác), chiều dày ra ngoài dải, quá trình hàn, vật liệu hàn khác nhóm, preheat thấp hơn, PWHT thêm/bớt, nhiệt lượng tăng mạnh: CÓ → thiết yếu. Chiều rộng lắc que, cách gõ xỉ, hãng que (cùng phân loại): ảnh hưởng ít → không thiết yếu.",
+  en:"An ESSENTIAL variable = changing it beyond limits may alter mechanical properties → RE-QUALIFICATION needed. No rote learning — just ask 'does this affect metallurgy/properties?' Parent material group, thickness outside range, process, consumable group, lower preheat, adding/removing PWHT, large heat-input increase: YES → essential. Weave width, slag-removal method, electrode brand within classification: barely → non-essential."}]},
+
+{h_vi:"🎓 Chứng nhận QUY TRÌNH vs chứng nhận THỢ HÀN — đề tách đôi",
+ h_en:"🎓 Procedure vs welder qualification — the exam splits them",
+ body:[
+ {vi:"Hai cuộc thi khác nhau trả lời hai câu hỏi khác nhau. Chứng nhận QUY TRÌNH (theo ISO 15614/ASME IX QW-200): 'cách hàn này có cho CƠ TÍNH đạt không?' → thử kéo, va đập, độ cứng... Chứng nhận THỢ HÀN (ISO 9606/ASME IX QW-300): 'người này có TAY NGHỀ hàn được mối hàn lành lặn không?' → chủ yếu ngoại quan + uốn hoặc RT, KHÔNG cần thử va đập. Phạm vi phê duyệt của thợ đi theo: quá trình, loại que, tư thế (hàn 6G phủ mọi tư thế), chiều dày/đường kính, có/không lót đáy. Chứng chỉ thợ có hạn hiệu lực và bị treo nếu ngừng hàn quá 6 tháng (ISO 9606).",
+  en:"Two different exams answering two different questions. PROCEDURE qualification (ISO 15614/ASME IX QW-200): 'does this method give the PROPERTIES?' → tensile, impacts, hardness. WELDER qualification (ISO 9606/QW-300): 'can this person deposit a SOUND weld?' → mainly visual + bends or RT, NO impact tests. The welder's range follows: process, electrode type, position (6G covers all), thickness/diameter, backing. Welder approval expires and lapses after ~6 months without welding (ISO 9606)."}],
+ rows:[
+ {vi:"Bẫy kinh điển: 'thử nào KHÔNG có trong welder qualification?' → thử va đập/kéo (đó là của PQR).",
+  en:"Classic trap: 'which test is NOT in welder qualification?' → impact/tensile (those belong to the PQR)."}]}
+]);
+
+/* ========== GIẢNG GIẢI đợt 3: Thử phá hủy ========== */
+deep(ch('destructive'), [
+{h_vi:"🎓 Mỗi mẫu thử chứng minh một điều — bảng đối chiếu",
+ h_en:"🎓 Each specimen proves one thing — the mapping",
+ table:{cols:[{vi:"Mẫu thử",en:"Test"},{vi:"Chứng minh điều gì / bẫy đề",en:"Proves what / exam trap"}],
+ data:[
+ [{vi:"Kéo NGANG mối hàn (transverse)",en:"Transverse tensile"},{vi:"Mối hàn KHÔNG YẾU HƠN kim loại nền (đứt phải ≥ min UTS của nền). Bẫy: nó KHÔNG đo giới hạn chảy của kim loại hàn!",en:"Weld is NOT WEAKER than parent (must break ≥ parent min UTS). Trap: it does NOT measure weld-metal yield!"}],
+ [{vi:"Kéo TOÀN kim loại hàn (all-weld)",en:"All-weld tensile"},{vi:"Đo trực tiếp cơ tính của riêng kim loại hàn (yield, UTS, giãn dài)",en:"Direct properties of the weld metal itself (yield, UTS, elongation)"}],
+ [{vi:"Uốn đáy / mặt / cạnh",en:"Root / face / side bend"},{vi:"Độ lành lặn + độ dẻo bề mặt chịu kéo. Uốn CẠNH dùng cho tấm DÀY (≥~12mm). Đường kính gối uốn thường 4t",en:"Soundness + ductility of the tension face. SIDE bends for THICK plate (≥~12mm). Former typically 4t"}],
+ [{vi:"Va đập Charpy-V",en:"Charpy V-notch"},{vi:"Độ DAI ở nhiệt độ quy định — rãnh V đặt được vào tâm hàn HOẶC HAZ. Kết quả tính bằng Joule",en:"TOUGHNESS at a specified temperature — notch in weld centre OR HAZ. Result in Joules"}],
+ [{vi:"Độ cứng (thường HV)",en:"Hardness (usually Vickers)"},{vi:"Vết cứng nhất thường ở HAZ. Giới hạn hay gặp: ~350HV thép C-Mn; ~248HV môi trường chua H2S",en:"Hardest point usually in HAZ. Common caps: ~350HV C-Mn; ~248HV sour service"}],
+ [{vi:"Macro (soi thô đại)",en:"Macro section"},{vi:"Mặt cắt mài + tẩm thực: soi ngấu, số lớp, khuyết tật trong — mẫu bắt buộc của welder qual góc",en:"Polished & etched section: fusion, passes, internal defects — mandatory for fillet welder qual"}]]},
+ body:[
+ {vi:"Mẹo làm bài: đề cho một TÍNH CHẤT, bạn chọn MẪU THỬ (hoặc ngược lại). Cứ dịch tính chất về bản chất: 'độ dai/toughness ở −20°C' → chỉ có Charpy làm được ở nhiệt độ âm; 'độ dẻo bề mặt đáy' → uốn đáy; 'mối hàn có yếu hơn thép nền không' → kéo ngang; 'HAZ có bị tôi cứng không' → đo độ cứng. Nhớ thêm: vì sao Charpy quan trọng — thép ferit GIÒN dần khi lạnh (đường cong chuyển tiếp dẻo-giòn); thép austenit không có chuyển tiếp này.",
+  en:"Exam skill: map PROPERTY ↔ SPECIMEN. Translate the property to its essence: 'toughness at −20°C' → only Charpy tests sub-zero; 'root-surface ductility' → root bend; 'is the joint weaker than parent' → transverse tensile; 'did the HAZ harden' → hardness survey. And why Charpy matters: ferritic steel EMBRITTLES with cold (ductile-brittle transition curve); austenitics show no transition."}]}
+]);
+
 })();
