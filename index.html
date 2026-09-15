@@ -321,9 +321,8 @@ function renderLearn(){
         <span class="pill">${bili('Chương','Chapter')} ${CURCHAP+1}</span>
         <h2>${bili(c.vi,c.en)}</h2>
         ${c.intro?`<p class="muted" style="margin-top:8px">${bili(c.intro.vi,c.intro.en)}</p>`:''}
-        <ul class="lesson">${c.lessons.map(L=>`<li>${bili('<span class="term">'+L.t_vi+':</span> '+L.vi, (L.t_en?L.t_en+': ':'')+L.en)}</li>`).join('')}</ul>
-        ${c.key?`<h3>🔑 ${bili('Điểm cần nhớ cho kỳ thi','Exam key points')}</h3><ul class="lesson">${c.key.map(k=>`<li>${bili(k.vi,k.en)}</li>`).join('')}</ul>`:''}
-        ${c.deep?`<h3>🔬 ${bili('Phân tích chuyên sâu','In-depth analysis')}</h3>
+        ${c.deep?`<h3>🎓 ${bili('Giảng giải — đọc phần này trước','Explained — read this first')}</h3>
+        <p class="muted" style="margin:-4px 0 12px;font-size:13px">${bili('Giải thích cơ chế, lý do và bẫy đề thi. Hiểu phần này rồi mới xuống phần tóm tắt bên dưới.','Mechanisms, reasons and exam traps. Understand this before the summary below.')}</p>
         <div class="deep-wrap">${c.deep.map(b=>`
           <div class="deep-block">
             <h4>${bili(b.h_vi,b.h_en)}</h4>
@@ -332,6 +331,10 @@ function renderLearn(){
             ${b.table?`<div class="tbl-wrap"><table class="deep-tbl"><thead><tr>${b.table.cols.map(col=>`<th>${bili(col.vi,col.en)}</th>`).join('')}</tr></thead><tbody>${b.table.data.map(row=>`<tr>${row.map(cell=>`<td>${bili(cell.vi,cell.en)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
             ${b.foot?`<p class="muted deep-foot">${bili(b.foot.vi,b.foot.en)}</p>`:''}
           </div>`).join('')}</div>`:''}
+        <h3>📋 ${bili('Tóm tắt & tra nhanh','Summary & quick reference')}</h3>
+        <p class="muted" style="margin:-4px 0 10px;font-size:13px">${bili('Bản rút gọn để ôn lại trước khi thi — không dùng để học lần đầu.','Condensed revision notes — not for first-time learning.')}</p>
+        <ul class="lesson">${c.lessons.map(L=>`<li>${bili('<span class="term">'+L.t_vi+':</span> '+L.vi, (L.t_en?L.t_en+': ':'')+L.en)}</li>`).join('')}</ul>
+        ${c.key?`<h3>🔑 ${bili('Điểm cần nhớ cho kỳ thi','Exam key points')}</h3><ul class="lesson">${c.key.map(k=>`<li>${bili(k.vi,k.en)}</li>`).join('')}</ul>`:''}
         <div class="row" style="margin-top:16px;justify-content:flex-start">
           <button class="btn ${PROG[CURCHAP]?'sec':''}" onclick="toggleDone(${CURCHAP})">${PROG[CURCHAP]?'✓ '+bili('Đã hoàn thành','Done'):bili('Đánh dấu hoàn thành','Mark done')}</button>
           <button class="btn sec" onclick="go('quiz');startQuiz(${CURCHAP})">${bili('Làm quiz chương này','Quiz this chapter')} →</button>
