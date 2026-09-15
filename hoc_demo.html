@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Học dễ nhớ — Chương 2: Quá trình hàn</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--card:#161b22;--card2:#1c2430;--line:#2a3441;--tx:#e6edf3;--mut:#8b98a8;--acc:#ff8a3d;--grn:#3fb950;--blu:#58a6ff}
+body{background:var(--bg);color:var(--tx);font:16px/1.65 -apple-system,"Segoe UI",Roboto,sans-serif;padding:16px;max-width:760px;margin:0 auto;-webkit-text-size-adjust:100%}
+header{margin-bottom:18px}
+.kicker{display:inline-block;background:rgba(255,138,61,.14);color:var(--acc);font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;letter-spacing:.4px}
+h1{font-size:22px;margin:10px 0 4px;line-height:1.3}
+.sub{color:var(--mut);font-size:14px}
+.dots{display:flex;gap:6px;margin:16px 0 20px}
+.dot{flex:1;height:5px;border-radius:3px;background:var(--line);transition:.3s}
+.dot.on{background:var(--acc)}
+.dot.done{background:var(--grn)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px}
+.idea-n{color:var(--acc);font-size:13px;font-weight:700;letter-spacing:.5px}
+h2{font-size:19px;margin:6px 0 14px;line-height:1.35}
+h3{font-size:15px;margin:18px 0 8px;color:var(--acc)}
+p{margin-bottom:12px}
+.ask{background:linear-gradient(135deg,rgba(88,166,255,.12),rgba(88,166,255,.04));border:1px solid rgba(88,166,255,.3);border-radius:12px;padding:16px;margin-bottom:14px}
+.ask b{color:var(--blu);display:block;margin-bottom:8px;font-size:14px}
+.ask p{margin-bottom:0;font-size:17px}
+.hint{color:var(--mut);font-size:13px;margin-top:10px;font-style:italic}
+.ana{background:rgba(63,185,80,.09);border-left:3px solid var(--grn);border-radius:0 10px 10px 0;padding:14px 16px;margin:14px 0}
+.ana b{color:var(--grn);display:block;margin-bottom:6px;font-size:13px;letter-spacing:.3px}
+.ana p{margin:0}
+.warn{background:rgba(255,138,61,.09);border-left:3px solid var(--acc);border-radius:0 10px 10px 0;padding:14px 16px;margin:14px 0}
+.warn b{color:var(--acc);display:block;margin-bottom:6px;font-size:13px}
+.warn p{margin:0}
+svg{width:100%;height:auto;display:block;margin:6px 0 14px;background:var(--card2);border-radius:12px;padding:10px}
+.terms{border-top:1px dashed var(--line);margin-top:18px;padding-top:14px}
+.terms .lb{color:var(--mut);font-size:12px;margin-bottom:8px}
+.chip{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:5px 10px;margin:0 6px 6px 0;font-size:13px}
+.chip b{color:var(--blu);font-weight:600}
+.chip span{color:var(--mut)}
+button{font:inherit;cursor:pointer;border:0;border-radius:11px;padding:13px 20px;font-weight:600}
+.btn{background:var(--acc);color:#1a0d04;width:100%}
+.btn.sec{background:var(--card2);color:var(--tx);border:1px solid var(--line)}
+.row{display:flex;gap:10px;margin-top:6px}
+.row button{flex:1}
+.hide{display:none}
+.opt{display:block;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:11px;padding:13px 15px;margin-bottom:9px;font-weight:400;line-height:1.45}
+.opt:hover{border-color:var(--acc)}
+.opt.ok{border-color:var(--grn);background:rgba(63,185,80,.14)}
+.opt.bad{border-color:#f85149;background:rgba(248,81,73,.13)}
+.fb{border-radius:11px;padding:13px 15px;margin-top:4px;font-size:14px;line-height:1.55}
+.fb.ok{background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.35)}
+.fb.bad{background:rgba(248,81,73,.09);border:1px solid rgba(248,81,73,.35)}
+.score{font-size:40px;font-weight:800;color:var(--acc);text-align:center;margin:10px 0}
+.note{color:var(--mut);font-size:13px;text-align:center;margin-top:20px;line-height:1.6}
+svg text{font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="kicker">BẢN THỬ · CÁCH HỌC MỚI</span>
+  <h1>Chương 2 — Quá trình hàn</h1>
+  <p class="sub">6 ý lớn. Mỗi ý: đoán trước → xem hình → hiểu → nhớ.</p>
+</header>
+
+<div class="dots" id="dots"></div>
+<div id="stage"></div>
+
+<p class="note">Đây là bản thử để bạn xem cách học này có vào đầu dễ hơn không.<br>Nếu được, mình làm tiếp cho cả 18 chương.</p>
+
+<script>
+const IDEAS = [
+{
+ n:"Ý LỚN 1 / 6",
+ t:"Hàn là nấu chảy kim loại — và phải đậy vung",
+ ask:"Bạn nấu một nồi canh. Nếu mở vung giữa lúc sôi, chuyện gì lọt vào nồi?",
+ hint:"Nghĩ 5 giây rồi bấm xem.",
+ svg:`<svg viewBox="0 0 640 230">
+  <rect x="0" y="0" width="640" height="230" fill="none"/>
+  <rect x="60" y="150" width="520" height="52" rx="4" fill="#3d4a5c"/>
+  <text x="70" y="182" fill="#8b98a8" font-size="13">kim loại cơ bản (tấm thép)</text>
+  <ellipse cx="320" cy="150" rx="72" ry="20" fill="#ff8a3d" opacity=".85"/>
+  <ellipse cx="320" cy="148" rx="46" ry="12" fill="#ffd166"/>
+  <text x="320" y="196" fill="#ffd166" font-size="13" text-anchor="middle">vũng hàn (kim loại LỎNG, ~1500°C)</text>
+  <rect x="306" y="34" width="28" height="74" rx="4" fill="#6e7d90"/>
+  <polygon points="306,108 334,108 320,126" fill="#c9d4e0"/>
+  <text x="348" y="60" fill="#8b98a8" font-size="13">điện cực / que hàn</text>
+  <path d="M320 126 L308 143 M320 126 L332 143 M320 126 L320 145" stroke="#ffd166" stroke-width="2.5" opacity=".9"/>
+  <path d="M225 118 Q320 60 415 118 Q415 150 320 152 Q225 150 225 118Z" fill="#58a6ff" opacity=".17" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="320" y="96" fill="#58a6ff" font-size="13" text-anchor="middle">LỚP BẢO VỆ = cái vung</text>
+  <text x="70" y="30" fill="#f85149" font-size="13">✕ Ôxy + Nitơ trong không khí</text>
+  <path d="M120 38 L150 70" stroke="#f85149" stroke-width="2"/><polygon points="150,70 141,60 154,61" fill="#f85149"/>
+  <path d="M500 38 L470 70" stroke="#f85149" stroke-width="2"/><polygon points="470,70 479,60 466,61" fill="#f85149"/>
+  <text x="440" y="30" fill="#f85149" font-size="13">✕ Hơi ẩm</text>
+ </svg>`,
+ body:`<p>Hàn hồ quang chỉ là: dùng tia lửa điện <b>nấu chảy</b> mép hai miếng thép cho chúng hòa vào nhau, nguội lại thì thành một khối.</p>
+ <p>Nhưng thép lỏng ở 1500°C <b>hút ôxy và nitơ trong không khí như miếng bọt biển hút nước</b>. Hút vào rồi, khi nguội chúng biến thành bọt khí và hạt cứng giòn nằm lại trong mối hàn.</p>
+ <p>Vì vậy <b>mọi quá trình hàn đều phải che vũng hàn lại</b>. Đó là lý do tồn tại của thuốc bọc que, của bình khí, của lớp thuốc hạt. Không có cái nào là "cho đẹp" cả — tất cả đều là <b>cái vung đậy nồi</b>.`,
+ ana:{t:"NEO VÀO ĐỜI THƯỜNG",p:"Vũng hàn = nồi canh đang sôi. Lớp bảo vệ = cái vung. Mở vung ra thì bụi rơi vào — hàn mà mất lớp bảo vệ thì <b>rỗ khí</b> rơi vào mối hàn. Nhớ đúng một câu này là hiểu được cả chương."},
+ terms:[["weld pool","vũng hàn"],["shielding","sự bảo vệ, che chắn"],["porosity","rỗ khí"],["arc","hồ quang"]],
+ recall:"Vì sao vũng hàn bắt buộc phải được che chắn?"
+},
+{
+ n:"Ý LỚN 2 / 6",
+ t:"Bốn quá trình hàn = bốn kiểu 'đậy vung' khác nhau",
+ ask:"Nếu có 4 cách đậy vung khác nhau, bạn đoán cách nào dùng được ngoài trời gió to?",
+ hint:"Gió thổi bay được cái gì, và không thổi bay được cái gì?",
+ svg:`<svg viewBox="0 0 640 300">
+  <g>
+   <rect x="14" y="14" width="146" height="128" rx="10" fill="#1c2430" stroke="#2a3441"/>
+   <text x="87" y="38" fill="#ff8a3d" font-size="14" font-weight="700" text-anchor="middle">MMA</text>
+   <rect x="78" y="48" width="18" height="44" rx="3" fill="#6e7d90"/>
+   <rect x="73" y="48" width="5" height="44" fill="#c9a227"/><rect x="96" y="48" width="5" height="44" fill="#c9a227"/>
+   <ellipse cx="87" cy="106" rx="30" ry="9" fill="#ff8a3d"/>
+   <path d="M62 102 Q87 92 112 102" stroke="#c9a227" stroke-width="4" fill="none"/>
+   <text x="87" y="128" fill="#c9a227" font-size="12" text-anchor="middle">đậy bằng XỈ</text>
+  </g>
+  <g>
+   <rect x="174" y="14" width="146" height="128" rx="10" fill="#1c2430" stroke="#2a3441"/>
+   <text x="247" y="38" fill="#ff8a3d" font-size="14" font-weight="700" text-anchor="middle">MIG / MAG</text>
+   <rect x="240" y="46" width="14" height="34" rx="2" fill="#6e7d90"/>
+   <path d="M228 80 L266 80 L258 96 L236 96Z" fill="#8795a8"/>
+   <path d="M247 96 L247 106" stroke="#c9d4e0" stroke-width="3"/>
+   <ellipse cx="247" cy="112" rx="28" ry="8" fill="#ff8a3d"/>
+   <path d="M230 94 Q247 118 264 94" fill="#58a6ff" opacity=".28"/>
+   <text x="247" y="134" fill="#58a6ff" font-size="12" text-anchor="middle">đậy bằng KHÍ</text>
+  </g>
+  <g>
+   <rect x="334" y="14" width="146" height="128" rx="10" fill="#1c2430" stroke="#2a3441"/>
+   <text x="407" y="38" fill="#ff8a3d" font-size="14" font-weight="700" text-anchor="middle">TIG</text>
+   <path d="M388 46 L426 46 L418 76 L396 76Z" fill="#8795a8"/>
+   <rect x="404" y="76" width="7" height="24" fill="#d0d7de"/>
+   <ellipse cx="407" cy="112" rx="26" ry="8" fill="#ff8a3d"/>
+   <path d="M390 74 Q407 118 424 74" fill="#58a6ff" opacity=".28"/>
+   <path d="M356 92 L392 106" stroke="#c9d4e0" stroke-width="3"/>
+   <text x="407" y="134" fill="#58a6ff" font-size="12" text-anchor="middle">KHÍ + que KHÔNG TAN</text>
+  </g>
+  <g>
+   <rect x="494" y="14" width="132" height="128" rx="10" fill="#1c2430" stroke="#2a3441"/>
+   <text x="560" y="38" fill="#ff8a3d" font-size="14" font-weight="700" text-anchor="middle">SAW</text>
+   <rect x="553" y="46" width="12" height="30" rx="2" fill="#6e7d90"/>
+   <rect x="510" y="86" width="100" height="26" rx="4" fill="#c9a227" opacity=".55"/>
+   <circle cx="524" cy="82" r="3" fill="#c9a227"/><circle cx="545" cy="80" r="3" fill="#c9a227"/><circle cx="572" cy="81" r="3" fill="#c9a227"/><circle cx="596" cy="83" r="3" fill="#c9a227"/>
+   <text x="560" y="134" fill="#c9a227" font-size="12" text-anchor="middle">VÙI trong thuốc hạt</text>
+  </g>
+  <rect x="14" y="160" width="612" height="124" rx="10" fill="#1c2430" stroke="#2a3441"/>
+  <text x="30" y="186" fill="#3fb950" font-size="14" font-weight="700">XỈ (thể rắn) — gió KHÔNG thổi bay được</text>
+  <text x="30" y="208" fill="#e6edf3" font-size="13">→ MMA và SAW dùng được ngoài công trường, ngoài gió.</text>
+  <text x="30" y="240" fill="#f85149" font-size="14" font-weight="700">KHÍ (thể khí) — gió THỔI BAY MẤT</text>
+  <text x="30" y="262" fill="#e6edf3" font-size="13">→ MIG/MAG và TIG phải che chắn gió, hoặc chỉ hàn trong xưởng.</text>
+ </svg>`,
+ body:`<p>Bốn quá trình trong đề thi chỉ khác nhau ở <b>cách đậy vung</b> và <b>que có tan hay không</b>:</p>
+ <p><b>MMA</b> — que sắt bọc một lớp thuốc. Thuốc cháy thành xỉ phủ lên trên. Que tự tan thành kim loại đắp.<br>
+ <b>MIG/MAG</b> — dây sắt chạy ra liên tục, khí thổi ra từ chụp bao quanh. Dây tan.<br>
+ <b>TIG</b> — que vonfram <b>không tan</b> (chỉ để sinh hồ quang), khí bảo vệ, muốn đắp thì cầm que phụ chấm vào.<br>
+ <b>SAW</b> — dây chạy tự động, cả hồ quang <b>chìm nghỉm</b> dưới đống thuốc hạt, không nhìn thấy tia lửa.</p>`,
+ ana:{t:"CÁCH NHỚ",p:"Xỉ là <b>chất rắn</b> — gió không thổi bay. Khí là <b>chất khí</b> — gió thổi bay ngay. Nên hỏi 'hàn ngoài trời gió dùng gì' thì đáp án luôn là loại có <b>xỉ</b>: MMA. Không cần học thuộc, cứ hỏi lại 'gió thổi bay được không'."},
+ terms:[["MMA / SMAW","hàn que bọc thuốc"],["MIG / MAG","hàn dây + khí"],["TIG / GTAW","hàn điện cực vonfram"],["SAW","hàn hồ quang chìm"],["slag","xỉ"],["consumable","tan được / vật liệu tiêu hao"]],
+ recall:"Hàn ngoài công trường có gió thì chọn quá trình nào, và vì sao?"
+},
+{
+ n:"Ý LỚN 3 / 6",
+ t:"Nguồn hàn CC và CV — cái vòi nước và cái bơm",
+ ask:"Thợ cầm que bằng tay. Tay người thì luôn run lên xuống. Nếu tay run làm hồ quang lúc dài lúc ngắn, bạn muốn máy giữ chặt cái gì?",
+ hint:"Giữ chặt dòng điện, hay giữ chặt điện áp?",
+ svg:`<svg viewBox="0 0 640 290">
+  <rect x="12" y="12" width="300" height="266" rx="12" fill="#1c2430" stroke="#2a3441"/>
+  <text x="162" y="40" fill="#ff8a3d" font-size="15" font-weight="700" text-anchor="middle">CC — giữ chặt DÒNG</text>
+  <text x="162" y="62" fill="#8b98a8" font-size="12" text-anchor="middle">"vòi nước vặn cứng một mức"</text>
+  <line x1="60" y1="220" x2="280" y2="220" stroke="#4a5666" stroke-width="2"/>
+  <line x1="60" y1="220" x2="60" y2="90" stroke="#4a5666" stroke-width="2"/>
+  <text x="170" y="242" fill="#8b98a8" font-size="12" text-anchor="middle">dòng điện (A) →</text>
+  <text x="36" y="160" fill="#8b98a8" font-size="12" text-anchor="middle" transform="rotate(-90 36 160)">điện áp (V)</text>
+  <path d="M72 100 Q170 118 205 210" stroke="#ff8a3d" stroke-width="3.5" fill="none"/>
+  <line x1="205" y1="90" x2="205" y2="225" stroke="#3fb950" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="212" y="104" fill="#3fb950" font-size="12">tay run</text>
+  <text x="212" y="120" fill="#3fb950" font-size="12">lên xuống</text>
+  <path d="M150 128 L196 176" stroke="#3fb950" stroke-width="2"/><polygon points="196,176 185,170 192,163" fill="#3fb950"/>
+  <text x="162" y="268" fill="#e6edf3" font-size="13" text-anchor="middle">→ dòng gần như KHÔNG ĐỔI</text>
+  <rect x="328" y="12" width="300" height="266" rx="12" fill="#1c2430" stroke="#2a3441"/>
+  <text x="478" y="40" fill="#58a6ff" font-size="15" font-weight="700" text-anchor="middle">CV — giữ chặt ĐIỆN ÁP</text>
+  <text x="478" y="62" fill="#8b98a8" font-size="12" text-anchor="middle">"máy tự bù, không cần tay"</text>
+  <line x1="376" y1="220" x2="596" y2="220" stroke="#4a5666" stroke-width="2"/>
+  <line x1="376" y1="220" x2="376" y2="90" stroke="#4a5666" stroke-width="2"/>
+  <text x="486" y="242" fill="#8b98a8" font-size="12" text-anchor="middle">dòng điện (A) →</text>
+  <path d="M388 128 L580 142" stroke="#58a6ff" stroke-width="3.5" fill="none"/>
+  <line x1="388" y1="135" x2="580" y2="135" stroke="#3fb950" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="430" y="182" fill="#3fb950" font-size="12">dòng tự nhảy rất nhiều</text>
+  <path d="M420 172 L410 150" stroke="#3fb950" stroke-width="2"/><polygon points="410,150 409,162 418,157" fill="#3fb950"/>
+  <path d="M540 172 L556 150" stroke="#3fb950" stroke-width="2"/><polygon points="556,150 545,156 554,162" fill="#3fb950"/>
+  <text x="478" y="268" fill="#e6edf3" font-size="13" text-anchor="middle">→ điện áp KHÔNG ĐỔI</text>
+ </svg>`,
+ body:`<p>Đây là câu hỏi ra đề nhiều nhất chương này, và nó chỉ là một ý duy nhất.</p>
+ <p><b>Người cầm tay thì tay run.</b> Tay run làm hồ quang lúc dài lúc ngắn. Nếu dòng điện cũng nhảy theo, mối hàn lúc ngấu sâu lúc ngấu nông — hỏng. Nên máy phải <b>giữ chặt dòng điện</b> dù hồ quang dài ngắn thế nào. Đó là <b>CC</b> — dùng cho <b>MMA và TIG</b>, hai quá trình cầm tay.</p>
+ <p><b>Máy tự cấp dây thì không có tay nào run</b>, nhưng có chuyện khác: dây chạy ra đều đặn, nếu thợ đưa mỏ hàn lại gần thì dây thừa ra. Ở chế độ <b>CV</b>, dây gần vật hơn → dòng vọt lên → dây <b>cháy cụt nhanh hơn</b> → hồ quang tự dài trở lại. Máy tự sửa, không cần thợ. Đó là <b>CV</b> — dùng cho <b>MIG/MAG và SAW dây nhỏ</b>.</p>`,
+ ana:{t:"NEO VÀO ĐỜI THƯỜNG",p:"<b>CC = vòi nước vặn cứng một mức.</b> Bạn đưa cái ca lên cao xuống thấp (hồ quang dài ngắn), nước vẫn chảy đúng bằng đó. → Tay người cầm → CC → <b>MMA, TIG</b>.<br><br><b>CV = máy tự bù.</b> Đút dây vào sâu hơn thì nó ăn dòng mạnh hơn, cháy cụt nhanh hơn, tự cân bằng lại. → Máy cấp dây → CV → <b>MIG/MAG, SAW</b>."},
+ warn:{t:"BẪY ĐỀ THI",p:"Đề rất hay hỏi ngược: <i>\"self-adjusting arc (hồ quang tự điều chỉnh) thuộc loại nguồn nào?\"</i> — Đáp án là <b>CV</b>, vì chỉ CV mới có khả năng tự bù đó. CC không tự điều chỉnh, chính thợ phải giữ tay."},
+ terms:[["constant current (CC)","nguồn dòng không đổi"],["drooping","đặc tính dốc (của CC)"],["constant voltage (CV)","nguồn áp không đổi"],["flat characteristic","đặc tính phẳng (của CV)"],["self-adjusting arc","hồ quang tự điều chỉnh"]],
+ recall:"MMA dùng nguồn CC hay CV? Vì sao lại là loại đó?"
+},
+{
+ n:"Ý LỚN 4 / 6",
+ t:"Cực tính — hai phần ba nhiệt nằm ở cực DƯƠNG",
+ ask:"Nếu hàn tấm thép dày, bạn muốn nhiệt dồn vào TẤM hay dồn vào QUE?",
+ hint:"Tấm dày thì cần nhiệt ở đâu để ngấu sâu?",
+ svg:`<svg viewBox="0 0 640 260">
+  <rect x="14" y="14" width="300" height="230" rx="12" fill="#1c2430" stroke="#2a3441"/>
+  <text x="164" y="40" fill="#ff8a3d" font-size="15" font-weight="700" text-anchor="middle">DCEP (+ ở que)</text>
+  <rect x="150" y="56" width="26" height="56" rx="3" fill="#6e7d90"/>
+  <text x="188" y="78" fill="#f85149" font-size="17" font-weight="700">+</text>
+  <text x="188" y="98" fill="#ff8a3d" font-size="12">2/3 nhiệt</text>
+  <path d="M163 112 L163 140" stroke="#ffd166" stroke-width="3"/>
+  <rect x="60" y="150" width="210" height="44" rx="4" fill="#3d4a5c"/>
+  <ellipse cx="163" cy="152" rx="34" ry="8" fill="#ff8a3d" opacity=".8"/>
+  <text x="76" y="178" fill="#58a6ff" font-size="15" font-weight="700">−</text>
+  <text x="96" y="178" fill="#8b98a8" font-size="12">1/3 nhiệt — ngấu NÔNG</text>
+  <text x="164" y="222" fill="#e6edf3" font-size="13" text-anchor="middle">Dùng cho: đa số que MMA,</text>
+  <text x="164" y="240" fill="#e6edf3" font-size="13" text-anchor="middle">MIG/MAG, thổi rãnh hồ quang-khí</text>
+  <rect x="326" y="14" width="300" height="230" rx="12" fill="#1c2430" stroke="#2a3441"/>
+  <text x="476" y="40" fill="#58a6ff" font-size="15" font-weight="700" text-anchor="middle">DCEN (− ở que)</text>
+  <rect x="462" y="56" width="26" height="56" rx="3" fill="#6e7d90"/>
+  <text x="500" y="78" fill="#58a6ff" font-size="17" font-weight="700">−</text>
+  <text x="500" y="98" fill="#8b98a8" font-size="12">1/3 nhiệt</text>
+  <path d="M475 112 L475 140" stroke="#ffd166" stroke-width="3"/>
+  <rect x="372" y="150" width="210" height="44" rx="4" fill="#3d4a5c"/>
+  <ellipse cx="475" cy="152" rx="34" ry="14" fill="#ff8a3d"/>
+  <path d="M451 152 Q475 188 499 152" fill="#ff8a3d" opacity=".55"/>
+  <text x="388" y="178" fill="#f85149" font-size="15" font-weight="700">+</text>
+  <text x="408" y="178" fill="#ffd166" font-size="12">2/3 nhiệt — ngấu SÂU</text>
+  <text x="476" y="222" fill="#e6edf3" font-size="13" text-anchor="middle">Dùng cho: TIG (thép, inox),</text>
+  <text x="476" y="240" fill="#e6edf3" font-size="13" text-anchor="middle">tấm dày cần ngấu sâu</text>
+ </svg>`,
+ body:`<p>Chỉ cần nhớ <b>một quy tắc duy nhất</b>: trong hàn hồ quang một chiều, <b>khoảng 2/3 nhiệt sinh ra ở cực DƯƠNG (+), 1/3 ở cực ÂM (−)</b>. Mọi câu hỏi về cực tính đều suy ra từ đây.</p>
+ <p>Đặt <b>cực dương vào QUE</b> (gọi là DCEP) → nhiệt dồn vào que → que tan nhanh, tấm ngấu nông hơn. Đặt <b>cực dương vào TẤM</b> (gọi là DCEN) → nhiệt dồn vào tấm → <b>ngấu sâu</b>.</p>
+ <p>Riêng hàn <b>nhôm bằng TIG</b> phải dùng <b>dòng xoay chiều AC</b>: nhôm có màng ôxit nóng chảy ở 2050°C phủ trên bề mặt (nhôm thì chảy ở 660°C), phải có nửa chu kỳ để "bắn vỡ" màng đó ra, nửa chu kỳ còn lại mới nấu chảy nhôm.</p>`,
+ ana:{t:"CÁCH NHỚ",p:"Chỉ nhớ: <b>cực dương nóng hơn</b>. Rồi tự hỏi <i>\"tôi muốn cái gì nóng hơn?\"</i> — muốn tấm ngấu sâu thì cho cực dương vào tấm. Không cần thuộc chữ DCEP hay DCEN, cứ nhìn dấu + nằm ở đâu."},
+ terms:[["DCEP / DC+","cực thuận nghịch: dương ở điện cực"],["DCEN / DC−","âm ở điện cực"],["polarity","cực tính"],["penetration","độ ngấu"]],
+ recall:"Muốn mối hàn ngấu SÂU vào tấm thì đặt cực dương ở đâu?"
+},
+{
+ n:"Ý LỚN 5 / 6",
+ t:"Nhiệt lượng đường hàn — đi nhanh hay đi chậm",
+ ask:"Rang lạc: lửa để nguyên, bạn đảo chảo NHANH hơn thì lạc chín nhiều hơn hay ít hơn?",
+ hint:"Thời gian lửa tác dụng lên hạt lạc thay đổi thế nào?",
+ svg:`<svg viewBox="0 0 640 250">
+  <rect x="14" y="14" width="612" height="90" rx="12" fill="#1c2430" stroke="#2a3441"/>
+  <text x="320" y="46" fill="#ff8a3d" font-size="16" font-weight="700" text-anchor="middle">Nhiệt lượng =  (Dòng × Điện áp × 60) ÷ (Tốc độ đi × 1000)</text>
+  <text x="320" y="76" fill="#8b98a8" font-size="13" text-anchor="middle">Đơn vị: kJ/mm  ·  Dòng A, Áp V, Tốc độ mm/phút</text>
+  <text x="320" y="94" fill="#8b98a8" font-size="12" text-anchor="middle">Tốc độ nằm ở MẪU SỐ → đi nhanh thì nhiệt lượng GIẢM</text>
+  <rect x="14" y="118" width="300" height="118" rx="12" fill="#1c2430" stroke="#2a3441"/>
+  <text x="164" y="144" fill="#f85149" font-size="14" font-weight="700" text-anchor="middle">ĐI CHẬM = nhiệt lượng CAO</text>
+  <rect x="44" y="160" width="240" height="18" rx="4" fill="#3d4a5c"/>
+  <ellipse cx="164" cy="160" rx="66" ry="12" fill="#ff8a3d" opacity=".75"/>
+  <text x="164" y="200" fill="#e6edf3" font-size="12.5" text-anchor="middle">nguội chậm · hạt to · HAZ rộng</text>
+  <text x="164" y="220" fill="#e6edf3" font-size="12.5" text-anchor="middle">→ mềm hơn nhưng ĐỘ DAI GIẢM</text>
+  <rect x="326" y="118" width="300" height="118" rx="12" fill="#1c2430" stroke="#2a3441"/>
+  <text x="476" y="144" fill="#58a6ff" font-size="14" font-weight="700" text-anchor="middle">ĐI NHANH = nhiệt lượng THẤP</text>
+  <rect x="356" y="160" width="240" height="18" rx="4" fill="#3d4a5c"/>
+  <ellipse cx="476" cy="160" rx="30" ry="9" fill="#ff8a3d" opacity=".75"/>
+  <text x="476" y="200" fill="#e6edf3" font-size="12.5" text-anchor="middle">nguội nhanh · hạt mịn · HAZ hẹp</text>
+  <text x="476" y="220" fill="#e6edf3" font-size="12.5" text-anchor="middle">→ CỨNG hơn, dễ NỨT NGUỘI</text>
+ </svg>`,
+ body:`<p>"Nhiệt lượng đường hàn" nghe to tát nhưng chỉ là: <b>một milimét mối hàn nhận được bao nhiêu nhiệt</b>.</p>
+ <p>Ba thứ quyết định nó: <b>dòng điện</b>, <b>điện áp</b>, và <b>tốc độ đi</b>. Hai cái đầu ở <b>tử số</b> — tăng lên thì nhiệt tăng. Tốc độ ở <b>mẫu số</b> — <b>đi nhanh thì nhiệt giảm</b>. Chỉ cần nhớ vị trí trên dưới của tốc độ là làm được mọi câu hỏi dạng này.</p>
+ <p>Vì sao thanh tra viên quan tâm? Vì nhiệt lượng quyết định <b>tốc độ nguội</b>, mà tốc độ nguội quyết định <b>tổ chức kim loại</b>. Nguội quá nhanh (nhiệt lượng thấp) → thép biến thành tổ chức <b>cứng và giòn</b>, cộng thêm hydro là <b>nứt nguội</b>. Nguội quá chậm (nhiệt lượng cao) → hạt kim loại lớn lên, <b>độ dai giảm</b>. Vì vậy WPS luôn quy định một <b>khoảng</b> nhiệt lượng, không phải một con số.</p>`,
+ ana:{t:"NEO VÀO ĐỜI THƯỜNG",p:"Rang lạc. Lửa giữ nguyên, <b>đảo nhanh</b> thì mỗi hạt ăn ít nhiệt hơn → chín ít. <b>Đảo chậm</b> thì mỗi hạt ăn nhiều nhiệt → chín kỹ, có khi cháy. Mối hàn y hệt: <b>đi nhanh = ít nhiệt, đi chậm = nhiều nhiệt</b>."},
+ terms:[["heat input","nhiệt lượng đường hàn"],["travel speed","tốc độ di chuyển"],["cooling rate","tốc độ nguội"],["HAZ","vùng ảnh hưởng nhiệt"]],
+ recall:"Thợ hàn đi NHANH hơn thì nhiệt lượng đường hàn tăng hay giảm?"
+},
+{
+ n:"Ý LỚN 6 / 6",
+ t:"Kiểu chuyển dịch kim loại — nhỏ giọt hay xịt sương",
+ ask:"Vòi sen: mở nhỏ thì nước rơi từng giọt, mở to thì thành tia sương. Kiểu nào nóng hơn?",
+ hint:"Mở to hơn nghĩa là năng lượng nhiều hơn hay ít hơn?",
+ svg:`<svg viewBox="0 0 640 260">
+  <rect x="14" y="14" width="300" height="230" rx="12" fill="#1c2430" stroke="#2a3441"/>
+  <text x="164" y="40" fill="#58a6ff" font-size="15" font-weight="700" text-anchor="middle">DIP — nhỏ giọt</text>
+  <text x="164" y="60" fill="#8b98a8" font-size="12" text-anchor="middle">dòng &amp; áp THẤP · 50–200 lần/giây</text>
+  <rect x="155" y="74" width="16" height="40" rx="2" fill="#8795a8"/>
+  <circle cx="163" cy="126" r="8" fill="#ffd166"/>
+  <circle cx="163" cy="148" r="8" fill="#ffd166"/>
+  <rect x="64" y="166" width="200" height="34" rx="4" fill="#3d4a5c"/>
+  <ellipse cx="163" cy="166" rx="30" ry="8" fill="#ff8a3d" opacity=".8"/>
+  <text x="164" y="222" fill="#3fb950" font-size="12.5" text-anchor="middle">✓ tấm mỏng, mọi tư thế, hàn chân</text>
+  <text x="164" y="240" fill="#f85149" font-size="12.5" text-anchor="middle">✕ tấm dày → dễ THIẾU NGẤU</text>
+  <rect x="326" y="14" width="300" height="230" rx="12" fill="#1c2430" stroke="#2a3441"/>
+  <text x="476" y="40" fill="#ff8a3d" font-size="15" font-weight="700" text-anchor="middle">SPRAY — xịt sương</text>
+  <text x="476" y="60" fill="#8b98a8" font-size="12" text-anchor="middle">dòng &amp; áp CAO · không chạm vũng</text>
+  <rect x="468" y="74" width="16" height="34" rx="2" fill="#8795a8"/>
+  <circle cx="470" cy="118" r="3" fill="#ffd166"/><circle cx="482" cy="124" r="3" fill="#ffd166"/>
+  <circle cx="464" cy="132" r="3" fill="#ffd166"/><circle cx="486" cy="138" r="3" fill="#ffd166"/>
+  <circle cx="474" cy="146" r="3" fill="#ffd166"/><circle cx="480" cy="156" r="3" fill="#ffd166"/>
+  <rect x="376" y="166" width="200" height="34" rx="4" fill="#3d4a5c"/>
+  <ellipse cx="476" cy="166" rx="42" ry="14" fill="#ff8a3d"/>
+  <path d="M446 166 Q476 202 506 166" fill="#ff8a3d" opacity=".6"/>
+  <text x="476" y="222" fill="#3fb950" font-size="12.5" text-anchor="middle">✓ tấm dày, ngấu sâu, đắp nhanh</text>
+  <text x="476" y="240" fill="#f85149" font-size="12.5" text-anchor="middle">✕ vũng quá lỏng → chỉ bằng &amp; ngang</text>
+ </svg>`,
+ body:`<p>Trong MIG/MAG, giọt kim loại từ dây đi sang vũng hàn theo mấy kiểu khác nhau, và kiểu nào là do <b>bạn đặt dòng và điện áp cao hay thấp</b>.</p>
+ <p><b>Dip (ngắn mạch)</b> — dòng và áp thấp. Dây chạm hẳn vào vũng hàn, chập mạch, giọt kim loại tách ra, hồ quang cháy lại. Lặp lại 50–200 lần mỗi giây. Vì nhiệt thấp nên <b>hàn được tấm mỏng và mọi tư thế</b> (kể cả hàn ngược trần), nhưng chính vì nhiệt thấp mà đem hàn <b>tấm dày thì dễ thiếu ngấu</b>.</p>
+ <p><b>Spray (phun)</b> — dòng và áp cao. Kim loại bay sang thành <b>hạt rất nhỏ như sương</b>, không chạm vũng. Nhiệt cao nên <b>ngấu sâu, đắp nhanh</b>, nhưng vũng hàn to và lỏng như nước nên <b>chỉ hàn được tư thế bằng và ngang</b> — ngửa lên thì nó chảy xuống.</p>`,
+ ana:{t:"NEO VÀO ĐỜI THƯỜNG",p:"<b>Dip = vòi mở nhỏ, nước rơi từng giọt</b> — mát, nhẹ, làm gì cũng được, nhưng yếu.<br><b>Spray = vòi mở hết, thành tia sương</b> — mạnh, nóng, ngấu sâu, nhưng vũng hàn lỏng quá nên không ngửa lên được."},
+ warn:{t:"BẪY ĐỀ THI",p:"Câu hỏi hay gặp: <i>\"dip transfer có rủi ro gì?\"</i> — Đáp án là <b>thiếu ngấu (lack of fusion)</b> trên vật liệu dày, vì nhiệt lượng quá thấp. Đây là liên kết giữa chương này và chương khuyết tật."},
+ terms:[["dip / short-circuit transfer","chuyển dịch ngắn mạch"],["spray transfer","chuyển dịch phun"],["globular","chuyển dịch giọt lớn (giữa hai kiểu)"],["lack of fusion","thiếu ngấu / không nóng chảy hết"]],
+ recall:"Vì sao dip transfer không nên dùng cho tấm dày?"
+}
+];
+
+const QUIZ=[
+ {q:"MMA hàn được ngoài trời có gió, còn MIG/MAG thì không. Vì sao?",
+  o:["MMA dùng dòng điện lớn hơn","MMA được bảo vệ bằng XỈ (chất rắn), gió không thổi bay được","MMA không cần bảo vệ vũng hàn","MIG/MAG chỉ dùng cho nhôm"],a:1,
+  e:"Xỉ là chất rắn phủ lên mối hàn nên gió không thổi bay. Khí bảo vệ là chất khí, gió thổi bay ngay lập tức."},
+ {q:"Vì sao MMA và TIG dùng nguồn CC (dòng không đổi)?",
+  o:["Vì hai quá trình này rẻ tiền hơn","Vì thợ CẦM TAY, tay run làm hồ quang dài ngắn — dòng phải giữ nguyên","Vì chúng chỉ hàn được thép","Vì chúng không cần khí bảo vệ"],a:1,
+  e:"Tay người luôn run. Nếu dòng nhảy theo chiều dài hồ quang thì độ ngấu lúc sâu lúc nông. CC giữ dòng gần như không đổi — giống vòi nước vặn cứng một mức."},
+ {q:"Muốn mối hàn ngấu SÂU vào tấm thì làm thế nào?",
+  o:["Đặt cực DƯƠNG vào tấm (DCEN)","Đặt cực ÂM vào tấm","Dùng dòng xoay chiều","Giảm dòng điện xuống thấp nhất"],a:0,
+  e:"Khoảng 2/3 nhiệt sinh ra ở cực DƯƠNG. Muốn tấm nóng hơn để ngấu sâu thì cho cực dương vào tấm — đó chính là DCEN (điện cực mang cực âm)."},
+ {q:"Thợ hàn đi NHANH hơn thì nhiệt lượng đường hàn thay đổi thế nào?",
+  o:["Tăng lên","Giảm xuống","Không đổi","Tùy loại que hàn"],a:1,
+  e:"Tốc độ nằm ở MẪU SỐ của công thức, nên đi nhanh thì nhiệt lượng giảm. Giống rang lạc: đảo nhanh thì mỗi hạt ăn ít nhiệt hơn."},
+ {q:"Dip transfer (chuyển dịch ngắn mạch) có rủi ro gì trên tấm dày?",
+  o:["Cháy thủng","Thiếu ngấu, vì nhiệt lượng quá thấp","Rỗ khí do gió","Nứt nóng"],a:1,
+  e:"Dip dùng dòng và áp thấp nên nhiệt thấp — tốt cho tấm mỏng và mọi tư thế, nhưng trên tấm dày nhiệt không đủ làm chảy thành bên, sinh thiếu ngấu."}
+];
+
+let i=0, phase='ask', qi=0, score=0, answered=false;
+const stage=document.getElementById('stage'), dotsEl=document.getElementById('dots');
+
+function dots(){
+  dotsEl.innerHTML=IDEAS.map((_,k)=>`<div class="dot ${k<i?'done':k===i?'on':''}"></div>`).join('')+`<div class="dot ${phase==='quiz'||phase==='end'?'on':''}"></div>`;
+}
+function esc(s){return s;}
+
+function render(){
+  dots();
+  if(phase==='ask'){
+    const d=IDEAS[i];
+    stage.innerHTML=`<div class="card">
+      <div class="idea-n">${d.n}</div>
+      <h2>${d.t}</h2>
+      <div class="ask"><b>❓ ĐOÁN THỬ TRƯỚC ĐÃ</b><p>${d.ask}</p><div class="hint">${d.hint}</div></div>
+      <button class="btn" onclick="reveal()">Tôi đoán xong — xem đáp án</button>
+    </div>`;
+    window.scrollTo(0,0);
+  } else if(phase==='learn'){
+    const d=IDEAS[i];
+    stage.innerHTML=`<div class="card">
+      <div class="idea-n">${d.n}</div>
+      <h2>${d.t}</h2>
+      ${d.svg}
+      ${d.body}
+      <div class="ana"><b>${d.ana.t}</b><p>${d.ana.p}</p></div>
+      ${d.warn?`<div class="warn"><b>⚠️ ${d.warn.t}</b><p>${d.warn.p}</p></div>`:''}
+      <div class="terms"><div class="lb">Thuật ngữ tiếng Anh của ý này — chỉ cần nhận mặt, không cần thuộc lòng:</div>
+        ${d.terms.map(t=>`<span class="chip"><b>${t[0]}</b> <span>= ${t[1]}</span></span>`).join('')}</div>
+      <h3>🔁 Nhắc lại bằng lời của bạn</h3>
+      <p style="color:var(--mut)">${d.recall}</p>
+      <p style="color:var(--mut);font-size:13px;font-style:italic">Nói thành tiếng một câu rồi bấm tiếp. Nói ra được mới là nhớ.</p>
+      <div class="row">
+        ${i>0?`<button class="btn sec" onclick="prev()">← Ý trước</button>`:''}
+        <button class="btn" onclick="next()">${i<IDEAS.length-1?'Ý tiếp theo →':'Làm 5 câu kiểm tra →'}</button>
+      </div>
+    </div>`;
+    window.scrollTo(0,0);
+  } else if(phase==='quiz'){
+    const q=QUIZ[qi];
+    stage.innerHTML=`<div class="card">
+      <div class="idea-n">KIỂM TRA ${qi+1} / ${QUIZ.length}</div>
+      <h2>${q.q}</h2>
+      <div id="opts">${q.o.map((o,k)=>`<button class="opt" onclick="pick(${k})">${o}</button>`).join('')}</div>
+      <div id="fb"></div>
+    </div>`;
+    answered=false;
+    window.scrollTo(0,0);
+  } else {
+    const pct=Math.round(score/QUIZ.length*100);
+    stage.innerHTML=`<div class="card">
+      <div class="idea-n">XONG</div>
+      <h2>Bạn đúng ${score}/${QUIZ.length}</h2>
+      <div class="score">${pct}%</div>
+      <p>${pct>=80?'Rất tốt — cách học này đang vào đầu được.':pct>=60?'Khá ổn. Xem lại ý nào sai rồi làm lại là nhớ.':'Đừng lo — làm lại lần nữa, lần này đọc kỹ phần "neo vào đời thường".'}</p>
+      <p style="color:var(--mut);font-size:14px">Cả chương này chỉ có <b>6 ý</b>. Nhớ 6 ý là bạn trả lời được phần lớn câu hỏi về quá trình hàn trong đề thi.</p>
+      <div class="row">
+        <button class="btn sec" onclick="restart()">Học lại từ đầu</button>
+        <button class="btn" onclick="requiz()">Làm lại 5 câu</button>
+      </div>
+    </div>`;
+    window.scrollTo(0,0);
+  }
+}
+function reveal(){phase='learn';render();}
+function next(){ if(i<IDEAS.length-1){i++;phase='ask';} else {phase='quiz';qi=0;score=0;} render(); }
+function prev(){ if(i>0){i--;phase='learn';} render(); }
+function pick(k){
+  if(answered)return; answered=true;
+  const q=QUIZ[qi], btns=document.querySelectorAll('#opts .opt');
+  btns[q.a].classList.add('ok');
+  if(k!==q.a) btns[k].classList.add('bad'); else score++;
+  document.getElementById('fb').innerHTML=
+    `<div class="fb ${k===q.a?'ok':'bad'}"><b>${k===q.a?'✓ Đúng':'✗ Chưa đúng'}</b><br>${q.e}</div>
+     <div class="row"><button class="btn" onclick="nq()">${qi<QUIZ.length-1?'Câu tiếp →':'Xem kết quả →'}</button></div>`;
+}
+function nq(){ if(qi<QUIZ.length-1){qi++;render();} else {phase='end';render();} }
+function restart(){i=0;phase='ask';render();}
+function requiz(){qi=0;score=0;phase='quiz';render();}
+render();
+</script>
+</body>
+</html>
