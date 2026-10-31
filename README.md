@@ -32,7 +32,7 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `config.js` | Giá, liên hệ, khóa sinh mã, Firebase |
 | `data.js`, `data_extra.js` | 18 chương: `lessons`, `deep` (giảng giải), `key`, `quiz`, lộ trình & prompt AI |
 | `bank.js`, `realbank.js`, `cwibank.js`, `cwibank_vi.js` | Ngân hàng câu hỏi (CSWIP + CWI tham khảo) |
-| `thibank1–6.js`, `thi.js`, `mock.js` | Tài liệu thi & thi thử 3 phần |
+| `thibank1–7.js`, `thi.js`, `mock.js` | Tài liệu thi & thi thử 3 phần (`thibank7.js`: Work Pack TWI 20 câu kèm hồ sơ, đáp án do trợ lý xác định từ hồ sơ) |
 | `auth.js`, `premium.js`, `cloud.js` | Đăng ký, công cụ nâng cao (qualify thợ, PQR), thi chương, đồng bộ Firestore. Chế độ mở khóa PRO đã bỏ: `isPremium()` luôn true, `chapFree()` luôn true |
 | `glossary.js`, `dich.js` | Từ điển 502 thuật ngữ, bôi đen → dịch |
 | `map_thi.js`, `cswip_focus.js`, `img_book.js`, `nangcap.js` | Liên kết câu hỏi → bài học, tách CWI, hình sách (local), flashcard từ điển |

@@ -84,7 +84,7 @@ function injectThi(){
     if (c.querySelector('.pt-setbtn')) return;
     var row = c.querySelector('.thi-row'); var b = row && row.querySelector('button[onclick*="THI.learn"]'); if (!b) return;
     var m = /THI\.learn\('([^']+)'\)/.exec(b.getAttribute('onclick')); if (!m) return;
-    var label = ({wp1:'Work Pack 1', wp2:'Work Pack 2', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết', dd:'Kéo-thả', c21:'Hỏi đáp 2.1', c22:'Kinh nghiệm 2.2', c23:'Hỏi đáp 2.3'})[m[1]]; if (!label) return;
+    var label = ({wp1:'Work Pack 1', wp2:'Work Pack 2', wptwi:'Work Pack TWI', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết', dd:'Kéo-thả', c21:'Hỏi đáp 2.1', c22:'Kinh nghiệm 2.2', c23:'Hỏi đáp 2.3'})[m[1]]; if (!label) return;
     var n = P.filter(function(p){ return p.src === label; }).length; if (!n) return;
     var nb = document.createElement('button'); nb.className = 'btn sec pt-setbtn'; nb.innerHTML = '📘 Kiến thức bộ này (' + n + ')'; nb.title = 'Học các điểm kiến thức của bộ đề này, xếp theo chương → mục bài học';
     nb.onclick = function(){ hdStartSet(label); }; row.appendChild(nb);

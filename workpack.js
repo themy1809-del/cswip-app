@@ -57,8 +57,26 @@ window.WORKPACK = {
   open:function(i){ OPEN = true; PI = i || 0; renderViewer(); },
   close:function(){ OPEN = false; try{ if (window.THI) THI.back(); else if (typeof renderThi === 'function') renderThi(); }catch(e){} },
   go:function(i){ PI = Math.max(0, Math.min(WP.length - 1, i)); renderViewer(); },
-  zoom:function(){ var o = document.createElement('div'); o.className = 'wp-zoom'; o.innerHTML = '<img src="' + BASE + WP[PI].f + '" alt="">'; o.addEventListener('click', function(){ o.remove(); }); document.body.appendChild(o); }
+  zoom:function(){ var o = document.createElement('div'); o.className = 'wp-zoom'; o.innerHTML = '<img src="' + BASE + WP[PI].f + '" alt="">'; o.addEventListener('click', function(){ o.remove(); }); document.body.appendChild(o); },
+  /* xem hồ sơ dạng cửa sổ nổi — dùng khi đang làm bài, không mất tiến độ */
+  modal:function(i){
+    var old = document.getElementById('wp-modal'); if (old) old.remove();
+    var mi = Math.max(0, Math.min(WP.length - 1, i == null ? 4 : i));
+    var o = document.createElement('div'); o.id = 'wp-modal'; o.className = 'wp-zoom'; o.style.cursor = 'default';
+    function draw(){ var p = WP[mi]; o.innerHTML = '<div style="max-width:1100px;margin:0 auto"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px"><b style="color:#fff">📎 ' + esc(p.t) + '</b><span style="color:#aab;font-size:12px">' + (mi + 1) + '/' + WP.length + '</span><span style="flex:1"></span><button class="btn sec" style="padding:6px 12px" onclick="WORKPACK.modalGo(-1)">←</button><button class="btn sec" style="padding:6px 12px" onclick="WORKPACK.modalGo(1)">→</button><button class="btn" style="padding:6px 12px" onclick="document.getElementById(\'wp-modal\').remove()">✕ Đóng, làm tiếp</button></div><div class="wp-thumbs" style="margin-bottom:8px">' + WP.map(function(x, k){ return '<button class="' + (k === mi ? 'on' : '') + '" onclick="WORKPACK.modalGo(' + (k - mi) + ')">' + (k + 1) + '. ' + esc(x.t.split(' (')[0]) + '</button>'; }).join('') + '</div><img src="' + BASE + p.f + '" alt=""></div>'; }
+    o._go = function(d){ mi = Math.max(0, Math.min(WP.length - 1, mi + d)); draw(); };
+    draw(); document.body.appendChild(o);
+  },
+  modalGo:function(d){ var o = document.getElementById('wp-modal'); if (o && o._go) o._go(d); }
 };
+/* nút "Mở hồ sơ" khi đang học/làm bộ Work Pack TWI */
+function injectSetBtn(){
+  var el = document.getElementById('v-thi'); if (!el || !el.classList.contains('on')) return;
+  var head = el.querySelector('.thi-card b'); if (!head || !/Work Pack TWI/.test(head.textContent) || el.querySelector('.wp-setbtn')) return;
+  var b = document.createElement('button'); b.className = 'btn sec wp-setbtn'; b.style.cssText = 'margin-top:8px;padding:7px 12px;font-size:12.5px'; b.textContent = '📎 Mở hồ sơ WPS / chứng chỉ / bản vẽ (cửa sổ nổi)';
+  b.onclick = function(){ WORKPACK.modal(4); };
+  head.parentNode.parentNode.appendChild(b);
+}
 /* thẻ trong menu Tài liệu thi */
 function inject(){
   var el = document.getElementById('v-thi'); if (!el || !el.classList.contains('on')) return;
@@ -71,7 +89,7 @@ function inject(){
     + '<div class="thi-row"><button class="btn" onclick="WORKPACK.open(0)">📖 Mở hồ sơ</button><button class="btn sec" onclick="WORKPACK.open(10)">Xem bản vẽ TRAIN 1</button></div>';
   first.insertAdjacentElement('afterend', d);
 }
-new MutationObserver(function(){ try{ inject(); }catch(e){} }).observe(document.body, {childList:true, subtree:true});
+new MutationObserver(function(){ try{ inject(); injectSetBtn(); }catch(e){} }).observe(document.body, {childList:true, subtree:true});
 /* đổi tab thì đóng viewer */
 if (typeof window.go === 'function' && !window._wpGoWrapped){ var og = window.go; window.go = function(t){ if (t !== 'thi') OPEN = false; return og.apply(this, arguments); }; window._wpGoWrapped = true; }
 inject();

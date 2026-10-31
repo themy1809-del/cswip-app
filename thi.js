@@ -4,7 +4,7 @@
    ============================================================ */
 (function(){
   var SETS=[];
-  ['THI_WP1','THI_WP2','THI_LEAD','THI_RING','THI_FB','THI_DD','THI_C21','THI_C22','THI_C23'].forEach(function(k){ if(window[k]) SETS.push(window[k]); });
+  ['THI_WP1','THI_WP2','THI_WPTWI','THI_LEAD','THI_RING','THI_FB','THI_DD','THI_C21','THI_C22','THI_C23'].forEach(function(k){ if(window[k]) SETS.push(window[k]); });
   if(!SETS.length) return;
 
   var P={}; try{ P=JSON.parse(localStorage.getItem('THIP')||'{}'); }catch(e){}

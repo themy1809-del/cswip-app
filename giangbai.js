@@ -211,7 +211,8 @@ function ensure(){
   '.gb-learnfig{margin:8px 0 12px}',
   '.gb-learnfig svg{max-height:290px}',
   '.gb-slide .bk-fig img{max-height:430px;object-fit:contain;background:#fff}',
-  '@media(max-width:520px){.gb-bubble{font-size:15px;padding:12px}.gb-big{font-size:16px}}'
+  '@media(max-width:520px){.gb-bubble{font-size:15px;padding:12px}.gb-big{font-size:16px}}',
+  '@media print{body *{visibility:hidden}#v-teach,#v-teach *{visibility:visible}#v-teach{position:absolute;left:0;top:0;width:100%;color:#000}#v-teach .card{background:#fff;border:none;box-shadow:none}.gb-top,.gb-row,.btn,.back{display:none!important}}'
   ].join('\n');
   document.head.appendChild(css);
 }
@@ -224,7 +225,19 @@ window.gbStart = function(ci, fromStart, auto){
   if (auto){ AUTO = true; TTS = true; SV('cswip_tts', true); }
   go('teach');
 };
-window.gbList = function(){ stopSpeak(); AUTO = false; S.ci = null; render(); };
+window.gbList = function(){ stopSpeak(); AUTO = false; S.ci = null; S.numbers = false; render(); };
+/* 🔢 Bảng số liệu phải thuộc — gom "numbers" + thần chú của 18 chương, in được */
+window.gbNumbers = function(){ stopSpeak(); AUTO = false; S.ci = null; S.numbers = true; render(); };
+function numbersView(el){
+  var h = '<div class="card"><button class="back" onclick="gbList()">← Giảng bài</button><h2 style="margin-top:8px">🔢 Bảng số liệu & thần chú phải thuộc — toàn khóa</h2><p class="muted" style="margin-top:6px;line-height:1.6">Gom toàn bộ con số, bảng và câu thần chú của 18 chương (phần "Phải thuộc" trong từng bài giảng). 21% câu đề có đáp án là con số — đọc bảng này mỗi ngày trong tuần cuối. In ra giấy: Ctrl/Cmd + P.</p><div class="gb-row"><button class="btn" onclick="window.print()">🖨️ In bảng</button><button class="btn sec" onclick="gbSpeak(\'gb-numbers-all\')">🔊 Đọc</button></div></div><div class="card" id="gb-numbers-all">';
+  ORDER.forEach(function(ci){ var X = EXTRA[ci]; var c = DATA.chapters[ci]; if (!X || !c) return;
+    h += '<h3 style="margin:14px 0 4px;color:var(--accent2)">' + (ci + 1) + '. ' + esc(c.vi) + '</h3>';
+    if (X.numbers) h += '<ul class="lesson" style="margin:4px 0">' + X.numbers.map(function(n){ return '<li>' + n + '</li>'; }).join('') + '</ul>';
+    if (X.mnemonic) h += '<div class="gb-story" style="margin-top:6px">🧷 ' + X.mnemonic + '</div>';
+  });
+  h += '</div>';
+  el.innerHTML = '<div class="gb-wrap">' + h + '</div>'; window.scrollTo(0, 0);
+}
 function setStep(si){ var st = build(S.ci); S.si = Math.max(0, Math.min(st.length - 1, si)); S.pi = 0; S.ans = null; S.qans = null; S.ask = ''; S.dis = false; var p = prg(S.ci); if (S.si > (p.si || 0)) p.si = S.si; if (st[S.si].t === 'done') p.done = true; savePrg(); }
 window.gbNext = function(){ stopSpeak(); var st = build(S.ci); if (S.si < st.length - 1) setStep(S.si + 1); render(); };
 window.gbPrev = function(){ stopSpeak(); if (S.si > 0){ setStep(S.si - 1); var s = build(S.ci)[S.si]; S.pi = s.slides ? s.slides.length - 1 : (s.items ? s.items.length - 1 : 0); } render(); };
@@ -334,12 +347,13 @@ function listView(){
     var status = locked ? '<span class="gb-ring" style="background:rgba(255,255,255,.08);color:var(--muted)">🔒 khóa</span>' : (p && p.done ? '<span class="gb-ring" style="background:rgba(52,199,89,.15);color:var(--green)">✓ xong · đúng ' + p.right + '/' + p.total + '</span>' : pct ? '<span class="gb-ring" style="background:rgba(76,168,255,.15);color:var(--accent2)">▶ ' + pct + '%</span>' : '<span class="gb-ring" style="background:rgba(255,255,255,.08);color:var(--muted)">chưa học</span>');
     return '<div class="chap" onclick="gbStart(' + ci + ')"><div class="num">' + (k + 1) + '</div><div class="meta"><b>' + esc(c.vi) + '</b><div class="muted" style="font-size:12px">' + ideas + ' ý lớn · ' + nfig + ' mô phỏng · ' + nbook + ' hình sách · ~' + mins + ' phút · ' + (EXTRA[ci] && EXTRA[ci].traps ? EXTRA[ci].traps.length + ' bẫy đề' : '') + '</div></div><div>' + status + '</div></div>';
   }).join('') + '</div>';
+  h += '<div class="card" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-left:3px solid var(--yellow)"><div style="font-size:26px">🔢</div><div style="flex:1;min-width:200px"><b>Bảng số liệu & thần chú phải thuộc — toàn khóa</b><div class="muted" style="font-size:12.5px;margin-top:2px">Gom con số của 18 chương (sấy que, H5/H10, 27 J, 4t, 380 HV, 723 °C, PWHT, 75 mm, lux…) + câu thần chú. In được. 21% câu đề có đáp án là số.</div></div><button class="btn sec" onclick="gbNumbers()">Mở bảng</button></div>';
   h += '<div class="card" style="text-align:center"><p class="muted" style="font-size:13px">Đã xong ' + done + '/' + total + ' chương. Nghe lại chương đã xong vẫn tính điểm & ghi câu sai.</p></div>';
   el.innerHTML = '<div class="gb-wrap">' + h + '</div>';
 }
 function render(){
   var el = document.getElementById('v-teach'); if (!el) return;
-  if (S.ci === null){ listView(); return; }
+  if (S.ci === null){ if (S.numbers) return numbersView(el); listView(); return; }
   var c = DATA.chapters[S.ci], st = build(S.ci), s = st[S.si]; if (!s){ listView(); return; }
   var X = EXTRA[S.ci] || {};
   var h = topBar(st, S.si), body = '', nav = '', speakId = 'gb-say-' + S.si + '-' + S.pi, autoNext = null;
