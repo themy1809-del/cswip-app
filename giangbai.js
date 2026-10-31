@@ -92,7 +92,7 @@ function build(ci){
   var figs = FIG ? FIG.assign(ci, deep) : [];
   var quiz = (c.quiz || []).map(function(q, qi){ var n = normChapQ(q, ci, qi); n.w = words((q.en || '') + ' ' + (q.exp && q.exp.en || '')); return n; });
   var bank = bankForChapter(ci).map(function(n){ n.w = words(n.en + ' ' + (n.exp && n.exp.en || '')); return n; });
-  var usedIds = {};
+  var usedIds = {}, usedBook = {};
   deep.forEach(function(b, bi){
     var fig = figs[bi] || null;
     steps.push({t:'hook', b:b, bi:bi, fig:fig});
@@ -100,6 +100,12 @@ function build(ci){
     var slides = [];
     if (fig && FIG){ for (var k = 0; k < FIG.steps(fig); k++) slides.push({kind:'fig', fig:fig, k:k, text:FIG.cap(fig, k)}); }
     (b.body || []).forEach(function(p){ slides.push({kind:'para', vi:p.vi, en:p.en, fig:fig}); });
+    // ảnh thật / hình vẽ trong giáo trình WIS5 khớp với ý này
+    if (window.BOOK && BOOK.figs.length){
+      var btxt = (b.h_en || '') + ' ' + (b.body || []).map(function(p){ return p.en || ''; }).join(' ') + ' ' + (b.rows || []).map(function(r){ return r.en || ''; }).join(' ');
+      var bfs = BOOK.match(ci, btxt, 2, usedBook);
+      bfs.forEach(function(f){ usedBook[f.i] = 1; slides.push({kind:'book', f:f, fig:fig}); });
+    }
     if ((b.rows && b.rows.length) || b.table || b.foot) slides.push({kind:'tail', b:b, fig:fig});
     if (!slides.length) slides.push({kind:'para', vi:strip(b.h_vi), en:strip(b.h_en || ''), fig:fig});
     steps.push({t:'teach', b:b, bi:bi, fig:fig, slides:slides});
@@ -111,6 +117,11 @@ function build(ci){
     if (best && best.sc >= 0.33){ usedIds[best.x.id] = 1; steps.push({t:'check', b:b, bi:bi, q:best.x}); }
     else steps.push({t:'recall', b:b, bi:bi, fig:fig});
   });
+  if (window.BOOK && BOOK.figs.length){
+    var rest = BOOK.forChapter(ci).filter(function(f){ return !usedBook[f.i]; });
+    steps.forEach(function(st){ if (st.t !== 'teach' || !rest.length) return; if (st.slides.some(function(x){ return x.kind === 'book'; })) return; var f = rest.shift(); usedBook[f.i] = 1; var at = st.slides.findIndex(function(x){ return x.kind === 'tail'; }); st.slides.splice(at < 0 ? st.slides.length : at, 0, {kind:'book', f:f, fig:st.fig}); });
+    if (rest.length) steps.splice(steps.length, 0, {t:'gallery', items:rest}); // trước recap/done sẽ sắp lại bên dưới
+  }
   if (!deep.length){ (c.lessons || []).forEach(function(L, li){ if (li % 4 === 0) steps.push({t:'teachL', items:c.lessons.slice(li, li + 4), li:li}); }); }
   if (X.traps && X.traps.length) steps.push({t:'traps', items:X.traps});
   if (X.numbers && X.numbers.length) steps.push({t:'numbers', items:X.numbers});
@@ -121,6 +132,8 @@ function build(ci){
   var qs = shuf(rest).slice(0, Math.min(5, rest.length));
   if (qs.length) steps.push({t:'quiz', qs:qs});
   steps.push({t:'done'});
+  var gi = steps.findIndex(function(x){ return x.t === 'gallery'; });
+  if (gi >= 0){ var g = steps.splice(gi, 1)[0]; var ri = steps.findIndex(function(x){ return x.t === 'recap' || x.t === 'keys' || x.t === 'quiz'; }); steps.splice(ri < 0 ? steps.length - 1 : ri, 0, g); }
   CACHE[ci] = steps; return steps;
 }
 
@@ -197,6 +210,7 @@ function ensure(){
   '.gb-story{font-size:15.5px;line-height:1.75;padding:12px 14px;border-left:3px solid var(--yellow);background:rgba(255,214,10,.05);border-radius:0 12px 12px 0;margin-top:10px}',
   '.gb-learnfig{margin:8px 0 12px}',
   '.gb-learnfig svg{max-height:290px}',
+  '.gb-slide .bk-fig img{max-height:430px;object-fit:contain;background:#fff}',
   '@media(max-width:520px){.gb-bubble{font-size:15px;padding:12px}.gb-big{font-size:16px}}'
   ].join('\n');
   document.head.appendChild(css);
@@ -316,9 +330,9 @@ function listView(){
   h += '<div class="chap-list gb-list">' + ORDER.map(function(ci, k){
     var c = DATA.chapters[ci]; if (!c) return ''; var st = build(ci), p = PRG[ci], pct = p ? Math.min(100, Math.round((p.si || 0) / (st.length - 1) * 100)) : 0; total++; if (p && p.done) done++;
     var locked = (typeof chapFree === 'function' && !chapFree(ci));
-    var ideas = (c.deep || []).length, nfig = FIG ? FIG.assign(ci, c.deep || []).filter(Boolean).length : 0, mins = Math.max(8, ideas * 4 + 8);
+    var ideas = (c.deep || []).length, nfig = FIG ? FIG.assign(ci, c.deep || []).filter(Boolean).length : 0, nbook = window.BOOK ? BOOK.forChapter(ci).length : 0, mins = Math.max(8, ideas * 4 + 8);
     var status = locked ? '<span class="gb-ring" style="background:rgba(255,255,255,.08);color:var(--muted)">🔒 khóa</span>' : (p && p.done ? '<span class="gb-ring" style="background:rgba(52,199,89,.15);color:var(--green)">✓ xong · đúng ' + p.right + '/' + p.total + '</span>' : pct ? '<span class="gb-ring" style="background:rgba(76,168,255,.15);color:var(--accent2)">▶ ' + pct + '%</span>' : '<span class="gb-ring" style="background:rgba(255,255,255,.08);color:var(--muted)">chưa học</span>');
-    return '<div class="chap" onclick="gbStart(' + ci + ')"><div class="num">' + (k + 1) + '</div><div class="meta"><b>' + esc(c.vi) + '</b><div class="muted" style="font-size:12px">' + ideas + ' ý lớn · ' + nfig + ' hình mô phỏng · ~' + mins + ' phút · ' + (EXTRA[ci] && EXTRA[ci].traps ? EXTRA[ci].traps.length + ' bẫy đề' : '') + '</div></div><div>' + status + '</div></div>';
+    return '<div class="chap" onclick="gbStart(' + ci + ')"><div class="num">' + (k + 1) + '</div><div class="meta"><b>' + esc(c.vi) + '</b><div class="muted" style="font-size:12px">' + ideas + ' ý lớn · ' + nfig + ' mô phỏng · ' + nbook + ' hình sách · ~' + mins + ' phút · ' + (EXTRA[ci] && EXTRA[ci].traps ? EXTRA[ci].traps.length + ' bẫy đề' : '') + '</div></div><div>' + status + '</div></div>';
   }).join('') + '</div>';
   h += '<div class="card" style="text-align:center"><p class="muted" style="font-size:13px">Đã xong ' + done + '/' + total + ' chương. Nghe lại chương đã xong vẫn tính điểm & ghi câu sai.</p></div>';
   el.innerHTML = '<div class="gb-wrap">' + h + '</div>';
@@ -334,7 +348,7 @@ function render(){
     body = teacher('<p>Chào bạn 👋 Hôm nay mình học <b>chương ' + (S.ci + 1) + ': ' + esc(c.vi) + '</b>' + (c.en ? ' <span class="muted">(' + esc(c.en) + ')</span>' : '') + '.</p>'
       + (c.intro ? '<p>' + bil(esc(c.intro.vi), esc(c.intro.en)) + '</p>' : '')
       + (X.story ? '<div class="gb-story">💡 <b>Hình dung cả chương:</b> ' + X.story + '</div>' : '')
-      + '<p style="margin-top:10px">Mình sẽ đi qua <b>' + ideas + ' ý lớn</b> bằng hình và từng đoạn ngắn. Ở mỗi ý bạn đoán trước, mình giảng, rồi mình hỏi lại bằng câu đề thật. Đừng cố thuộc lòng — hãy cố <b>giải thích được vì sao</b>.</p>'
+      + '<p style="margin-top:10px">Mình sẽ đi qua <b>' + ideas + ' ý lớn</b> bằng hình mô phỏng, <b>ảnh thật trong giáo trình WIS5</b> và từng đoạn ngắn. Ở mỗi ý bạn đoán trước, mình giảng, rồi mình hỏi lại bằng câu đề thật. Đừng cố thuộc lòng — hãy cố <b>giải thích được vì sao</b>.</p>'
       + (p && p.si > 0 && !p.done ? '<p class="muted">Lần trước bạn học dở ở bước ' + p.si + '.</p>' : ''), '', speakId);
     nav = '<div class="gb-row"><button class="btn" onclick="gbGoto(1)">▶ Bắt đầu giảng</button><button class="btn sec" onclick="gbStart(' + S.ci + ',true,true)">🎧 Nghe tự động cả chương</button>' + (p && p.si > 1 && !p.done ? '<button class="btn sec" onclick="gbGoto(' + p.si + ')">⏩ Học tiếp từ bước ' + p.si + '</button>' : '') + '<button class="btn ghost" onclick="go(\'learn\');openChap(' + S.ci + ')">📄 Bản đọc đầy đủ</button></div>';
     autoNext = function(){ gbGoto(1); };
@@ -350,6 +364,7 @@ function render(){
     var inner = '';
     if (sl.kind === 'fig') body = '<div class="gb-slide">' + fig(sl.fig, sl.k) + teacher(head + '<div class="gb-big" id="' + speakId + '">' + sl.text + '</div><div class="gb-mini" style="margin-top:8px">Hình: bước ' + (sl.k + 1) + '/' + FIG.steps(sl.fig) + '</div>', '', null) + '</div>';
     else if (sl.kind === 'para') body = '<div class="gb-slide">' + (sl.fig ? fig(sl.fig, null, true) : '') + teacher(head + '<div class="gb-big" id="' + speakId + '">' + bil(sl.vi, sl.en) + '</div>', '', null) + '</div>';
+    else if (sl.kind === 'book') body = '<div class="gb-slide">' + BOOK.img(sl.f, '', false) + teacher(head + '<div class="gb-big" id="' + speakId + '">📷 <b>Hình thật trong giáo trình WIS5</b> (trang ' + sl.f.p + ', ' + esc(sl.f.n.replace(/^T/, 'Bảng ')) + '): ' + esc(sl.f.vi || sl.f.cap) + '.' + (sl.f.vi ? '<span class="lang-en">' + esc(sl.f.cap) + '</span>' : '') + '</div><div class="gb-mini" style="margin-top:8px">Nhìn kỹ hình này 10 giây — đề thi hay cho ảnh macro/ảnh khuyết tật tương tự và hỏi "đây là gì / do đâu". Chạm ảnh để phóng to.</div>', '', null) + '</div>';
     else {
       var tail = '';
       if (s.b.rows && s.b.rows.length) tail += '<ul class="lesson" style="margin-top:4px">' + s.b.rows.map(function(r){ return '<li>' + bil(r.vi, r.en) + '</li>'; }).join('') + '</ul>';
@@ -384,6 +399,11 @@ function render(){
   else if (s.t === 'teachL'){
     body = teacher('<p>Chương này mình học theo cụm thuật ngữ. Đọc từng dòng, chỗ nào chưa hình dung được thì hỏi mình bên dưới.</p>' + s.items.map(function(L){ return '<div class="gb-story" style="border-left-color:var(--accent)"><b>' + esc(L.t_vi) + (L.t_en ? ' <span class="muted">(' + esc(L.t_en) + ')</span>' : '') + ':</b> ' + bil(L.vi, L.en) + '</div>'; }).join(''), '', speakId);
     nav = '<div class="gb-row"><button class="gb-tbtn" onclick="gbSpeak(\'' + speakId + '\')">🔊 Đọc</button><button class="btn" onclick="gbNext()">Tiếp →</button><button class="btn ghost" onclick="gbPrev()">← Lùi</button></div>' + askBox();
+    autoNext = gbNext;
+  }
+  else if (s.t === 'gallery'){
+    body = teacher('<p>📷 <b>Thêm ' + s.items.length + ' hình trong giáo trình thuộc chương này</b> — lướt nhanh để nhận mặt: đề thi thực hành & lý thuyết đều dùng ảnh kiểu này. Chạm hình để phóng to, ←/→ để lật.</p><div class="bk-grid">' + s.items.map(function(f){ return '<div>' + BOOK.img(f) + BOOK.cap(f) + '</div>'; }).join('') + '</div>', '', null);
+    nav = '<div class="gb-row"><button class="btn" onclick="gbNext()">Tiếp →</button><button class="btn ghost" onclick="gbPrev()">← Lùi</button></div>';
     autoNext = gbNext;
   }
   else if (s.t === 'traps' || s.t === 'numbers'){

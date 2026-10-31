@@ -37,10 +37,16 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `map_thi.js`, `cswip_focus.js`, `img_book.js`, `nangcap.js` | Liên kết câu hỏi → bài học, tách CWI, hình sách (local), flashcard từ điển |
 | `giangbai.js` | 🎙️ Giảng bài dạng slide (tự sinh từ `deep` + `lessons` + `key` + `quiz` + đề thật theo chủ đề) |
 | `giangbai_data.js` | Lời thầy viết tay 18 chương: hình dung đời thường, bẫy đề, con số thuộc lòng, thần chú, ý giảng bổ sung |
+| `img_book/` + `img_book.js` | 223 hình trích từ giáo trình WIS5 (chú thích Anh/Việt, gắn chương) + 14 trang Work Pack mẫu; thư viện & phóng to trong tab Bài học, slide ảnh thật trong Giảng bài |
+| `workpack.js` | 📎 Trình xem hồ sơ Work Pack mẫu TWI (WPS, chứng chỉ thợ, bản vẽ) trong tab Tài liệu thi |
 | `giangbai_hinh.js` | Thư viện 37 hình SVG mô phỏng nhiều bước (vết nứt lan, bọt khí, tia RT, từ trường rò…) |
 | `nuocrut.js` | Ôn thi nước rút: ngày thi, nhật ký học, sổ câu sai, mức sẵn sàng, Tổng quan & Lộ trình mới, menu, phím tắt, sao lưu |
 | `sw.js`, `manifest.json` | PWA: cache network-first, shortcut |
 | `admin.html`, `dashboard.html` | Trang chủ shop: tạo mã, xem học viên |
+
+## Bản quyền hình giáo trình
+
+Thư mục `img_book/` chứa hình trích từ tài liệu WIS5 và phụ lục của TWI (© TWI Ltd), do chủ app cung cấp để **học tập cá nhân**. Không phân phối lại thương mại. Nếu cần hạn chế, chuyển repo sang private hoặc xóa thư mục này (app vẫn chạy, chỉ mất hình sách).
 
 ## Dữ liệu lưu trên máy (localStorage)
 
