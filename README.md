@@ -44,6 +44,7 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `workpack.js` | 📎 Trình xem hồ sơ Work Pack mẫu TWI (WPS, chứng chỉ thợ, bản vẽ) trong tab Tài liệu thi |
 | `giangbai_hinh.js` | Thư viện 37 hình SVG mô phỏng nhiều bước (vết nứt lan, bọt khí, tia RT, từ trường rò…) |
 | `nuocrut.js` | Ôn thi nước rút: ngày thi, nhật ký học, sổ câu sai, mức sẵn sàng, Tổng quan & Lộ trình mới, menu, phím tắt, sao lưu |
+| `theme.css` | Bảng màu dùng chung (tông tối sáng hơn) + giao diện sáng `body.light`; chọn 🌙/☀️ ở cuối thanh bên, lưu trong máy |
 | `sw.js`, `manifest.json` | PWA: cache network-first, shortcut |
 | `admin.html`, `dashboard.html` | Trang chủ shop: tạo mã, xem học viên |
 

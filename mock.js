@@ -44,8 +44,8 @@
       var orig=window.renderAll; window.renderAll=function(){ orig(); try{ if(typeof CUR!=='undefined'&&CUR==='mock') renderMock(); }catch(e){} };
       window._mockWrapped=true;
     }
-    var css='.mk-card{background:var(--card,#151c2c);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}'
-      +'.mk-timer{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;background:rgba(11,15,23,.97);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 14px;margin-bottom:12px}'
+    var css='.mk-card{background:var(--card,#1b2435);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}'
+      +'.mk-timer{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;background:var(--glass);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 14px;margin-bottom:12px}'
       +'.mk-timer b.warn{color:#f85149}'
       +'.mk-q{font-size:16px;font-weight:700;line-height:1.45}'
       +'.mk-opt{display:block;width:100%;text-align:left;margin-top:8px;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:inherit;font-size:14.5px;cursor:pointer;line-height:1.4}'
@@ -57,7 +57,7 @@
       +'.mk-cell.done{background:rgba(76,168,255,.22);border-color:#4ca8ff}'
       +'.mk-cell.flag{background:rgba(255,209,102,.22);border-color:#ffd166}'
       +'.mk-cell.cur{outline:2px solid #fff}'
-      +'.mk-muted{color:#94a3bb;font-size:12.5px}'
+      +'.mk-muted{color:var(--muted,#94a3bb);font-size:12.5px}'
       +'.mk-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}'
       +'.mk-exp{margin-top:10px;background:rgba(76,168,255,.08);border:1px solid rgba(76,168,255,.25);border-radius:12px;padding:12px;font-size:14px;line-height:1.55}'
       +'.mk-exp .vq{color:#ffd166;font-weight:700}.mk-exp .va{margin-top:6px;color:#dbe7ff}.mk-exp .nn{margin-top:6px;color:#ff9f7f;font-size:12.5px}';

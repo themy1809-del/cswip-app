@@ -359,7 +359,7 @@ css.textContent = [
 '.nr-stat span{font-size:11.5px;color:var(--muted)}',
 '.nr-ready{display:flex;align-items:center;gap:14px;margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08)}',
 '.nr-ring{width:72px;height:72px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;background:conic-gradient(var(--rc) calc(var(--rp)*1%),rgba(255,255,255,.08) 0);position:relative}',
-'.nr-ring:before{content:"";position:absolute;inset:7px;border-radius:50%;background:#131a27}',
+'.nr-ring:before{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--panel)}',
 '.nr-ring span{position:relative}',
 '.nr-task{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line)}',
 '.nr-task:last-child{border-bottom:none}',
