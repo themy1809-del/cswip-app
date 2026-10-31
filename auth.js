@@ -38,11 +38,9 @@ function checkCode(key, code){
   return {ok:true,exp:exp};
 }
 function _curUser(){ try{ return JSON.parse(localStorage.getItem('cswip_user')||'{}'); }catch(e){ return {}; } }
-function isPremium(){
-  var u=_curUser();
-  if(!u.phone || !u.code) return false;
-  return checkCode(u.phone, u.code).ok===true;
-}
+/* ĐÃ BỎ CHẾ ĐỘ MỞ KHÓA: toàn bộ nội dung & công cụ mở sẵn cho mọi người.
+   (Giữ makeCode/checkCode để admin.html/dashboard.html không lỗi.) */
+function isPremium(){ return true; }
 function premiumExpiryText(){
   var u=_curUser(); if(!u.phone||!u.code) return '';
   var r=checkCode(u.phone,u.code); if(!r.ok) return '';

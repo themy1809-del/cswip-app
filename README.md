@@ -14,11 +14,11 @@ Bản chạy trực tiếp: https://themy1809-del.github.io/cswip-app/
 | 🎓 Thi thử | 3 phần bấm giờ như thi thật, cắm cờ, nộp bài, xem lại câu sai | Mốc đậu 70 % |
 | 📝 Quiz & Ôn tập | Ôn ngắt quãng (SRS), luyện điểm yếu, theo chủ đề / chương, thi có giờ | |
 | 📕 Sổ câu sai | Gom **mọi** câu sai ở mọi chế độ, kèm giải thích và đoạn bài học liên quan | Đúng lại 2 lần = "đã thuộc" |
-| 📚 Bài học | 18 chương: 🎓 Giảng giải → tóm tắt → điểm cần nhớ → thẻ "Tôi hiểu bài này chưa?" | Thi chương (chấm điểm) để mở chương sau |
+| 📚 Bài học | 18 chương: 🎓 Giảng giải → tóm tắt → điểm cần nhớ → thẻ "Tôi hiểu bài này chưa?" | Mọi chương mở sẵn; thi chương để ghi điểm |
 | 🃏 Flashcard | Thuật ngữ bài học + 502 từ điển, phát âm | |
 | 🗓️ Lộ trình | Kế hoạch **từng ngày** tới ngày thi, ngày đã qua hiện kết quả thật | |
 | 🛠️ Công cụ | CEV, heat input, fillet, tiền nhiệt, WPS/PQR, phạm vi qualify thợ, NCR | Tham khảo |
-| 👤 Hồ sơ | Bảng điểm, huy hiệu, **sao lưu/khôi phục**, chế độ học tự do, kích hoạt PRO | |
+| 👤 Hồ sơ | Bảng điểm, huy hiệu, **sao lưu/khôi phục** | |
 
 Trang phụ: `tuvung.html` (120 từ vựng đề thi), `hoc_demo.html` (bản thử "học dễ nhớ" chương 2).
 
@@ -33,7 +33,7 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `data.js`, `data_extra.js` | 18 chương: `lessons`, `deep` (giảng giải), `key`, `quiz`, lộ trình & prompt AI |
 | `bank.js`, `realbank.js`, `cwibank.js`, `cwibank_vi.js` | Ngân hàng câu hỏi (CSWIP + CWI tham khảo) |
 | `thibank1–6.js`, `thi.js`, `mock.js` | Tài liệu thi & thi thử 3 phần |
-| `auth.js`, `premium.js`, `cloud.js` | Đăng ký, mã kích hoạt PRO, khóa chương, công cụ PRO, đồng bộ Firestore |
+| `auth.js`, `premium.js`, `cloud.js` | Đăng ký, công cụ nâng cao (qualify thợ, PQR), thi chương, đồng bộ Firestore. Chế độ mở khóa PRO đã bỏ: `isPremium()` luôn true, `chapFree()` luôn true |
 | `glossary.js`, `dich.js` | Từ điển 502 thuật ngữ, bôi đen → dịch |
 | `map_thi.js`, `cswip_focus.js`, `img_book.js`, `nangcap.js` | Liên kết câu hỏi → bài học, tách CWI, hình sách (local), flashcard từ điển |
 | `giangbai.js` | 🎙️ Giảng bài dạng slide (tự sinh từ `deep` + `lessons` + `key` + `quiz` + đề thật theo chủ đề) |

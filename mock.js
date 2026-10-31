@@ -72,7 +72,7 @@
     var el=document.getElementById('v-mock'); if(!el)return;
     var h='<div class="mk-card"><h2>🎓 Thi thử CSWIP 3.1 — như thi thật 2026</h2>'
       +'<p class="mk-muted" style="margin-top:6px">Kỳ thi 2026 gồm 3 phần: <b>80 câu/120′ · 40 câu/90′ · 24 câu/90′</b>. Mỗi lần bấm thi, app rút đề <b>ngẫu nhiên mới</b> từ ngân hàng tài liệu — thi đi thi lại thoải mái. Có đồng hồ đếm ngược, hết giờ tự nộp; đậu từ <b>70%</b>. Nộp xong xem lại từng câu sai kèm giải nghĩa tiếng Việt.</p>'
-      +(pro()?'':'<p class="mk-muted">🔒 Bản miễn phí: mỗi phần rút gọn 8 câu / 12 phút. Mở khóa PRO để thi bản đầy đủ.</p>')+'</div>';
+      +'</div>';
     PAPERS.forEach(function(p){
       var bank=p.pool().length;
       var best=null,count=0;

@@ -290,9 +290,7 @@ renderProfile = function(){
     +'<button class="btn sec" onclick="resetProgress()">'+bili('Đặt lại tiến độ','Reset progress')+'</button>'
     +'</div></div>'
     + examResultsHTML()
-    + examHistoryHTML()
-    + premiumCardHTML()
-    + adminPanelHTML();
+    + examHistoryHTML();
 };
 
 /* ---------- wrap renderQuiz to log mock-exam scores ---------- */
@@ -373,12 +371,11 @@ function _appendExamBanner(ci, pct){
   if(pass){
     msg='<div class="card" style="border-color:rgba(52,199,89,.55);text-align:center"><div style="font-size:36px">🎉</div><h3 style="color:var(--green)">'+bili('Đậu Chương '+(ci+1)+'!','Passed Chapter '+(ci+1)+'!')+'</h3>';
     if(hasNext){
-      if(typeof isPremium==='function' && isPremium()) msg+='<p class="muted">'+bili('Đã mở Chương '+(nextI+1)+'. Học tiếp nhé!','Chapter '+(nextI+1)+' unlocked!')+'</p><button class="btn" onclick="go(\'learn\');openChap('+nextI+')">'+bili('Vào Chương ','Go to Ch ')+(nextI+1)+' →</button>';
-      else msg+='<p class="muted">'+bili('Mở khóa PRO để học tiếp Chương '+(nextI+1)+' + toàn bộ.','Unlock PRO to continue.')+'</p>'+unlockBtn();
+      msg+='<p class="muted">'+bili('Sang Chương '+(nextI+1)+' nhé!','On to Chapter '+(nextI+1)+'!')+'</p><button class="btn" onclick="go(\'learn\');openChap('+nextI+')">'+bili('Vào Chương ','Go to Ch ')+(nextI+1)+' →</button>';
     } else { msg+='<p class="muted">'+bili('Bạn đã hoàn thành chương cuối! 👏','You finished the last chapter!')+'</p>'; }
     msg+='</div>';
   } else {
-    msg='<div class="card" style="border-color:rgba(255,122,51,.5);text-align:center"><div style="font-size:36px">💪</div><h3>'+bili('Chưa đạt (cần ≥70%)','Not passed (need ≥70%)')+'</h3><p class="muted">'+bili('Ôn lại Chương '+(ci+1)+' rồi thi lại để mở chương sau.','Review and retry.')+'</p><button class="btn" onclick="examChap('+ci+')">🔁 '+bili('Thi lại','Retry')+'</button> <button class="btn sec" onclick="go(\'learn\');openChap('+ci+')">'+bili('Ôn lại chương','Review')+'</button></div>';
+    msg='<div class="card" style="border-color:rgba(255,122,51,.5);text-align:center"><div style="font-size:36px">💪</div><h3>'+bili('Chưa đạt (cần ≥70%)','Not passed (need ≥70%)')+'</h3><p class="muted">'+bili('Ôn lại Chương '+(ci+1)+' rồi thi lại cho chắc.','Review and retry.')+'</p><button class="btn" onclick="examChap('+ci+')">🔁 '+bili('Thi lại','Retry')+'</button> <button class="btn sec" onclick="go(\'learn\');openChap('+ci+')">'+bili('Ôn lại chương','Review')+'</button></div>';
   }
   el.insertAdjacentHTML('beforeend', msg);
 }
@@ -399,8 +396,8 @@ function examResultsHTML(){
   return '<div class="card"><h3>🎯 '+bili('Kết quả thi từng chương','Chapter exam results')+'</h3><p class="muted" style="font-size:12px">'+bili('Đã đậu ','Passed ')+'<b>'+chaptersPassedCount()+'/'+DATA.chapters.length+'</b> '+bili('chương (mốc 70%)','chapters (70%)')+'</p>'+rows+'</div>';
 }
 /* ===== Cổng chương: Ch1 free; Ch2+ cần PRO + đậu chương liền trước ===== */
-function chapFree(i){ if(i===0) return true; if(!isPremium()) return false; try{ if(localStorage.getItem('cswip_free')==='1') return true; }catch(e){} return chapPassed(i-1); }
-function chapLockReason(i){ if(chapFree(i)) return null; if(!isPremium()) return 'pro'; return 'exam'; }
+function chapFree(i){ return true; } /* đã bỏ khóa: mọi chương mở sẵn, thi chương chỉ để ghi điểm */
+function chapLockReason(i){ return null; }
 function unlockBtn(){ return '<div class="row" style="margin-top:10px;justify-content:flex-start"><button class="btn" onclick="go(\'profile\')">⭐ '+bili('Mở khóa ngay','Unlock now')+' — '+fmtPrice()+'</button></div>'; }
 function lockUpsellHTML(nextVi,nextEn){
   return '<div class="card" style="border-color:rgba(255,122,51,.55);text-align:center">'
@@ -418,7 +415,7 @@ renderLearn=function(){
   var el=document.getElementById('v-learn');
   if(CURCHAP===null){
     el.innerHTML='<div class="card"><h2>📚 '+bili('Chương trình học','Syllabus')+'</h2>'
-      +'<p class="muted">'+bili('Chương 1 học miễn phí. Hoàn thành rồi mở khóa toàn bộ để học tiếp.','Chapter 1 is free. Finish it, then unlock the rest.')+'</p></div>'
+      +'<p class="muted">'+bili('Mọi chương đều mở. Bấm vào chương để học; bấm "Thi chương" để ghi điểm từng chương.','All chapters are open. Tap a chapter to study; take the chapter exam to log a score.')+'</p></div>'
       +'<div class="chap-list">'+DATA.chapters.map(function(c,i){
         var free=chapFree(i), r=chapResult(i), num, sub, done='';
         if(!free){
@@ -444,7 +441,7 @@ renderLearn=function(){
     _origRenderLearnBase();
     var rows=el.querySelectorAll('.card .row'); var row=rows.length?rows[rows.length-1]:null;
     if(row){ row.innerHTML='<button class="btn '+(PROG[CURCHAP]?'sec':'')+'" onclick="toggleDone('+CURCHAP+')">'+(PROG[CURCHAP]?'✓ '+bili('Đã hoàn thành','Done'):bili('Đánh dấu hoàn thành','Mark done'))+'</button><button class="btn sec" onclick="go(\'quiz\');startChap('+CURCHAP+')">'+bili('Ôn quiz (hiện đáp án)','Practice')+'</button><button class="btn" onclick="examChap('+CURCHAP+')">📝 '+bili('Thi chương (chấm điểm)','Take exam')+'</button>'; row.style.flexWrap='wrap'; row.style.gap='8px'; }
-    var extra=(function(){ var r=chapResult(CURCHAP); if(!r) return ''; var p=r.best>=PASS_MARK; return '<div class="card" style="border-color:'+(p?'rgba(52,199,89,.5)':'rgba(255,122,51,.5)')+'"><b>'+(p?'✅ '+bili('Đã đậu chương này','Passed'):'⚠️ '+bili('Chưa đạt — thi lại để mở chương sau','Not passed yet'))+'</b><div class="muted" style="font-size:12px;margin-top:4px">'+bili('Điểm cao nhất','Best')+': '+r.best+'% · '+bili('gần nhất','last')+': '+(r.last||0)+'% · '+bili('số lần thi','attempts')+': '+(r.attempts||0)+'</div></div>'; })()
+    var extra=(function(){ var r=chapResult(CURCHAP); if(!r) return ''; var p=r.best>=PASS_MARK; return '<div class="card" style="border-color:'+(p?'rgba(52,199,89,.5)':'rgba(255,122,51,.5)')+'"><b>'+(p?'✅ '+bili('Đã đậu chương này','Passed'):'⚠️ '+bili('Chưa đạt — ôn rồi thi lại','Not passed yet'))+'</b><div class="muted" style="font-size:12px;margin-top:4px">'+bili('Điểm cao nhất','Best')+': '+r.best+'% · '+bili('gần nhất','last')+': '+(r.last||0)+'% · '+bili('số lần thi','attempts')+': '+(r.attempts||0)+'</div></div>'; })()
       +((!isPremium()&&CURCHAP===0)?'<div class="card" style="border-color:rgba(255,122,51,.55)"><h3>🎉 '+bili('Xong Chương 1! Còn 17 chương nữa','Chapter 1 done! 17 more')+'</h3><p class="muted" style="font-size:13px">'+bili('Chương 2 đang chờ — mở khóa để học tiếp toàn bộ + quiz đầy đủ + công cụ Pro.','Chapter 2 awaits — unlock to continue everything.')+'</p><div style="font-size:22px;font-weight:800;color:var(--accent)">'+fmtPrice()+'</div>'+unlockBtn()+'</div>':'');
     if(extra) el.insertAdjacentHTML('beforeend', extra);
   }
