@@ -274,7 +274,7 @@ renderProfile = function(){
     +'<p class="muted" style="font-size:13px">'+bili('Ghi tên để app chấm điểm theo bạn. Dữ liệu lưu trên máy bạn (riêng tư).','Enter your name so the app scores you. Stored privately on your device.')+'</p>'
     +'<div class="tool-grid">'
     +'<label>'+bili('Họ tên','Full name')+'<input id="u_name" value="'+_esc(u.name)+'" oninput="saveUserField(\'name\',this.value)"></label>'
-    +'<label>'+bili('SĐT (kích hoạt)','Phone (activation)')+'<input id="u_phone" value="'+_esc(u.phone)+'" oninput="saveUserField(\'phone\',this.value)"></label>'
+    +'<label>'+bili('Số điện thoại','Phone')+'<input id="u_phone" value="'+_esc(u.phone)+'" oninput="saveUserField(\'phone\',this.value)"></label>'
     +'<label>'+bili('Đơn vị','Company')+'<input id="u_org" value="'+_esc(u.org)+'" oninput="saveUserField(\'org\',this.value)"></label>'
     +'<label>Email<input id="u_email" value="'+_esc(u.email)+'" oninput="saveUserField(\'email\',this.value)"></label>'
     +'</div></div>'
