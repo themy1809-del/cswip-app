@@ -76,7 +76,8 @@ function injectThi(){
   var el = document.getElementById('v-thi'); if (!el || !el.classList.contains('on')) return;
   var cards = el.querySelectorAll('.thi-card');
   // a) menu: thẻ phân tích + nút kiến thức bộ này
-  if (cards.length && /Tài liệu thi/.test(cards[0].textContent) && !el.querySelector('#pt-card')){
+  var mh2 = cards.length ? cards[0].querySelector('h2') : null; var isMenu = !!(mh2 && /^📖/.test(mh2.textContent.trim()));
+  if (isMenu && !el.querySelector('#pt-card')){
     var d = document.createElement('div'); d.innerHTML = analysisHTML(true); var card = d.firstChild; card.className = 'thi-card'; card.style.borderLeft = '3px solid var(--yellow)';
     (el.querySelector('#wp-card') || cards[0]).insertAdjacentElement('afterend', card);
   }

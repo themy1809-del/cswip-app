@@ -41,7 +41,8 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `hocde.js` | 📘 Học từ đề thi: gom 510 câu Tài liệu thi + 206 câu ngân hàng thành điểm kiến thức theo chương/mục (THI_LESSON_MAP + khớp từ khóa) |
 | `giangbai_data.js` | Lời thầy viết tay 18 chương: hình dung đời thường, bẫy đề, con số thuộc lòng, thần chú, ý giảng bổ sung |
 | `img_book/` + `img_book.js` | 223 hình trích từ giáo trình WIS5 (chú thích Anh/Việt, gắn chương) + 14 trang Work Pack mẫu; thư viện & phóng to trong tab Bài học, slide ảnh thật trong Giảng bài |
-| `workpack.js` | 📎 Trình xem hồ sơ Work Pack mẫu TWI (WPS, chứng chỉ thợ, bản vẽ) trong tab Tài liệu thi |
+| `workpack.js` | 📎 Hồ sơ Work Pack mẫu TWI (WPS, chứng chỉ thợ, bản vẽ): trình xem, cửa sổ nổi khi làm bài, 👨‍🏫 hướng dẫn đọc từng ô (khoanh đỏ trên ảnh thật, 19 bước) |
+| `thuchanh.js` | 🔧 Thi thực hành: cách TWI chấm (3 câu/mẫu), bảng tiêu chí A/B/C cho 13 khuyết tật, ảnh thật, bài tập kết án có chấm |
 | `giangbai_hinh.js` | Thư viện 37 hình SVG mô phỏng nhiều bước (vết nứt lan, bọt khí, tia RT, từ trường rò…) |
 | `nuocrut.js` | Ôn thi nước rút: ngày thi, nhật ký học, sổ câu sai, mức sẵn sàng, Tổng quan & Lộ trình mới, menu, phím tắt, sao lưu |
 | `theme.css` | Bảng màu dùng chung (tông tối sáng hơn) + giao diện sáng `body.light`; chọn 🌙/☀️ ở cuối thanh bên, lưu trong máy |

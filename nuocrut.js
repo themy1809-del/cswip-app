@@ -508,6 +508,7 @@ function quickHTML(){
     ['📘', 'Học từ đề thi', (window.HOCDE ? HOCDE.points.length : 700) + ' điểm kiến thức rút từ đề', "go('hocde')"],
     ['📖', 'Tài liệu thi', 'Đề Work Pack, Leading Q, Rings', "go('thi')"],
     ['🎓', 'Thi thử bấm giờ', '3 phần như thi thật', "go('mock')"],
+    ['🔧', 'Thi thực hành', 'Tiêu chí A/B/C, 13 khuyết tật', "go('thi');setTimeout(function(){if(window.TH)TH.open()},150)"],
     ['📕', 'Sổ câu sai', wrongCount() + ' câu chưa thuộc', "go('wrong')"],
     ['🧠', 'Ôn ngắt quãng', 'Spaced repetition + điểm yếu', "go('quiz')"],
     ['📚', 'Bài học 18 chương', 'Giảng giải + tóm tắt', "go('learn')"],

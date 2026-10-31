@@ -2,13 +2,13 @@
    (ép trình duyệt kiểm tra máy chủ mỗi lần -> không kẹt bản cache cũ),
    chỉ dùng cache khi offline. Tự cập nhật ngay (skipWaiting + claim).
    Bump CACHE khi muốn xóa sạch cache cũ. */
-const CACHE = 'cswip-v38';
+const CACHE = 'cswip-v39';
 const ASSETS = [
   './', './index.html', './theme.css', './config.js', './data.js', './bank.js', './realbank.js',
   './cwibank.js', './auth.js', './premium.js', './cloud.js',
   './thibank1.js', './thibank2.js', './thibank3.js', './thibank4.js',
   './thibank5.js', './thibank6.js', './thibank7.js', './thi.js', './mock.js',
-  './glossary.js', './dich.js', './data_extra.js', './map_thi.js', './cwibank_vi.js', './cswip_focus.js', './nangcap.js', './img_book.js', './img_book/manifest.js', './workpack.js', './giangbai_data.js', './giangbai_hinh.js', './giangbai.js', './hocde.js', './phantich.js', './nuocrut.js', './tuvung.html', './hoc_demo.html',
+  './glossary.js', './dich.js', './data_extra.js', './map_thi.js', './cwibank_vi.js', './cswip_focus.js', './nangcap.js', './img_book.js', './img_book/manifest.js', './workpack.js', './thuchanh.js', './giangbai_data.js', './giangbai_hinh.js', './giangbai.js', './hocde.js', './phantich.js', './nuocrut.js', './tuvung.html', './hoc_demo.html',
   './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'
 ];
 self.addEventListener('install', e => {
