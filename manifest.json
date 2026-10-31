@@ -10,6 +10,11 @@
   "background_color": "#0a0e17",
   "theme_color": "#0a0e17",
   "categories": ["education", "productivity"],
+  "shortcuts": [
+    { "name": "Tài liệu thi", "url": "./?tab=thi", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Thi thử bấm giờ", "url": "./?tab=mock", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Sổ câu sai", "url": "./?tab=wrong", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ],
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

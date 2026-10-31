@@ -48,7 +48,7 @@
   function menu(){
     var el=document.getElementById('v-thi'); if(!el)return;
     var total=0; SETS.forEach(function(s){ total+=s.items.length; });
-    var h='<div class="thi-card"><h2>📖 '+((typeof bili==='function')?bili('Tài liệu thi tháng 9 — học thuộc & luyện tập','September exam pack'):'Tài liệu thi')+'</h2>'
+    var h='<div class="thi-card"><h2>📖 '+((typeof bili==='function')?bili('Tài liệu thi — học thuộc & luyện tập','Exam pack — learn & drill'):'Tài liệu thi')+'</h2>'
       +'<p class="thi-muted" style="margin-top:6px">Số hóa từ bộ tài liệu bạn cung cấp ('+total+' mục): đề Work Pack có đáp án gốc, Leading Questions, WPS Rings, điền khuyết và toàn bộ ghi chú kinh nghiệm thi. Chạm thẻ để xem đáp án, chạm 💡 để xem dịch & giải nghĩa từng câu.</p>'
       +(pro()?'':'<p class="thi-muted" style="margin-top:6px">🔒 Bản miễn phí xem 5 mục đầu mỗi phần — mở khóa PRO để học toàn bộ.</p>')
       +'</div>';
