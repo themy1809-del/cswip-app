@@ -300,6 +300,10 @@ function todayTasks(){
     var gp = (window.gbProgress ? gbProgress(ci) : null);
     add('chap', '🎙️ Nghe giảng chương "' + (ch ? ch.vi : '') + '" (thầy dẫn từng ý: đoán → giảng → hỏi lại)' + (gp && !gp.done ? ' — đang ' + gp.pct + '%' : '') + (up != null ? ' · hiểu bài ' + up + '%' : ''), (window.gbStart ? "gbStart(" + ci + ")" : "go('learn');openChap(" + ci + ")"), (gp && gp.done) || (up != null && up >= 80));
   }
+  if ((ph.id === 'drill' || ph.id === 'mock') && window.hdProgress){
+    var hci = chapOfDay(days), hp = hdProgress(hci);
+    if (hp) add('hocde', '📘 Học từ đề: chương "' + DATA.chapters[hci].vi + '" — ' + hp.n + ' điểm kiến thức rút từ đề thật' + (hp.k ? ' (đã nắm ' + hp.k + ')' : ''), "hdStart(" + hci + ")", hp.pct >= 80);
+  }
   if (ph.id === 'drill' || ph.id === 'mock' || ph.id === 'base'){
     var ws = weakThiSet();
     add('thi', '📖 Làm ' + (ph.id === 'base' ? 15 : 25) + ' câu Tài liệu thi — ' + ws.label + (ws.p != null ? ' (đang ' + ws.p + '%)' : ''), "go('thi');THI.quiz('" + ws.id + "')", L.thi >= (ph.id === 'base' ? 15 : 25));
@@ -486,6 +490,7 @@ function heatHTML(weeks){
 function quickHTML(){
   var items = [
     ['🎙️', 'Giảng bài từng bước', 'Thầy ảo dẫn 18 chương', "go('teach')"],
+    ['📘', 'Học từ đề thi', (window.HOCDE ? HOCDE.points.length : 700) + ' điểm kiến thức rút từ đề', "go('hocde')"],
     ['📖', 'Tài liệu thi', 'Đề Work Pack, Leading Q, Rings', "go('thi')"],
     ['🎓', 'Thi thử bấm giờ', '3 phần như thi thật', "go('mock')"],
     ['📕', 'Sổ câu sai', wrongCount() + ' câu chưa thuộc', "go('wrong')"],
@@ -688,8 +693,8 @@ window.addEventListener('error', function(e){
 /* ---------- đăng ký tab, menu, thanh dưới ---------- */
 function ensureView(id){ if (document.getElementById('v-' + id)) return; var main = document.querySelector('main'); if (!main) return; var d = document.createElement('div'); d.id = 'v-' + id; d.className = 'view'; main.appendChild(d); }
 ensureView('wrong');
-var LABELS = {home:'🏠 Tổng quan', teach:'🎙️ Giảng bài', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
-var ORDER = ['home', 'teach', 'thi', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
+var LABELS = {home:'🏠 Tổng quan', teach:'🎙️ Giảng bài', hocde:'📘 Học từ đề', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
+var ORDER = ['home', 'teach', 'hocde', 'thi', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
 function reorderTabs(){
   if (typeof TABS === 'undefined') return;
   var have = {}; TABS.forEach(function(t){ have[t[0]] = t[1]; });

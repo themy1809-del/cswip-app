@@ -441,7 +441,7 @@ function render(){
       + (X.mnemonic ? '<div class="gb-story">🧷 <b>Câu thần chú của chương:</b> ' + X.mnemonic + '</div>' : '')
       + (rev ? '<p style="margin-top:10px">Mấy ý bạn còn lấn cấn, mình gợi ý xem lại:</p><ul class="lesson">' + rev + '</ul>' : '<p style="margin-top:10px">Không có ý nào bị đánh dấu lấn cấn — rất tốt.</p>')
       + '<p>Bước tiếp theo đúng chuẩn: <b>thi chương có chấm điểm</b> (toàn tiếng Anh như đề thật). Đậu ≥70% rồi hãy sang chương kế. Câu sai nằm trong 📕 Sổ câu sai.</p>', 'good', speakId);
-    nav = '<div class="gb-row"><button class="btn" onclick="(typeof examChap===\'function\'?examChap(' + S.ci + '):(go(\'quiz\'),startChap(' + S.ci + ')))">📝 Thi chương này</button><button class="btn sec" onclick="gbStart(' + nx + ',true)">▶ Chương tiếp: ' + esc(DATA.chapters[nx].vi) + '</button><button class="btn ghost" onclick="gbStart(' + S.ci + ',true)">🔁 Học lại</button><button class="btn ghost" onclick="gbList()">Danh sách</button></div>';
+    nav = '<div class="gb-row">' + (window.hdStart ? '<button class="btn" onclick="hdStart(' + S.ci + ')">📘 Học từ đề chương này</button>' : '') + '<button class="btn ' + (window.hdStart ? 'sec' : '') + '" onclick="(typeof examChap===\'function\'?examChap(' + S.ci + '):(go(\'quiz\'),startChap(' + S.ci + ')))">📝 Thi chương này</button><button class="btn sec" onclick="gbStart(' + nx + ',true)">▶ Chương tiếp: ' + esc(DATA.chapters[nx].vi) + '</button><button class="btn ghost" onclick="gbStart(' + S.ci + ',true)">🔁 Học lại</button><button class="btn ghost" onclick="gbList()">Danh sách</button></div>';
     AUTO = false;
   }
   el.innerHTML = '<div class="gb-wrap">' + h + '<div class="card">' + body + nav + '</div></div>';
