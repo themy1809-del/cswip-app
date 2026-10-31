@@ -113,6 +113,11 @@ var THI_LABEL = {wp1:'Work Pack 1', wp2:'Work Pack 2', lead:'Leading Q', ring:'W
     });
   });
 })();
+/* câu đề thật CSWIP trong Thi thử Phần 1 → cùng id với quiz lõi (b#, r#) để SRS/Sổ câu sai thống nhất */
+(function(){
+  function addBank(arr, pre){ if (!arr) return; arr.forEach(function(q, i){ if (!q.o || typeof q.a !== 'number') return; var key = norm(q.q); if (THI_BY_TEXT[key]) return; THI_BY_TEXT[key] = {set:null, idx:i, it:{q:q.q, o:q.o, a:q.a, vq:q.qv || '', va:q.ev || q.e || '', n:''}, id:pre + i, cat:q.c || 'Đề thật', bank:true}; }); }
+  try{ addBank(typeof BANK !== 'undefined' ? BANK : null, 'b'); addBank(typeof REALBANK !== 'undefined' ? REALBANK : null, 'r'); }catch(e){}
+})();
 function thiMeta(q){ var m = THI_BY_TEXT[norm(q)]; if (m) return m; var key = norm(q); for (var k in THI_BY_TEXT){ if (k.indexOf(key.slice(0, 50)) === 0) return THI_BY_TEXT[k]; } return null; }
 
 /* ---------- ghi nhận 1 lượt trả lời ---------- */
@@ -210,7 +215,8 @@ function watchMockResult(){
   var ids = Object.keys(mockSess);
   ids.forEach(function(id){
     var s = mockSess[id], it = s.m.it, right = s.pick === it.a;
-    record({id:id, qe:it.q, qv:it.vq || '', oe:it.o, ov:[], a:it.a, ee:'', ev:(it.va || '') + (it.n ? ' ⚠️ ' + it.n : ''), cat:s.m.cat, src:'Thi thử — ' + s.m.cat, lesson:lessonFor(it.q)}, s.pick, right, {game:true});
+    if (s.m.bank){ try{ QUIZSTATE[id] = {correct:right}; if (typeof srsUpdate === 'function') srsUpdate(id, right); if (typeof save === 'function') save(); }catch(e){} }
+    record({id:id, qe:it.q, qv:it.vq || '', oe:it.o, ov:[], a:it.a, ee:'', ev:(it.va || '') + (it.n ? ' ⚠️ ' + it.n : ''), cat:s.m.cat, src:'Thi thử — ' + (s.m.bank ? 'đề thật CSWIP' : s.m.cat), lesson:s.m.bank ? null : lessonFor(it.q)}, s.pick, right, {game:true});
   });
   mockSess = {};
   saveAll();

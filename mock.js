@@ -6,12 +6,20 @@
    ============================================================ */
 (function(){
   function pool(names){ var out=[]; names.forEach(function(k){ var s=window[k]; if(s&&s.items) s.items.forEach(function(it){ if(it.o&&typeof it.a==='number') out.push(it); }); }); return out; }
-  function P1(){ return pool(['THI_LEAD','THI_RING','THI_FB']); }
+  /* Câu đề thật CSWIP (bank.js + realbank.js) đổi sang dạng {q,o,a,vq,va} — KHÔNG lấy CWI (khác chuẩn) */
+  function bankItems(){
+    var out=[];
+    try{ if(typeof BANK!=='undefined') BANK.forEach(function(q,i){ if(q.o&&typeof q.a==='number') out.push({q:q.q,o:q.o,a:q.a,vq:q.qv||'',va:q.ev||q.e||'',n:'',_id:'b'+i,_c:q.c}); }); }catch(e){}
+    try{ if(typeof REALBANK!=='undefined') REALBANK.forEach(function(q,i){ if(q.o&&typeof q.a==='number') out.push({q:q.q,o:q.o,a:q.a,vq:q.qv||'',va:q.ev||q.e||'',n:'',_id:'r'+i,_c:q.c}); }); }catch(e){}
+    return out;
+  }
+  window.MOCK_BANK_ITEMS=bankItems;
+  function P1(){ return pool(['THI_LEAD','THI_RING','THI_FB']).concat(bankItems()); }
   function P2(){ return pool(['THI_WP1','THI_WP2']); }
   function P3(){ return pool(['THI_WP1','THI_WP2','THI_LEAD','THI_RING','THI_FB']); }
 
   var PAPERS=[
-    {id:'p1', icon:'1️⃣', vi:'Phần 1 — Lý thuyết tổng quát', n:80, min:120, pool:P1, note:'Leading Questions + WPS Rings + điền khuyết'},
+    {id:'p1', icon:'1️⃣', vi:'Phần 1 — Lý thuyết tổng quát', n:80, min:120, pool:P1, note:'Leading Questions + WPS Rings + điền khuyết + đề thật CSWIP'},
     {id:'p2', icon:'2️⃣', vi:'Phần 2 — Work Pack (WPS/bản vẽ)', n:40, min:90, pool:P2, note:'Rút từ 2 đề Work Pack thật có đáp án'},
     {id:'p3', icon:'3️⃣', vi:'Phần 3 — Tổng hợp', n:24, min:90, pool:P3, note:'Trộn toàn bộ ngân hàng (mô phỏng phần 3)'}
   ];

@@ -8,7 +8,7 @@ Bản chạy trực tiếp: https://themy1809-del.github.io/cswip-app/
 | Tab | Dùng để | Ghi chú |
 |---|---|---|
 | 🏠 Tổng quan | Đếm ngược ngày thi, **việc cần làm hôm nay**, điểm yếu, mức sẵn sàng, lịch sử học | Việc hằng ngày tự sinh theo số ngày còn lại và chỗ bạn yếu |
-| 🎙️ Giảng bài | **Thầy ảo dẫn từng ý**: đoán trước → giảng từng đoạn → hỏi lại ngay → chốt thuật ngữ → 5 câu tổng kết | Có đọc giọng tiếng Việt, ô "Hỏi thầy" ngay tại chỗ, nhớ tiến độ học dở |
+| 🎙️ Giảng bài | **Thầy ảo dẫn từng slide**: hình mô phỏng hiện dần từng lớp → giảng từng đoạn → hỏi lại bằng câu đề thật kèm 🔍 mổ xẻ đề → bẫy đề → con số thuộc lòng → chốt thuật ngữ → 5 câu tổng kết | ▶ chạy tự động với giọng đọc tiếng Việt, ô "Hỏi thầy", nhớ tiến độ học dở |
 | 📖 Tài liệu thi | Đề Work Pack, Leading Questions, WPS Rings, điền khuyết, bộ hỏi–đáp kinh nghiệm | Chọn đáp án tiếng Anh trước, xem dịch sau |
 | 🎓 Thi thử | 3 phần bấm giờ như thi thật, cắm cờ, nộp bài, xem lại câu sai | Mốc đậu 70 % |
 | 📝 Quiz & Ôn tập | Ôn ngắt quãng (SRS), luyện điểm yếu, theo chủ đề / chương, thi có giờ | |
@@ -35,7 +35,9 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `auth.js`, `premium.js`, `cloud.js` | Đăng ký, mã kích hoạt PRO, khóa chương, công cụ PRO, đồng bộ Firestore |
 | `glossary.js`, `dich.js` | Từ điển 502 thuật ngữ, bôi đen → dịch |
 | `map_thi.js`, `cswip_focus.js`, `img_book.js`, `nangcap.js` | Liên kết câu hỏi → bài học, tách CWI, hình sách (local), flashcard từ điển |
-| `giangbai.js` | 🎙️ Giảng bài từng bước (tự sinh từ `deep` + `lessons` + `key` + `quiz`) |
+| `giangbai.js` | 🎙️ Giảng bài dạng slide (tự sinh từ `deep` + `lessons` + `key` + `quiz` + đề thật theo chủ đề) |
+| `giangbai_data.js` | Lời thầy viết tay 18 chương: hình dung đời thường, bẫy đề, con số thuộc lòng, thần chú, ý giảng bổ sung |
+| `giangbai_hinh.js` | Thư viện 37 hình SVG mô phỏng nhiều bước (vết nứt lan, bọt khí, tia RT, từ trường rò…) |
 | `nuocrut.js` | Ôn thi nước rút: ngày thi, nhật ký học, sổ câu sai, mức sẵn sàng, Tổng quan & Lộ trình mới, menu, phím tắt, sao lưu |
 | `sw.js`, `manifest.json` | PWA: cache network-first, shortcut |
 | `admin.html`, `dashboard.html` | Trang chủ shop: tạo mã, xem học viên |
