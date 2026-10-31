@@ -65,12 +65,16 @@ function groups(ci){
 
 /* ---------- tiến độ ---------- */
 var P = LS('cswip_hocde', {}); // ci -> {k:{pid:1 learned}, u:{pid:1 unsure}, i:index}
-function prg(ci){ if (!P[ci]) P[ci] = {k:{}, u:{}, i:0}; return P[ci]; }
+function prg(ci){ if (ci == null) ci = pkey(); if (!P[ci]) P[ci] = {k:{}, u:{}, i:0}; return P[ci]; }
 function save(){ SV('cswip_hocde', P); }
 window.hdProgress = function(ci){ var p = P[ci]; var n = (BYCH[ci] || []).length; if (!n) return null; var k = p ? Object.keys(p.k).length : 0; return {n:n, k:k, pct:Math.round(k / n * 100)}; };
 
 /* ---------- trạng thái ---------- */
-var S = {ci:null, mode:'list', i:0, show:false, qs:null, qi:0, qa:null, right:0};
+var S = {ci:null, set:null, mode:'list', i:0, show:false, qs:null, qi:0, qa:null, right:0};
+var SETCACHE = {};
+function setPoints(label){ if (!SETCACHE[label]) SETCACHE[label] = POINTS.filter(function(p){ return p.src === label; }).sort(function(a, b){ return a.ci - b.ci || (a.li < 0 ? 999 : a.li) - (b.li < 0 ? 999 : b.li); }); return SETCACHE[label]; }
+function cur(){ return S.set ? setPoints(S.set) : (BYCH[S.ci] || []); }
+function pkey(){ return S.set ? 'set:' + S.set : S.ci; }
 
 /* ---------- CSS + tab ---------- */
 function ensure(){
@@ -122,28 +126,40 @@ function markQ(en){ return esc(en).replace(NEG, function(m){ return '<mark>' + m
 /* ---------- API ---------- */
 window.hdStart = function(ci, fromStart){
   if (typeof chapFree === 'function' && !chapFree(ci)){ go('learn'); openChap(ci); return; }
-  S.ci = ci; S.mode = 'study'; var p = prg(ci); S.i = fromStart ? 0 : Math.min(p.i || 0, Math.max(0, (BYCH[ci] || []).length - 1)); S.show = false; go('hocde');
+  S.set = null; S.ci = ci; S.mode = 'study'; var p = prg(ci); S.i = fromStart ? 0 : Math.min(p.i || 0, Math.max(0, (BYCH[ci] || []).length - 1)); S.show = false; S.qs = null; go('hocde');
 };
-window.hdList = function(){ S.mode = 'list'; S.ci = null; render(); };
+/* học kiến thức của một BỘ đề (Tài liệu thi) — xếp theo chương → mục */
+window.hdStartSet = function(label, fromStart){
+  var pts = setPoints(label); if (!pts.length){ T('Bộ này chưa có điểm kiến thức'); return; }
+  S.set = label; S.ci = pts[0].ci; S.mode = 'study'; var p = prg(); S.i = fromStart ? 0 : Math.min(p.i || 0, pts.length - 1); S.show = false; S.qs = null; go('hocde');
+};
+/* nhảy tới đúng điểm kiến thức theo id (từ Tài liệu thi) */
+window.hdJumpTo = function(id){
+  var p = null; for (var i = 0; i < POINTS.length; i++) if (POINTS[i].id === id){ p = POINTS[i]; break; } if (!p) return;
+  if (typeof chapFree === 'function' && !chapFree(p.ci)){ go('learn'); openChap(p.ci); return; }
+  S.set = null; S.ci = p.ci; S.mode = 'study'; S.i = Math.max(0, (BYCH[p.ci] || []).indexOf(p)); S.show = false; S.qs = null; go('hocde');
+};
+window.hdList = function(){ S.mode = 'list'; S.ci = null; S.set = null; render(); };
 window.hdSummary = function(ci){ if (ci != null) S.ci = ci; S.mode = 'summary'; render(); };
 window.hdShow = function(){ S.show = true; render(); };
 window.hdMark = function(ok){
-  var p = prg(S.ci), pt = (BYCH[S.ci] || [])[S.i]; if (!pt) return;
+  var p = prg(), pt = cur()[S.i]; if (!pt) return;
   if (ok){ p.k[pt.id] = 1; delete p.u[pt.id]; } else { p.u[pt.id] = 1; delete p.k[pt.id]; }
+  if (S.set){ var pc = prg(pt.ci); if (ok){ pc.k[pt.id] = 1; delete pc.u[pt.id]; } else { pc.u[pt.id] = 1; delete pc.k[pt.id]; } } // đồng bộ với tiến độ chương
   S.i++; p.i = S.i; S.show = false; save();
-  if (S.i >= (BYCH[S.ci] || []).length){ S.mode = 'end'; }
+  if (S.i >= cur().length){ S.mode = 'end'; }
   render();
 };
-window.hdGo = function(d){ S.i = Math.max(0, Math.min((BYCH[S.ci] || []).length - 1, S.i + d)); S.show = false; prg(S.ci).i = S.i; save(); render(); };
+window.hdGo = function(d){ S.i = Math.max(0, Math.min(cur().length - 1, S.i + d)); S.show = false; prg().i = S.i; save(); render(); };
 window.hdJump = function(i){ S.mode = 'study'; S.i = i; S.show = false; render(); };
 window.hdQuiz = function(onlyUnsure){
-  var p = prg(S.ci); var pool = (BYCH[S.ci] || []).filter(function(x){ return x.mcq && (!onlyUnsure || p.u[x.id]); });
+  var p = prg(); var pool = cur().filter(function(x){ return x.mcq && (!onlyUnsure || p.u[x.id]); });
   if (!pool.length){ T('Không có câu trắc nghiệm phù hợp'); return; }
   S.qs = shuf(pool).slice(0, 15); S.qi = 0; S.qa = null; S.right = 0; S.mode = 'quiz'; render();
 };
 window.hdPick = function(k){
   if (S.qa !== null) return; S.qa = k; var q = S.qs[S.qi], right = k === q.a; if (right) S.right++;
-  var p = prg(S.ci); if (right){ p.k[q.id] = 1; delete p.u[q.id]; } else { p.u[q.id] = 1; } save();
+  var p = prg(); if (right){ p.k[q.id] = 1; delete p.u[q.id]; } else { p.u[q.id] = 1; } if (S.set){ var pc = prg(q.ci); if (right){ pc.k[q.id] = 1; delete pc.u[q.id]; } else pc.u[q.id] = 1; } save();
   try{ QUIZSTATE[q.id] = {correct:right}; if (typeof srsUpdate === 'function') srsUpdate(q.id, right); if (typeof window.save === 'function') window.save(); if (typeof gameTick === 'function') gameTick(right); }catch(e){}
   try{ if (window.NR && NR.record) NR.record({id:q.id, qe:q.q, qv:q.vq, oe:q.opts, ov:q.optsVi || [], a:q.a, ee:'', ev:q.why, cat:q.cat, src:'Học từ đề — ' + q.src, lesson:[q.ci, q.li]}, k, right, {}); }catch(e){}
   render();
@@ -153,8 +169,8 @@ window.hdSpeak = function(id){ var el = document.getElementById(id); if (el && w
 
 /* ---------- vẽ ---------- */
 function topBar(){
-  var n = (BYCH[S.ci] || []).length, p = prg(S.ci), k = Object.keys(p.k).length;
-  return '<div class="hd-top"><button class="back" style="margin:0" onclick="hdList()">← Danh sách</button><div class="hd-prog"><i style="width:' + Math.round(k / Math.max(1, n) * 100) + '%"></i></div><small>đã nắm ' + k + '/' + n + ' · Ch.' + (S.ci + 1) + '</small><button class="gb-tbtn" onclick="hdSummary()">📄 Bảng tóm tắt</button></div>';
+  var n = cur().length, p = prg(), k = Object.keys(p.k).length;
+  return '<div class="hd-top"><button class="back" style="margin:0" onclick="' + (S.set ? "go('thi')" : 'hdList()') + '">← ' + (S.set ? 'Tài liệu thi' : 'Danh sách') + '</button><div class="hd-prog"><i style="width:' + Math.round(k / Math.max(1, n) * 100) + '%"></i></div><small>đã nắm ' + k + '/' + n + (S.set ? ' · bộ ' + esc(S.set) : ' · Ch.' + (S.ci + 1)) + '</small><button class="gb-tbtn" onclick="hdSummary()">📄 Bảng tóm tắt</button></div>';
 }
 function listView(el){
   var tot = POINTS.length, learned = 0; Object.keys(P).forEach(function(ci){ learned += Object.keys(P[ci].k || {}).length; });
@@ -169,16 +185,17 @@ function listView(el){
   el.innerHTML = '<div class="hd-wrap">' + h + '</div>';
 }
 function groupHeader(pt, ci, always){
-  var L = pt.li >= 0 ? DATA.chapters[ci].lessons[pt.li] : null;
-  var prev = (BYCH[ci] || [])[S.i - 1]; var changed = always || !prev || prev.li !== pt.li;
-  if (!L) return changed ? '<div class="hd-grp"><div class="n">📚</div><div><b>Kiến thức khác đề hay hỏi</b><div class="ctx">Các điểm này nằm ngoài tóm tắt chương nhưng đề thi vẫn hỏi — nhớ như một bổ sung.</div></div></div>' : '';
+  ci = pt.ci; var L = pt.li >= 0 ? DATA.chapters[ci].lessons[pt.li] : null;
+  var prev = cur()[S.i - 1]; var changed = always || !prev || prev.li !== pt.li || prev.ci !== pt.ci;
+  var chTag = S.set ? '<div class="muted" style="font-size:11.5px;text-transform:uppercase;letter-spacing:.4px">Chương ' + (ci + 1) + ' · ' + esc(DATA.chapters[ci].vi) + '</div>' : '';
+  if (!L) return changed ? '<div class="hd-grp"><div class="n">📚</div><div>' + chTag + '<b>Kiến thức khác đề hay hỏi</b><div class="ctx">Các điểm này nằm ngoài tóm tắt chương nhưng đề thi vẫn hỏi — nhớ như một bổ sung.</div></div></div>' : '';
   var idx = groups(ci).findIndex(function(g){ return g.li === pt.li; }) + 1;
-  return '<div class="hd-grp"><div class="n">📚</div><div><b>Mục ' + idx + ': ' + esc(L.t_vi) + '</b>' + (L.t_en ? ' <span class="muted">(' + esc(L.t_en) + ')</span>' : '') + (changed ? '<div class="ctx">' + esc(L.vi) + '</div>' : '') + '</div></div>';
+  return '<div class="hd-grp"><div class="n">📚</div><div>' + chTag + '<b>Mục ' + idx + ': ' + esc(L.t_vi) + '</b>' + (L.t_en ? ' <span class="muted">(' + esc(L.t_en) + ')</span>' : '') + (changed ? '<div class="ctx">' + esc(L.vi) + '</div>' : '') + '</div></div>';
 }
 function studyView(el){
-  var pts = BYCH[S.ci] || []; if (!pts.length){ el.innerHTML = '<div class="hd-wrap">' + topBar() + '<div class="card"><p>Chương này chưa có câu đề nào được gắn.</p></div></div>'; return; }
+  var pts = cur(); if (!pts.length){ el.innerHTML = '<div class="hd-wrap">' + topBar() + '<div class="card"><p>Chương này chưa có câu đề nào được gắn.</p></div></div>'; return; }
   if (S.i >= pts.length) S.i = pts.length - 1;
-  var pt = pts[S.i], p = prg(S.ci), state = p.k[pt.id] ? 'learned' : p.u[pt.id] ? 'unsure' : '';
+  var pt = pts[S.i], p = prg(), state = p.k[pt.id] ? 'learned' : p.u[pt.id] ? 'unsure' : '';
   var h = topBar() + '<div class="card">' + groupHeader(pt, S.ci, S.i === 0)
     + '<div class="hd-src">🎯 Điểm ' + (S.i + 1) + '/' + pts.length + ' · nguồn: ' + esc(pt.src) + (state === 'learned' ? ' · <span style="color:var(--green)">đã nắm</span>' : state === 'unsure' ? ' · <span style="color:var(--yellow)">chưa chắc</span>' : '') + '</div>'
     + (pt.ctx ? '<div class="hd-vq" style="margin:6px 0;padding:8px 10px;border-left:3px solid var(--line);background:rgba(255,255,255,.03);border-radius:0 8px 8px 0">↩ Câu trước đó: <i>' + esc(pt.ctx.q) + '</i> → <b style="color:var(--txt)">' + esc(pt.ctx.ans) + '</b></div>' : '')
@@ -188,18 +205,19 @@ function studyView(el){
     h += '<div class="hd-row"><button class="btn" onclick="hdShow()">🤔 Tôi đã tự trả lời → hiện đáp án</button><button class="gb-tbtn" onclick="hdSpeak(\'hd-q\')">🔊 Đọc câu hỏi</button><button class="btn ghost" onclick="hdGo(-1)" ' + (S.i === 0 ? 'disabled style="opacity:.4"' : '') + '>← Trước</button><button class="btn ghost" onclick="hdGo(1)">Bỏ qua →</button></div>';
   } else {
     h += '<div class="hd-ans"><div class="lbl">✅ Điều phải nhớ</div><div class="a" id="hd-a">' + esc(pt.ans) + (pt.ansVi ? ' <span class="muted" style="font-weight:400">— ' + esc(pt.ansVi) + '</span>' : '') + '</div>' + (pt.why ? '<div class="why">💡 ' + esc(pt.why) + '</div>' : '') + '</div>'
-      + '<div class="hd-row"><button class="btn" style="background:linear-gradient(135deg,var(--green),#2a9d4a)" onclick="hdMark(true)">✅ Đã nắm</button><button class="btn sec" onclick="hdMark(false)">😕 Chưa chắc — ôn lại sau</button><button class="gb-tbtn" onclick="hdSpeak(\'hd-a\')">🔊</button>' + (pt.li >= 0 ? '<button class="gb-tbtn" onclick="go(\'learn\');openChap(' + S.ci + ');setTimeout(function(){if(window.nrJumpLesson)nrJumpLesson(' + S.ci + ',' + pt.li + ')},200)">📚 Mở bài học</button>' : '') + (window.gbStart ? '<button class="gb-tbtn" onclick="gbStart(' + S.ci + ')">🎙️ Nghe giảng chương</button>' : '') + '</div>';
+      + '<div class="hd-row"><button class="btn" style="background:linear-gradient(135deg,var(--green),#2a9d4a)" onclick="hdMark(true)">✅ Đã nắm</button><button class="btn sec" onclick="hdMark(false)">😕 Chưa chắc — ôn lại sau</button><button class="gb-tbtn" onclick="hdSpeak(\'hd-a\')">🔊</button>' + (pt.li >= 0 ? '<button class="gb-tbtn" onclick="go(\'learn\');openChap(' + pt.ci + ');setTimeout(function(){if(window.nrJumpLesson)nrJumpLesson(' + pt.ci + ',' + pt.li + ')},200)">📚 Mở bài học</button>' : '') + (window.gbStart ? '<button class="gb-tbtn" onclick="gbStart(' + pt.ci + ')">🎙️ Nghe giảng chương</button>' : '') + '</div>';
   }
   h += '</div>';
   el.innerHTML = '<div class="hd-wrap">' + h + '</div>'; window.scrollTo(0, 0);
 }
+function setGroups(){ var out = [], map = {}; cur().forEach(function(p){ var k = p.ci + ':' + (p.li < 0 ? 'x' : p.li); if (!map[k]){ var L = p.li >= 0 ? DATA.chapters[p.ci].lessons[p.li] : null; map[k] = {li:p.li, L:L, title:(L ? L.t_vi : 'Kiến thức khác đề hay hỏi'), en:L ? L.t_en : '', ch:DATA.chapters[p.ci].vi, pts:[]}; out.push(map[k]); } map[k].pts.push(p); }); return out; }
 function summaryView(el){
-  var gs = groups(S.ci), p = prg(S.ci), c = DATA.chapters[S.ci];
-  var h = topBar() + '<div class="card hd-sum"><h2>📄 Bảng kiến thức rút từ đề — ' + esc(c.vi) + '</h2><p class="muted" style="font-size:13px;margin-top:4px">' + (BYCH[S.ci] || []).length + ' điểm, xếp theo mục bài học. Dòng vàng = bạn đánh dấu chưa chắc. Bấm vào dòng để học lại điểm đó. Có thể in (Ctrl/Cmd+P).</p>'
-    + '<div class="hd-row"><button class="btn" onclick="hdStart(' + S.ci + ',true)">▶ Học từ đầu</button><button class="btn sec" onclick="hdQuiz(false)">📝 Kiểm tra 15 câu</button>' + (Object.keys(p.u).length ? '<button class="btn sec" onclick="hdQuiz(true)">🔁 Kiểm tra ' + Object.keys(p.u).length + ' câu chưa chắc</button>' : '') + '<button class="btn ghost" onclick="window.print()">🖨️ In</button></div>';
+  var gs = S.set ? setGroups() : groups(S.ci), p = prg(), c = DATA.chapters[S.ci];
+  var h = topBar() + '<div class="card hd-sum"><h2>📄 Bảng kiến thức rút từ đề — ' + esc(S.set ? 'bộ ' + S.set : c.vi) + '</h2><p class="muted" style="font-size:13px;margin-top:4px">' + cur().length + ' điểm, xếp theo ' + (S.set ? 'chương → ' : '') + 'mục bài học. Dòng vàng = bạn đánh dấu chưa chắc. Bấm vào dòng để học lại điểm đó. Có thể in (Ctrl/Cmd+P).</p>'
+    + '<div class="hd-row"><button class="btn" onclick="' + (S.set ? 'hdStartSet(' + JSON.stringify(S.set).replace(/"/g, '&quot;') + ',true)' : 'hdStart(' + S.ci + ',true)') + '">▶ Học từ đầu</button><button class="btn sec" onclick="hdQuiz(false)">📝 Kiểm tra 15 câu</button>' + (Object.keys(p.u).length ? '<button class="btn sec" onclick="hdQuiz(true)">🔁 Kiểm tra ' + Object.keys(p.u).length + ' câu chưa chắc</button>' : '') + '<button class="btn ghost" onclick="window.print()">🖨️ In</button></div>';
   gs.forEach(function(g, gi){
-    h += '<h4>' + (g.L ? 'Mục ' + (gi + 1) + ': ' + esc(g.title) + (g.en ? ' <span class="muted" style="font-weight:400">(' + esc(g.en) + ')</span>' : '') : esc(g.title)) + ' <span class="muted" style="font-weight:400;font-size:12px">· ' + g.pts.length + ' điểm</span></h4>' + (g.L ? '<div class="ctx">' + esc(g.L.vi) + '</div>' : '');
-    g.pts.forEach(function(pt){ var i = (BYCH[S.ci] || []).indexOf(pt); h += '<div class="it ' + (p.k[pt.id] ? 'learned' : p.u[pt.id] ? 'unsure' : '') + '" onclick="hdJump(' + i + ')" style="cursor:pointer"><div class="l">' + (pt.ctx ? '<span class="vi">↩ ' + esc(pt.ctx.q) + ' → ' + esc(pt.ctx.ans) + '</span>' : '') + esc(pt.q) + (pt.vq ? '<span class="vi">' + esc(pt.vq) + '</span>' : '') + '</div><div class="r"><b>→ ' + esc(pt.ans) + '</b>' + (pt.why ? '<span class="vi">' + esc(pt.why) + '</span>' : '') + '</div></div>'; });
+    h += '<h4>' + (g.ch ? '<span class="muted" style="font-weight:400;font-size:12px">' + esc(g.ch) + ' › </span>' : '') + (g.L ? (g.ch ? '' : 'Mục ' + (gi + 1) + ': ') + esc(g.title) + (g.en ? ' <span class="muted" style="font-weight:400">(' + esc(g.en) + ')</span>' : '') : esc(g.title)) + ' <span class="muted" style="font-weight:400;font-size:12px">· ' + g.pts.length + ' điểm</span></h4>' + (g.L ? '<div class="ctx">' + esc(g.L.vi) + '</div>' : '');
+    g.pts.forEach(function(pt){ var i = cur().indexOf(pt); h += '<div class="it ' + (p.k[pt.id] ? 'learned' : p.u[pt.id] ? 'unsure' : '') + '" onclick="hdJump(' + i + ')" style="cursor:pointer"><div class="l">' + (pt.ctx ? '<span class="vi">↩ ' + esc(pt.ctx.q) + ' → ' + esc(pt.ctx.ans) + '</span>' : '') + esc(pt.q) + (pt.vq ? '<span class="vi">' + esc(pt.vq) + '</span>' : '') + '</div><div class="r"><b>→ ' + esc(pt.ans) + '</b>' + (pt.why ? '<span class="vi">' + esc(pt.why) + '</span>' : '') + '</div></div>'; });
   });
   h += '</div>';
   el.innerHTML = '<div class="hd-wrap">' + h + '</div>'; window.scrollTo(0, 0);
@@ -215,11 +233,11 @@ function quizView(el){
   el.innerHTML = '<div class="hd-wrap">' + h + '</div>'; window.scrollTo(0, 0);
 }
 function endView(el){
-  var p = prg(S.ci), n = (BYCH[S.ci] || []).length, k = Object.keys(p.k).length, u = Object.keys(p.u).length, c = DATA.chapters[S.ci];
+  var p = prg(), n = cur().length, k = Object.keys(p.k).length, u = Object.keys(p.u).length, c = DATA.chapters[S.ci];
   var quizLine = S.qs ? '<p>Kiểm tra vừa rồi: đúng <b>' + S.right + '/' + S.qs.length + '</b>' + (S.qs.length ? ' (' + Math.round(S.right / S.qs.length * 100) + '%)' : '') + '. Câu sai đã vào 📕 Sổ câu sai và lịch ôn ngắt quãng.</p>' : '';
   var nx = ORDER[(ORDER.indexOf(S.ci) + 1) % ORDER.length];
-  el.innerHTML = '<div class="hd-wrap">' + topBar() + '<div class="card" style="text-align:center"><div style="font-size:40px">🎉</div><h2>Xong phần đề của chương ' + (S.ci + 1) + '</h2><p class="muted" style="margin-top:6px">' + esc(c.vi) + ' — đã nắm <b style="color:var(--green)">' + k + '/' + n + '</b>' + (u ? ' · chưa chắc <b style="color:var(--yellow)">' + u + '</b>' : '') + '</p>' + quizLine
-    + '<div class="hd-row" style="justify-content:center">' + (!S.qs ? '<button class="btn" onclick="hdQuiz(false)">📝 Kiểm tra 15 câu</button>' : '') + (u ? '<button class="btn sec" onclick="hdQuiz(true)">🔁 Kiểm tra ' + u + ' câu chưa chắc</button>' : '') + '<button class="btn sec" onclick="hdSummary()">📄 Bảng tóm tắt</button><button class="btn ghost" onclick="hdStart(' + nx + ',true)">▶ Chương tiếp: ' + esc(DATA.chapters[nx].vi) + '</button><button class="btn ghost" onclick="hdList()">Danh sách</button></div></div></div>';
+  el.innerHTML = '<div class="hd-wrap">' + topBar() + '<div class="card" style="text-align:center"><div style="font-size:40px">🎉</div><h2>' + (S.set ? 'Xong kiến thức bộ ' + esc(S.set) : 'Xong phần đề của chương ' + (S.ci + 1)) + '</h2><p class="muted" style="margin-top:6px">' + esc(S.set ? 'Các điểm kiến thức của bộ đề này' : c.vi) + ' — đã nắm <b style="color:var(--green)">' + k + '/' + n + '</b>' + (u ? ' · chưa chắc <b style="color:var(--yellow)">' + u + '</b>' : '') + '</p>' + quizLine
+    + '<div class="hd-row" style="justify-content:center">' + (!S.qs ? '<button class="btn" onclick="hdQuiz(false)">📝 Kiểm tra 15 câu</button>' : '') + (u ? '<button class="btn sec" onclick="hdQuiz(true)">🔁 Kiểm tra ' + u + ' câu chưa chắc</button>' : '') + '<button class="btn sec" onclick="hdSummary()">📄 Bảng tóm tắt</button>' + (S.set ? '<button class="btn ghost" onclick="go(\'thi\')">📖 Về Tài liệu thi</button>' : '<button class="btn ghost" onclick="hdStart(' + nx + ',true)">▶ Chương tiếp: ' + esc(DATA.chapters[nx].vi) + '</button>') + '<button class="btn ghost" onclick="hdList()">Danh sách</button></div></div></div>';
   S.qs = null;
 }
 function render(){ var el = document.getElementById('v-hocde'); if (!el) return; if (S.ci === null || S.mode === 'list') return listView(el); if (S.mode === 'summary') return summaryView(el); if (S.mode === 'quiz') return quizView(el); if (S.mode === 'end') return endView(el); return studyView(el); }

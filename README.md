@@ -37,6 +37,7 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `glossary.js`, `dich.js` | Từ điển 502 thuật ngữ, bôi đen → dịch |
 | `map_thi.js`, `cswip_focus.js`, `img_book.js`, `nangcap.js` | Liên kết câu hỏi → bài học, tách CWI, hình sách (local), flashcard từ điển |
 | `giangbai.js` | 🎙️ Giảng bài dạng slide (tự sinh từ `deep` + `lessons` + `key` + `quiz` + đề thật theo chủ đề) |
+| `phantich.js` | 🔎 Phân tích bộ đề (tỉ trọng chương, mục hỏi nhiều, kiểu câu, độ phủ trọng tâm) + nút "Kiến thức bộ này" và hộp "Kiến thức bám sát" trong Tài liệu thi + huy hiệu "đề hỏi N lần" trong Bài học |
 | `hocde.js` | 📘 Học từ đề thi: gom 510 câu Tài liệu thi + 206 câu ngân hàng thành điểm kiến thức theo chương/mục (THI_LESSON_MAP + khớp từ khóa) |
 | `giangbai_data.js` | Lời thầy viết tay 18 chương: hình dung đời thường, bẫy đề, con số thuộc lòng, thần chú, ý giảng bổ sung |
 | `img_book/` + `img_book.js` | 223 hình trích từ giáo trình WIS5 (chú thích Anh/Việt, gắn chương) + 14 trang Work Pack mẫu; thư viện & phóng to trong tab Bài học, slide ảnh thật trong Giảng bài |
