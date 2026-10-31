@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CSWIP 3.1 Welding Inspector — Học song ngữ</title>
+<title>CSWIP 3.1 Welding Inspector — Ôn thi song ngữ</title>
+<meta name="description" content="Ôn thi CSWIP 3.1 Welding Inspector song ngữ Việt–Anh: 18 chương giảng giải, đề thật có đáp án, thi thử bấm giờ, sổ câu sai, lộ trình tới ngày thi.">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="CSWIP 3.1 — Ôn thi Welding Inspector">
+<meta property="og:description" content="Học hiểu + cày đề + thi thử bấm giờ. Lộ trình nước rút tới ngày thi.">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -114,6 +119,9 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
 code{background:#0a121b;padding:1px 6px;border-radius:5px;color:var(--yellow);font-size:13px}
 .warn{background:#2a1f0a;border:1px solid #5a4410;border-radius:10px;padding:12px;font-size:13px;margin-top:10px}
 @media(max-width:520px){header h1{font-size:15px}.flash{height:260px}}
+:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+button,.chap{-webkit-tap-highlight-color:transparent}
+.sr-only{position:absolute;left:-9999px}
 /* ===== MODERN SKIN ===== */
 body{font-family:'Inter',-apple-system,Segoe UI,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;background:
  radial-gradient(1100px 560px at 82% -8%, rgba(255,122,51,.10), transparent 58%),
@@ -188,7 +196,7 @@ footer{margin-top:auto}
 <body>
 <div class="app">
   <aside class="sidebar">
-    <div class="brand"><span class="spark">⚡</span> CSWIP 3.1</div>
+    <div class="brand"><span class="spark">⚡</span> CSWIP 3.1 <span class="muted" style="font-size:11px;font-weight:600;margin-left:auto">12/2026</span></div>
     <nav id="nav"></nav>
     <div class="side-foot">
       <div class="lang-toggle">
@@ -214,7 +222,7 @@ footer{margin-top:auto}
       <div id="v-tools" class="view"></div>
       <div id="v-profile" class="view"></div>
     </main>
-    <footer>CSWIP 3.1 Study App • Lộ trình thi tháng 12/2026 • Dữ liệu syllabus theo TWI/CSWIP</footer>
+    <footer>CSWIP 3.1 Study App • Ôn thi tháng 12/2026 • Nội dung theo WIS5 (TWI/CSWIP) • <a href="tuvung.html" style="color:var(--accent2)">Từ vựng</a> · <a href="hoc_demo.html" style="color:var(--accent2)">Học dễ nhớ</a></footer>
   </div>
 </div>
 
@@ -889,5 +897,7 @@ if('serviceWorker' in navigator){var _swReload=false;navigator.serviceWorker.add
 <script src="cwibank_vi.js"></script>
 <script src="cswip_focus.js"></script>
 <script src="nangcap.js"></script>
+<script src="giangbai.js"></script>
+<script src="nuocrut.js"></script>
 </body>
 </html>

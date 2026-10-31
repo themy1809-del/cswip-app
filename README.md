@@ -1,1 +1,59 @@
-# cswip-app
+# CSWIP 3.1 — App ôn thi Welding Inspector (song ngữ Việt–Anh)
+
+Web tĩnh (PWA, chạy offline) giúp ôn thi chứng chỉ **CSWIP 3.1 Welding Inspector** theo giáo trình WIS5 (TWI).
+Bản chạy trực tiếp: https://themy1809-del.github.io/cswip-app/
+
+## Cách học được thiết kế (nước rút nhưng phải hiểu bài)
+
+| Tab | Dùng để | Ghi chú |
+|---|---|---|
+| 🏠 Tổng quan | Đếm ngược ngày thi, **việc cần làm hôm nay**, điểm yếu, mức sẵn sàng, lịch sử học | Việc hằng ngày tự sinh theo số ngày còn lại và chỗ bạn yếu |
+| 🎙️ Giảng bài | **Thầy ảo dẫn từng ý**: đoán trước → giảng từng đoạn → hỏi lại ngay → chốt thuật ngữ → 5 câu tổng kết | Có đọc giọng tiếng Việt, ô "Hỏi thầy" ngay tại chỗ, nhớ tiến độ học dở |
+| 📖 Tài liệu thi | Đề Work Pack, Leading Questions, WPS Rings, điền khuyết, bộ hỏi–đáp kinh nghiệm | Chọn đáp án tiếng Anh trước, xem dịch sau |
+| 🎓 Thi thử | 3 phần bấm giờ như thi thật, cắm cờ, nộp bài, xem lại câu sai | Mốc đậu 70 % |
+| 📝 Quiz & Ôn tập | Ôn ngắt quãng (SRS), luyện điểm yếu, theo chủ đề / chương, thi có giờ | |
+| 📕 Sổ câu sai | Gom **mọi** câu sai ở mọi chế độ, kèm giải thích và đoạn bài học liên quan | Đúng lại 2 lần = "đã thuộc" |
+| 📚 Bài học | 18 chương: 🎓 Giảng giải → tóm tắt → điểm cần nhớ → thẻ "Tôi hiểu bài này chưa?" | Thi chương (chấm điểm) để mở chương sau |
+| 🃏 Flashcard | Thuật ngữ bài học + 502 từ điển, phát âm | |
+| 🗓️ Lộ trình | Kế hoạch **từng ngày** tới ngày thi, ngày đã qua hiện kết quả thật | |
+| 🛠️ Công cụ | CEV, heat input, fillet, tiền nhiệt, WPS/PQR, phạm vi qualify thợ, NCR | Tham khảo |
+| 👤 Hồ sơ | Bảng điểm, huy hiệu, **sao lưu/khôi phục**, chế độ học tự do, kích hoạt PRO | |
+
+Trang phụ: `tuvung.html` (120 từ vựng đề thi), `hoc_demo.html` (bản thử "học dễ nhớ" chương 2).
+
+## Cấu trúc mã nguồn
+
+Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module sau **bọc (wrap)** hàm của module trước, không sửa trực tiếp.
+
+| File | Vai trò |
+|---|---|
+| `index.html` | Khung giao diện, CSS, logic lõi (bài học, flashcard, quiz engine, công cụ, hồ sơ) |
+| `config.js` | Giá, liên hệ, khóa sinh mã, Firebase |
+| `data.js`, `data_extra.js` | 18 chương: `lessons`, `deep` (giảng giải), `key`, `quiz`, lộ trình & prompt AI |
+| `bank.js`, `realbank.js`, `cwibank.js`, `cwibank_vi.js` | Ngân hàng câu hỏi (CSWIP + CWI tham khảo) |
+| `thibank1–6.js`, `thi.js`, `mock.js` | Tài liệu thi & thi thử 3 phần |
+| `auth.js`, `premium.js`, `cloud.js` | Đăng ký, mã kích hoạt PRO, khóa chương, công cụ PRO, đồng bộ Firestore |
+| `glossary.js`, `dich.js` | Từ điển 502 thuật ngữ, bôi đen → dịch |
+| `map_thi.js`, `cswip_focus.js`, `img_book.js`, `nangcap.js` | Liên kết câu hỏi → bài học, tách CWI, hình sách (local), flashcard từ điển |
+| `giangbai.js` | 🎙️ Giảng bài từng bước (tự sinh từ `deep` + `lessons` + `key` + `quiz`) |
+| `nuocrut.js` | Ôn thi nước rút: ngày thi, nhật ký học, sổ câu sai, mức sẵn sàng, Tổng quan & Lộ trình mới, menu, phím tắt, sao lưu |
+| `sw.js`, `manifest.json` | PWA: cache network-first, shortcut |
+| `admin.html`, `dashboard.html` | Trang chủ shop: tạo mã, xem học viên |
+
+## Dữ liệu lưu trên máy (localStorage)
+
+`cswip_prog`, `cswip_quiz`, `cswip_srs`, `cswip_user`, `cswip_game`, `cswip_exam`, `THIP`, `MOCKH`,
+`cswip_log` (nhật ký ngày), `cswip_wrong` (sổ câu sai), `cswip_cat`, `cswip_seen`, `cswip_und` (hiểu bài), `cswip_teach` (tiến độ giảng bài), `cswip_tasks`, `cswip_exam_date`, `cswip_free`, `cswip_tts`.
+Nút **Sao lưu** ở tab Hồ sơ xuất toàn bộ ra một file JSON.
+
+## Chạy thử tại chỗ
+
+```bash
+python3 -m http.server 8765
+```
+
+Mở http://localhost:8765/ . Khi đổi tài nguyên tĩnh, tăng `CACHE` trong `sw.js`.
+
+## Phím tắt
+
+`1–4` / `A–D` chọn đáp án · `Enter` / `→` câu tiếp · `←` lùi · `Space` lật thẻ · `F` cắm cờ (thi thử).
