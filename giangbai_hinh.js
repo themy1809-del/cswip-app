@@ -329,7 +329,7 @@ G['gauges'] = F('Dưỡng hàn đo gì', [
 /* ---------- CSS mô phỏng ---------- */
 var css = document.createElement('style');
 css.textContent = [
-'.gbf{width:100%;height:auto;display:block;background:#0f1622;border:1px solid rgba(255,255,255,.08);border-radius:14px}',
+'.gbf{width:100%;height:auto;display:block;background:#101724;border:1px solid rgba(255,255,255,.08);border-radius:14px}',
 '@keyframes gbfDraw{from{stroke-dashoffset:600}to{stroke-dashoffset:0}}',
 '.gbf-draw{stroke-dasharray:600;animation:gbfDraw 1.6s ease forwards}',
 '@keyframes gbfFlicker{0%,100%{opacity:1}50%{opacity:.55}}',

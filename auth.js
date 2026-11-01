@@ -38,11 +38,9 @@ function checkCode(key, code){
   return {ok:true,exp:exp};
 }
 function _curUser(){ try{ return JSON.parse(localStorage.getItem('cswip_user')||'{}'); }catch(e){ return {}; } }
-function isPremium(){
-  var u=_curUser();
-  if(!u.phone || !u.code) return false;
-  return checkCode(u.phone, u.code).ok===true;
-}
+/* ĐÃ BỎ CHẾ ĐỘ MỞ KHÓA: toàn bộ nội dung & công cụ mở sẵn cho mọi người.
+   (Giữ makeCode/checkCode để admin.html/dashboard.html không lỗi.) */
+function isPremium(){ return true; }
 function premiumExpiryText(){
   var u=_curUser(); if(!u.phone||!u.code) return '';
   var r=checkCode(u.phone,u.code); if(!r.ok) return '';
@@ -78,7 +76,8 @@ function fmtPrice(){ try{ return (CONFIG.price||0).toLocaleString('vi-VN')+(CONF
 function _regOK(u){ u=u||_curUser(); return !!(u.name && u.phone); }
 function _vEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((e||'').trim()); }
 function _vPhone(p){ var d=(p||'').replace(/\D/g,''); if(d.indexOf('84')===0)d=d.slice(2); if(d.indexOf('0')===0)d=d.slice(1); return d.length>=9 && d.length<=10; }
-function maybeRegister(){ if(_regOK()) return; showRegister(false); }
+function maybeRegister(){ if(_regOK()) return; try{ var s=parseInt(localStorage.getItem('cswip_regskip')||'0',10); if(s && Date.now()-s < 7*86400000) return; }catch(e){} showRegister(false); }
+function skipRegister(){ try{ localStorage.setItem('cswip_regskip', String(Date.now())); }catch(e){} var ov=document.getElementById('reg-overlay'); if(ov) ov.remove(); }
 function showRegister(force){
   if(document.getElementById('reg-overlay')) return;
   var u=_curUser();
@@ -88,14 +87,14 @@ function showRegister(force){
   ov.innerHTML=
     '<div style="max-width:430px;width:100%;background:linear-gradient(180deg,#162030,#0e1622);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.5)">'+
       '<div style="font-size:20px;font-weight:800;margin-bottom:4px">👋 Đăng ký để bắt đầu học</div>'+
-      '<div style="color:#94a3bb;font-size:13px;margin-bottom:14px">Vui lòng nhập thông tin để vào học. Bắt buộc — để app chấm điểm & kích hoạt cho bạn. / Please register to start learning.</div>'+
+      '<div style="color:#94a3bb;font-size:13px;margin-bottom:14px">Nhập tên và số điện thoại để app chấm điểm theo bạn và lưu tiến độ. Có thể bỏ qua, học ngay. / Optional — you can skip.</div>'+
       '<label style="font-size:12px;color:#94a3bb">Họ tên / Full name *</label>'+
       '<input id="reg-name" value="'+(u.name||'').replace(/"/g,'&quot;')+'" placeholder="Nguyễn Văn A" style="'+inS+'">'+
       '<label style="font-size:12px;color:#94a3bb">Số điện thoại / Phone *</label>'+
       '<input id="reg-phone" value="'+(u.phone||'').replace(/"/g,'&quot;')+'" placeholder="09..." inputmode="tel" style="'+inS+'">'+
       '<div id="reg-err" style="color:#ff6b6b;font-size:12.5px;min-height:15px;margin:-4px 0 8px"></div>'+
       '<button onclick="submitRegister()" style="width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#4ca8ff,#2f7fe0);color:#06121f;font-weight:800;font-size:15px;cursor:pointer">Bắt đầu học →</button>'+
-      (force?'<button onclick="(function(){var e=document.getElementById(\'reg-overlay\');if(e)e.remove();})()" style="width:100%;margin-top:8px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:none;color:#94a3bb;cursor:pointer">Đóng</button>':'')+
+      '<button onclick="skipRegister()" style="width:100%;margin-top:8px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:none;color:#94a3bb;cursor:pointer">Để sau — vào học ngay</button>'+
     '</div>';
   document.body.appendChild(ov);
   var inp=document.getElementById('reg-name'); if(inp) inp.focus();

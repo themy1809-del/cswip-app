@@ -76,7 +76,8 @@ function injectThi(){
   var el = document.getElementById('v-thi'); if (!el || !el.classList.contains('on')) return;
   var cards = el.querySelectorAll('.thi-card');
   // a) menu: thẻ phân tích + nút kiến thức bộ này
-  if (cards.length && /Tài liệu thi/.test(cards[0].textContent) && !el.querySelector('#pt-card')){
+  var mh2 = cards.length ? cards[0].querySelector('h2') : null; var isMenu = !!(mh2 && /^📖/.test(mh2.textContent.trim()));
+  if (isMenu && !el.querySelector('#pt-card')){
     var d = document.createElement('div'); d.innerHTML = analysisHTML(true); var card = d.firstChild; card.className = 'thi-card'; card.style.borderLeft = '3px solid var(--yellow)';
     (el.querySelector('#wp-card') || cards[0]).insertAdjacentElement('afterend', card);
   }
@@ -84,7 +85,7 @@ function injectThi(){
     if (c.querySelector('.pt-setbtn')) return;
     var row = c.querySelector('.thi-row'); var b = row && row.querySelector('button[onclick*="THI.learn"]'); if (!b) return;
     var m = /THI\.learn\('([^']+)'\)/.exec(b.getAttribute('onclick')); if (!m) return;
-    var label = ({wp1:'Work Pack 1', wp2:'Work Pack 2', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết', dd:'Kéo-thả', c21:'Hỏi đáp 2.1', c22:'Kinh nghiệm 2.2', c23:'Hỏi đáp 2.3'})[m[1]]; if (!label) return;
+    var label = ({wp1:'Work Pack 1', wp2:'Work Pack 2', wptwi:'Work Pack TWI', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết', dd:'Kéo-thả', c21:'Hỏi đáp 2.1', c22:'Kinh nghiệm 2.2', c23:'Hỏi đáp 2.3'})[m[1]]; if (!label) return;
     var n = P.filter(function(p){ return p.src === label; }).length; if (!n) return;
     var nb = document.createElement('button'); nb.className = 'btn sec pt-setbtn'; nb.innerHTML = '📘 Kiến thức bộ này (' + n + ')'; nb.title = 'Học các điểm kiến thức của bộ đề này, xếp theo chương → mục bài học';
     nb.onclick = function(){ hdStartSet(label); }; row.appendChild(nb);

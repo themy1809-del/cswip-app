@@ -1,0 +1,155 @@
+/* ============================================================
+   THEME — bảng màu dùng chung + giao diện SÁNG (body.light)
+   Tông tối mặc định đã làm sáng hơn (xanh xám thay vì đen).
+   Chọn ở cuối thanh bên: 🌙 Tối / ☀️ Sáng (lưu trong máy).
+   ============================================================ */
+:root{
+  --bg:#131a28; --panel:#1b2435; --panel2:#253148; --line:#36456a;
+  --txt:#f1f4fa; --muted:#a6b2c8; --accent:#ff8a44; --accent2:#5db1ff;
+  --green:#3ed16a; --red:#ff5e54; --yellow:#ffd84d;
+  --glass:rgba(22,30,46,.8); --glass2:rgba(22,30,46,.62);
+  --card:#1b2435; --ink:#0f1622; --onaccent:#1a1206; --onaccent2:#06121f;
+}
+body.light{
+  --bg:#f2f5f9; --panel:#ffffff; --panel2:#eaeff6; --line:#d3dae6;
+  --txt:#1b2434; --muted:#5f6c82; --accent:#e4621c; --accent2:#1f6fd0;
+  --green:#1d9a48; --red:#d6362c; --yellow:#b7860a;
+  --glass:rgba(255,255,255,.86); --glass2:rgba(255,255,255,.7);
+  --card:#ffffff; --ink:#eaeff6; --onaccent:#fff; --onaccent2:#fff;
+  color-scheme:light;
+}
+/* ---------- nền & khung ---------- */
+body.light{background:
+  radial-gradient(1100px 560px at 82% -8%, rgba(228,98,28,.08), transparent 58%),
+  radial-gradient(900px 520px at -8% 6%, rgba(31,111,208,.08), transparent 55%),
+  var(--bg)}
+body.light .sidebar,body.light header,body.light .topbar{background:var(--glass);border-color:var(--line)}
+body.light nav{background:var(--glass2);border-color:var(--line)}
+body.light #nav button,body.light nav button{background:#fff;border-color:var(--line);color:var(--muted)}
+body.light #nav button:hover,body.light nav button:hover{border-color:var(--accent2);color:var(--txt)}
+body.light #nav button.on,body.light nav button.on{background:linear-gradient(135deg,var(--accent2),#2f7fe0);color:#fff;border-color:transparent}
+body.light .btn .sub,body.light .btn .lang-en,body.light .btn .en{color:rgba(255,255,255,.85)}
+body.light .btn.sec .sub,body.light .btn.sec .lang-en,body.light .btn.ghost .sub{color:var(--muted)}
+body.light .brand,body.light .topbar-title{color:var(--txt)}
+body.light .menu-btn{background:#fff;border-color:var(--line);color:var(--txt)}
+body.light .lang-toggle,body.light .theme-toggle{background:var(--panel2);border-color:var(--line)}
+body.light .lang-toggle button.on{color:#fff}
+body.light .card,body.light .chap,body.light .thi-card,body.light .mk-card{background:var(--card);border-color:var(--line);box-shadow:0 4px 18px rgba(20,30,60,.07)}
+body.light .card:hover{border-color:#c4cddc}
+body.light .chap:hover{border-color:var(--accent2);box-shadow:0 8px 22px rgba(20,30,60,.12)}
+body.light .chap .num{background:#fff3ea;border-color:#f6c9ad;color:var(--accent)}
+body.light .pill{background:#fff1e6;border-color:#f3c3a3;color:var(--accent)}
+body.light .muted,body.light .en,body.light .sub,body.light .thi-muted,body.light .mk-muted,body.light .gb-mini,body.light .hd-src,body.light .bk-cap{color:var(--muted)}
+body.light .deep-block{background:#fbfcfe;border-color:var(--line);border-left-color:var(--accent)}
+body.light table.deep-tbl th{background:#e9f1fc;color:var(--accent2)}
+body.light table.deep-tbl th,body.light table.deep-tbl td{border-color:var(--line)}
+body.light ul.lesson li{border-color:var(--line)}
+body.light .q-explain{background:#eef4fc;border-left-color:var(--accent2);color:var(--txt)}
+body.light .tool-out{background:#fff5ec;border-left-color:var(--accent);color:var(--txt)}
+body.light .warn{background:#fff8e1;border-color:#f1dd8a;color:var(--txt)}
+body.light code{background:#eef1f6;color:#8a5a00}
+body.light .timeline:before{background:var(--line)}
+body.light .tl:before{box-shadow:0 0 0 3px var(--bg)}
+body.light .stat .b,body.light .score-cell,body.light .nr-stat{background:#fff;border-color:var(--line);box-shadow:0 2px 10px rgba(20,30,60,.06)}
+body.light .progress,body.light .nr-bar,body.light .gb-prog,body.light .hd-prog,body.light .hd-top .gb-prog{background:#e2e8f2}
+body.light .flash-front,body.light .flash-back{background:#fff;border-color:var(--line)}
+body.light .flash-face .q{color:var(--txt)}
+/* ---------- nút & ô nhập ---------- */
+body.light .btn{color:#fff;box-shadow:0 4px 14px rgba(31,111,208,.28)}
+body.light .btn.sec{background:#fff;border-color:var(--line);color:var(--txt);box-shadow:none}
+body.light .btn.sec:hover{background:#f1f4f9}
+body.light .btn.ghost{background:none;color:var(--muted);border-color:var(--line)}
+body.light .opt,body.light .thi-opt,body.light .mk-opt,body.light .gb-opt,body.light .hd-opt{background:#fff;border-color:var(--line);color:var(--txt)}
+body.light .opt:hover,body.light .thi-opt:hover,body.light .gb-opt:hover,body.light .hd-opt:hover{border-color:var(--accent2);background:#f3f8ff}
+body.light .opt.correct,body.light .thi-opt.ok,body.light .mk-opt.ok,body.light .gb-opt.ok,body.light .hd-opt.ok{background:#e6f7ec;border-color:var(--green)}
+body.light .opt.wrong,body.light .thi-opt.bad,body.light .mk-opt.bad,body.light .gb-opt.bad,body.light .hd-opt.bad{background:#fdeceb;border-color:var(--red)}
+body.light .mk-opt.sel{background:#e8f1fd;border-color:var(--accent2)}
+body.light .mk-cell{background:#fff;border-color:var(--line);color:var(--txt)}
+body.light .mk-cell.done{background:#dcebfd;border-color:var(--accent2)}
+body.light .mk-cell.flag{background:#fff2c9;border-color:#e3b400}
+body.light .mk-cell.cur{outline-color:var(--accent)}
+body.light .mk-timer{background:var(--glass);border-color:var(--line);color:var(--txt)}
+body.light .mk-timer b.warn{color:var(--red)}
+body.light .tool-grid input,body.light .tool-grid select,body.light textarea,body.light input[type=date],body.light .gb-ask input,body.light .ai-in input,body.light #nr-exam-inp{background:#fff;border-color:var(--line);color:var(--txt)}
+body.light .tool-grid label,body.light label{color:var(--muted)}
+body.light .gb-tbtn,body.light .nr-chip,body.light .nr-weak .drill,body.light .nr-wrong .meta button,body.light .gb-term .sp,body.light .wp-thumbs button,body.light .back{background:#fff;border-color:var(--line);color:var(--txt)}
+body.light .back{color:var(--accent2);background:none}
+body.light .gb-tbtn.on,body.light .nr-chip.on{color:var(--accent2);background:#e8f1fd;border-color:var(--accent2)}
+body.light .nr-chip.on{color:#fff;background:var(--accent2)}
+body.light .gb-tbtn.play{color:var(--green);border-color:var(--green);background:#eaf8ee}
+body.light .wp-thumbs button.on{color:var(--accent2);background:#e8f1fd;border-color:var(--accent2)}
+body.light .nr-task .cb{border-color:#c5cedc;background:#fff}
+body.light .nr-task.done .cb{background:var(--green);border-color:var(--green);color:#fff}
+body.light .nr-task .go{background:#e8f1fd;border-color:#b9d3f7;color:var(--accent2)}
+/* ---------- khối nội dung của các module ---------- */
+body.light .thi-flash{background:#fbfcfe;border-color:var(--line)}
+body.light .thi-a{color:var(--green);border-color:var(--line)}
+body.light .thi-exp,body.light .mk-exp,body.light .nr-wrong .ex,body.light .gb-ask .ans .hit{background:#eef4fc;border-color:#c9dcf5;color:var(--txt)}
+body.light .thi-exp .vq,body.light .mk-exp .vq{color:#8a5a00}
+body.light .thi-exp .va,body.light .mk-exp .va{color:var(--txt)}
+body.light .thi-exp .nn,body.light .mk-exp .nn{color:#b23a1a}
+body.light .thi-tag,body.light .gb-chip{background:#eaeff6;color:var(--muted);border-color:#d3dae6}
+body.light .gb-chip b{color:var(--accent2)}
+body.light .thi-lessonlink{background:#fff5ec;border-color:var(--accent);color:var(--txt)}
+body.light .cwi-warn{background:#fff8e1;border-color:#e3b400;color:var(--txt)}
+body.light .gb-bubble{background:#f7f9fc;border-color:var(--line);color:var(--txt)}
+body.light .gb-bubble.hook{background:#eef4fc;border-color:#b9d3f7}
+body.light .gb-bubble.good{background:#e9f7ee;border-color:#9fdbb4}
+body.light .gb-bubble.bad{background:#fdeeed;border-color:#f1b2ad}
+body.light .gb-bubble.trap{background:#fff8e1;border-color:#f1dd8a}
+body.light .gb-para{background:#fff;border-left-color:var(--accent)}
+body.light .gb-para.dim{opacity:.6;border-left-color:var(--line)}
+body.light .gb-story{background:#fff8e1;border-left-color:#e3b400}
+body.light .gb-dis{background:#fbfcfe;border-color:var(--line)}
+body.light .gb-q mark,body.light .hd-q mark{background:#fff0b3;color:#7a5200}
+body.light .gb-term{border-color:var(--line)}
+body.light .gb-dots i{background:#dfe5ef}
+body.light .gb-av{box-shadow:0 4px 12px rgba(228,98,28,.3)}
+body.light .gb-learnfig svg,body.light .gb-figwrap svg,body.light svg.gbf{background:#1b2435}
+body.light .hd-grp{background:#eef4fc;border-color:#c9dcf5}
+body.light .hd-ans{background:#e9f7ee;border-color:#9fdbb4}
+body.light .hd-ans .why{color:var(--txt)}
+body.light .hd-sum .it{border-color:var(--line)}
+body.light .hd-sum .it.unsure{background:#fff8e1}
+body.light .nr-hero{border-left-color:var(--accent)}
+body.light .nr-ring:before{background:#fff}
+body.light .nr-ready,body.light .nr-quick a,body.light .nr-quick button,body.light .nr-day .dt{background:#fff;border-color:var(--line);color:var(--txt)}
+body.light .nr-quick a:hover,body.light .nr-quick button:hover{border-color:var(--accent2)}
+body.light .nr-day.today .dt{background:#fff1e6;border-color:var(--accent)}
+body.light .nr-heat i{background:#e3e8f0}
+body.light .nr-heat i.l1{background:#b9e9c6}.nr-heat i.l2{}
+body.light .nr-heat i.l2{background:#7fd79b}body.light .nr-heat i.l3{background:#3fbf6a}body.light .nr-heat i.l4{background:#1d9a48}
+body.light .nr-wrong .o.ok{background:#e9f7ee;border-color:#9fdbb4}
+body.light .nr-wrong .o.bad{background:#fdeeed;border-color:#f1b2ad}
+body.light .nr-trend:before{border-top-color:#d3a800;color:#8a6a00}
+body.light .nr-kbd{background:#eef1f6;border-color:#c5cedc}
+body.light .bk-fig{border-color:var(--line)}
+body.light .bk-sec summary{color:var(--accent2)}
+body.light .wp-tip{background:#fff8e1;border-color:#f1dd8a}
+body.light #botnav{background:var(--glass);border-top-color:var(--line)}
+body.light #botnav button{color:var(--muted)}
+body.light #botnav button.on{color:var(--accent2)}
+body.light .nav-overlay{background:rgba(20,30,60,.35)}
+body.light #ai-panel{background:#fff;border-color:var(--line)}
+body.light .ai-head{background:#eef4fc;color:var(--txt)}
+body.light .ai-msgs{color:var(--txt)}
+body.light .ai-bot{background:#f7f9fc;border-color:var(--line)}
+body.light .ai-in{border-color:var(--line)}
+body.light .ai-gpt{background:#fff;border-color:var(--line);color:var(--txt)}
+body.light #dichPanel{background:#fff;border-color:var(--line);color:var(--txt)}
+body.light .toast{color:#1a1206}
+body.light ::-webkit-scrollbar-thumb{background:rgba(20,30,60,.2)}
+body.light ::-webkit-scrollbar-thumb:hover{background:rgba(20,30,60,.35)}
+/* các khối ghi màu cứng trong chuỗi HTML (style="background:rgba(255,255,255,.0x)") */
+body.light [style*="background:rgba(255,255,255"],body.light [style*="background: rgba(255,255,255"]{background:#f4f6fa!important}
+body.light [style*="border:1px solid rgba(255,255,255"],body.light [style*="border-color:rgba(255,255,255"]{border-color:#d3dae6!important}
+body.light [style*="color:#dbe7ff"],body.light [style*="color:#eaeff7"]{color:var(--txt)!important}
+body.light [style*="color:#ffd166"]{color:#8a5a00!important}
+body.light [style*="color:#7ee787"]{color:var(--green)!important}
+body.light [style*="color:#ff9f7f"]{color:#b23a1a!important}
+body.light [style*="background:#13212d"],body.light [style*="background:#0a121b"],body.light [style*="background:#102030"]{background:#eef1f6!important;color:var(--txt)!important}
+/* ---------- nút chọn giao diện ---------- */
+.theme-toggle{display:flex;gap:6px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:4px;margin-top:8px;justify-content:center}
+.theme-toggle button{background:none;border:none;color:var(--muted);padding:6px 12px;border-radius:18px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit;transition:.2s}
+.theme-toggle button.on{background:var(--panel2);color:var(--txt)}
+body.light .theme-toggle button.on{background:#fff;color:var(--txt);box-shadow:0 2px 8px rgba(20,30,60,.12)}

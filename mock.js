@@ -15,12 +15,12 @@
   }
   window.MOCK_BANK_ITEMS=bankItems;
   function P1(){ return pool(['THI_LEAD','THI_RING','THI_FB']).concat(bankItems()); }
-  function P2(){ return pool(['THI_WP1','THI_WP2']); }
+  function P2(){ return pool(['THI_WP1','THI_WP2','THI_WPTWI']); }
   function P3(){ return pool(['THI_WP1','THI_WP2','THI_LEAD','THI_RING','THI_FB']); }
 
   var PAPERS=[
     {id:'p1', icon:'1️⃣', vi:'Phần 1 — Lý thuyết tổng quát', n:80, min:120, pool:P1, note:'Leading Questions + WPS Rings + điền khuyết + đề thật CSWIP'},
-    {id:'p2', icon:'2️⃣', vi:'Phần 2 — Work Pack (WPS/bản vẽ)', n:40, min:90, pool:P2, note:'Rút từ 2 đề Work Pack thật có đáp án'},
+    {id:'p2', icon:'2️⃣', vi:'Phần 2 — Work Pack (WPS/bản vẽ)', n:40, min:90, pool:P2, note:'Rút từ 2 đề Work Pack thật + Work Pack TWI'},
     {id:'p3', icon:'3️⃣', vi:'Phần 3 — Tổng hợp', n:24, min:90, pool:P3, note:'Trộn toàn bộ ngân hàng (mô phỏng phần 3)'}
   ];
 
@@ -44,8 +44,8 @@
       var orig=window.renderAll; window.renderAll=function(){ orig(); try{ if(typeof CUR!=='undefined'&&CUR==='mock') renderMock(); }catch(e){} };
       window._mockWrapped=true;
     }
-    var css='.mk-card{background:var(--card,#151c2c);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}'
-      +'.mk-timer{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;background:rgba(11,15,23,.97);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 14px;margin-bottom:12px}'
+    var css='.mk-card{background:var(--card,#1b2435);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}'
+      +'.mk-timer{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;background:var(--glass);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 14px;margin-bottom:12px}'
       +'.mk-timer b.warn{color:#f85149}'
       +'.mk-q{font-size:16px;font-weight:700;line-height:1.45}'
       +'.mk-opt{display:block;width:100%;text-align:left;margin-top:8px;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:inherit;font-size:14.5px;cursor:pointer;line-height:1.4}'
@@ -57,7 +57,7 @@
       +'.mk-cell.done{background:rgba(76,168,255,.22);border-color:#4ca8ff}'
       +'.mk-cell.flag{background:rgba(255,209,102,.22);border-color:#ffd166}'
       +'.mk-cell.cur{outline:2px solid #fff}'
-      +'.mk-muted{color:#94a3bb;font-size:12.5px}'
+      +'.mk-muted{color:var(--muted,#94a3bb);font-size:12.5px}'
       +'.mk-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}'
       +'.mk-exp{margin-top:10px;background:rgba(76,168,255,.08);border:1px solid rgba(76,168,255,.25);border-radius:12px;padding:12px;font-size:14px;line-height:1.55}'
       +'.mk-exp .vq{color:#ffd166;font-weight:700}.mk-exp .va{margin-top:6px;color:#dbe7ff}.mk-exp .nn{margin-top:6px;color:#ff9f7f;font-size:12.5px}';
@@ -72,7 +72,7 @@
     var el=document.getElementById('v-mock'); if(!el)return;
     var h='<div class="mk-card"><h2>🎓 Thi thử CSWIP 3.1 — như thi thật 2026</h2>'
       +'<p class="mk-muted" style="margin-top:6px">Kỳ thi 2026 gồm 3 phần: <b>80 câu/120′ · 40 câu/90′ · 24 câu/90′</b>. Mỗi lần bấm thi, app rút đề <b>ngẫu nhiên mới</b> từ ngân hàng tài liệu — thi đi thi lại thoải mái. Có đồng hồ đếm ngược, hết giờ tự nộp; đậu từ <b>70%</b>. Nộp xong xem lại từng câu sai kèm giải nghĩa tiếng Việt.</p>'
-      +(pro()?'':'<p class="mk-muted">🔒 Bản miễn phí: mỗi phần rút gọn 8 câu / 12 phút. Mở khóa PRO để thi bản đầy đủ.</p>')+'</div>';
+      +'</div>';
     PAPERS.forEach(function(p){
       var bank=p.pool().length;
       var best=null,count=0;

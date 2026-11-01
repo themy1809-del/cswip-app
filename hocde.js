@@ -22,7 +22,7 @@ var STOP = {the:1, of:1, and:1, to:1, in:1, a:1, is:1, for:1, on:1, with:1, whic
 function words(s){ return String(s || '').toLowerCase().replace(/<[^>]+>/g, ' ').replace(/[^a-z0-9\- ]/g, ' ').split(/\s+/).filter(function(w){ return w.length >= 3 && !STOP[w]; }); }
 function mapKey(q){ return String(q).toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 60); }
 var ORDER = [4, 1, 6, 7, 2, 8, 9, 5, 3, 11, 10, 15, 0, 12, 13, 14, 16, 17];
-var SRC = {wp1:'Work Pack 1', wp2:'Work Pack 2', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết', dd:'Kéo-thả', c21:'Hỏi đáp 2.1', c22:'Kinh nghiệm 2.2', c23:'Hỏi đáp 2.3'};
+var SRC = {wp1:'Work Pack 1', wp2:'Work Pack 2', wptwi:'Work Pack TWI', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết', dd:'Kéo-thả', c21:'Hỏi đáp 2.1', c22:'Kinh nghiệm 2.2', c23:'Hỏi đáp 2.3'};
 
 /* ---------- gom điểm kiến thức ---------- */
 var POINTS = [], BYCH = {}, seenQ = {};
@@ -37,7 +37,7 @@ function bestLesson(ci, text){
 function add(p){ var k = mapKey(p.q); if (seenQ[k]) return; seenQ[k] = 1; POINTS.push(p); (BYCH[p.ci] = BYCH[p.ci] || []).push(p); }
 (function build(){
   var M = window.THI_LESSON_MAP || {};
-  ['THI_WP1', 'THI_WP2', 'THI_LEAD', 'THI_RING', 'THI_FB', 'THI_DD', 'THI_C21', 'THI_C22', 'THI_C23'].forEach(function(k){
+  ['THI_WP1', 'THI_WP2', 'THI_WPTWI', 'THI_LEAD', 'THI_RING', 'THI_FB', 'THI_DD', 'THI_C21', 'THI_C22', 'THI_C23'].forEach(function(k){
     var s = window[k]; if (!s || !s.items) return;
     var prev = null;
     s.items.forEach(function(it, i){

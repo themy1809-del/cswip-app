@@ -14,11 +14,11 @@ Bản chạy trực tiếp: https://themy1809-del.github.io/cswip-app/
 | 🎓 Thi thử | 3 phần bấm giờ như thi thật, cắm cờ, nộp bài, xem lại câu sai | Mốc đậu 70 % |
 | 📝 Quiz & Ôn tập | Ôn ngắt quãng (SRS), luyện điểm yếu, theo chủ đề / chương, thi có giờ | |
 | 📕 Sổ câu sai | Gom **mọi** câu sai ở mọi chế độ, kèm giải thích và đoạn bài học liên quan | Đúng lại 2 lần = "đã thuộc" |
-| 📚 Bài học | 18 chương: 🎓 Giảng giải → tóm tắt → điểm cần nhớ → thẻ "Tôi hiểu bài này chưa?" | Thi chương (chấm điểm) để mở chương sau |
+| 📚 Bài học | 18 chương: 🎓 Giảng giải → tóm tắt → điểm cần nhớ → thẻ "Tôi hiểu bài này chưa?" | Mọi chương mở sẵn; thi chương để ghi điểm |
 | 🃏 Flashcard | Thuật ngữ bài học + 502 từ điển, phát âm | |
 | 🗓️ Lộ trình | Kế hoạch **từng ngày** tới ngày thi, ngày đã qua hiện kết quả thật | |
 | 🛠️ Công cụ | CEV, heat input, fillet, tiền nhiệt, WPS/PQR, phạm vi qualify thợ, NCR | Tham khảo |
-| 👤 Hồ sơ | Bảng điểm, huy hiệu, **sao lưu/khôi phục**, chế độ học tự do, kích hoạt PRO | |
+| 👤 Hồ sơ | Bảng điểm, huy hiệu, **sao lưu/khôi phục** | |
 
 Trang phụ: `tuvung.html` (120 từ vựng đề thi), `hoc_demo.html` (bản thử "học dễ nhớ" chương 2).
 
@@ -32,8 +32,8 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `config.js` | Giá, liên hệ, khóa sinh mã, Firebase |
 | `data.js`, `data_extra.js` | 18 chương: `lessons`, `deep` (giảng giải), `key`, `quiz`, lộ trình & prompt AI |
 | `bank.js`, `realbank.js`, `cwibank.js`, `cwibank_vi.js` | Ngân hàng câu hỏi (CSWIP + CWI tham khảo) |
-| `thibank1–6.js`, `thi.js`, `mock.js` | Tài liệu thi & thi thử 3 phần |
-| `auth.js`, `premium.js`, `cloud.js` | Đăng ký, mã kích hoạt PRO, khóa chương, công cụ PRO, đồng bộ Firestore |
+| `thibank1–7.js`, `thi.js`, `mock.js` | Tài liệu thi & thi thử 3 phần (`thibank7.js`: Work Pack TWI 20 câu kèm hồ sơ, đáp án do trợ lý xác định từ hồ sơ) |
+| `auth.js`, `premium.js`, `cloud.js` | Đăng ký, công cụ nâng cao (qualify thợ, PQR), thi chương, đồng bộ Firestore. Chế độ mở khóa PRO đã bỏ: `isPremium()` luôn true, `chapFree()` luôn true |
 | `glossary.js`, `dich.js` | Từ điển 502 thuật ngữ, bôi đen → dịch |
 | `map_thi.js`, `cswip_focus.js`, `img_book.js`, `nangcap.js` | Liên kết câu hỏi → bài học, tách CWI, hình sách (local), flashcard từ điển |
 | `giangbai.js` | 🎙️ Giảng bài dạng slide (tự sinh từ `deep` + `lessons` + `key` + `quiz` + đề thật theo chủ đề) |
@@ -41,9 +41,11 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `hocde.js` | 📘 Học từ đề thi: gom 510 câu Tài liệu thi + 206 câu ngân hàng thành điểm kiến thức theo chương/mục (THI_LESSON_MAP + khớp từ khóa) |
 | `giangbai_data.js` | Lời thầy viết tay 18 chương: hình dung đời thường, bẫy đề, con số thuộc lòng, thần chú, ý giảng bổ sung |
 | `img_book/` + `img_book.js` | 223 hình trích từ giáo trình WIS5 (chú thích Anh/Việt, gắn chương) + 14 trang Work Pack mẫu; thư viện & phóng to trong tab Bài học, slide ảnh thật trong Giảng bài |
-| `workpack.js` | 📎 Trình xem hồ sơ Work Pack mẫu TWI (WPS, chứng chỉ thợ, bản vẽ) trong tab Tài liệu thi |
+| `workpack.js` | 📎 Hồ sơ Work Pack mẫu TWI (WPS, chứng chỉ thợ, bản vẽ): trình xem, cửa sổ nổi khi làm bài, 👨‍🏫 hướng dẫn đọc từng ô (khoanh đỏ trên ảnh thật, 19 bước) |
+| `thuchanh.js` | 🔧 Thi thực hành: cách TWI chấm (3 câu/mẫu), bảng tiêu chí A/B/C cho 13 khuyết tật, ảnh thật, bài tập kết án có chấm |
 | `giangbai_hinh.js` | Thư viện 37 hình SVG mô phỏng nhiều bước (vết nứt lan, bọt khí, tia RT, từ trường rò…) |
 | `nuocrut.js` | Ôn thi nước rút: ngày thi, nhật ký học, sổ câu sai, mức sẵn sàng, Tổng quan & Lộ trình mới, menu, phím tắt, sao lưu |
+| `theme.css` | Bảng màu dùng chung (tông tối sáng hơn) + giao diện sáng `body.light`; chọn 🌙/☀️ ở cuối thanh bên, lưu trong máy |
 | `sw.js`, `manifest.json` | PWA: cache network-first, shortcut |
 | `admin.html`, `dashboard.html` | Trang chủ shop: tạo mã, xem học viên |
 

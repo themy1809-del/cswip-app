@@ -102,9 +102,9 @@ function phase(days){
 
 /* ---------- bản đồ câu hỏi Tài liệu thi (theo text) ---------- */
 var THI_SETS = {}, THI_BY_TEXT = {};
-var THI_LABEL = {wp1:'Work Pack 1', wp2:'Work Pack 2', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết'};
+var THI_LABEL = {wp1:'Work Pack 1', wp2:'Work Pack 2', wptwi:'Work Pack TWI', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết'};
 (function(){
-  ['THI_WP1','THI_WP2','THI_LEAD','THI_RING','THI_FB'].forEach(function(k){
+  ['THI_WP1','THI_WP2','THI_WPTWI','THI_LEAD','THI_RING','THI_FB'].forEach(function(k){
     var s = window[k]; if (!s || !s.items) return;
     THI_SETS[s.id] = s;
     s.items.forEach(function(it, i){
@@ -191,12 +191,17 @@ function hookThi(){
 function lessonFor(q){ try{ var map = window.THI_LESSON_MAP; if (!map) return null; var k = String(q).toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 60); return map[k] || null; }catch(e){ return null; } }
 
 /* ---------- HOOK 3: Thi thử (MOCK) ---------- */
-var mockSess = {}, mockActive = false, mockDoneFlag = false;
+var mockSess = {}, mockActive = false, mockDoneFlag = false, lastMockBD = '';
+function injectMockBD(){
+  if (!lastMockBD) return; var el = document.getElementById('v-mock'); if (!el || el.querySelector('#nr-mockbd')) return;
+  var h2 = el.querySelector('.mk-card h2'); if (!h2 || !/ĐẬU|Chưa đậu/.test(h2.textContent)) return;
+  h2.closest('.mk-card').insertAdjacentHTML('afterend', lastMockBD);
+}
 function hookMock(){
   if (!window.MOCK || window.MOCK._nr) return;
   var M = window.MOCK; M._nr = true;
   var oStart = M.start, oPick = M.pick, oQuit = M.quit;
-  M.start = function(){ mockSess = {}; mockActive = true; mockDoneFlag = false; return oStart.apply(this, arguments); };
+  M.start = function(){ mockSess = {}; mockActive = true; mockDoneFlag = false; lastMockBD = ''; return oStart.apply(this, arguments); };
   M.pick = function(i){
     try{ var qEl = document.querySelector('#v-mock .mk-q'); var m = qEl && thiMeta(qEl.textContent); if (m) mockSess[m.id] = {m:m, pick:i}; }catch(e){}
     return oPick.apply(this, arguments);
@@ -218,9 +223,19 @@ function watchMockResult(){
     if (s.m.bank){ try{ QUIZSTATE[id] = {correct:right}; if (typeof srsUpdate === 'function') srsUpdate(id, right); if (typeof save === 'function') save(); }catch(e){} }
     record({id:id, qe:it.q, qv:it.vq || '', oe:it.o, ov:[], a:it.a, ee:'', ev:(it.va || '') + (it.n ? ' ⚠️ ' + it.n : ''), cat:s.m.cat, src:'Thi thử — ' + (s.m.bank ? 'đề thật CSWIP' : s.m.cat), lesson:s.m.bank ? null : lessonFor(it.q)}, s.pick, right, {game:true});
   });
+  /* phân tích theo chương: sai ở đâu → học từ đề chương đó */
+  try{
+    var bd = {};
+    ids.forEach(function(id){ var s = mockSess[id], it = s.m.it, right = s.pick === it.a; var ci = null; if (s.m.bank){ ci = CAT2CHAP[s.m.cat]; } else { var ls = lessonFor(it.q); ci = ls ? ls[0] : null; } var key = ci != null ? ci : 'x'; bd[key] = bd[key] || {n:0, k:0}; bd[key].n++; if (right) bd[key].k++; });
+    var rows = Object.keys(bd).map(function(k){ return {k:k, n:bd[k].n, kk:bd[k].k, p:Math.round(bd[k].k / bd[k].n * 100)}; }).sort(function(a, b){ return a.p - b.p || b.n - a.n; });
+    lastMockBD = '<div class="card" id="nr-mockbd"><h3 style="margin:0 0 4px">📊 Sai ở chương nào?</h3><p class="muted" style="font-size:12.5px">Tính trên ' + ids.length + ' câu đã trả lời. Bấm "Học từ đề" để ôn đúng chương yếu, hoặc "Sổ câu sai" để xem từng câu.</p>'
+      + rows.map(function(r){ var name = r.k === 'x' ? 'Khác' : DATA.chapters[+r.k].vi; var col = r.p >= PASS ? 'var(--green)' : r.p >= 50 ? 'var(--accent)' : 'var(--red)'; return '<div class="nr-weak"><div class="nm"><div>' + esc(name) + ' <span class="muted" style="font-size:11.5px">' + r.kk + '/' + r.n + '</span></div><div class="nr-bar"><i style="width:' + r.p + '%;background:' + col + '"></i></div></div><div class="pc" style="color:' + col + '">' + r.p + '%</div>' + (r.k !== 'x' && window.hdStart ? '<button class="drill" onclick="hdStart(' + r.k + ')">📘 Học từ đề</button>' : '') + '</div>'; }).join('')
+      + '<div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn sec" onclick="go(\'wrong\')">📕 Sổ câu sai</button></div></div>';
+  }catch(e){ lastMockBD = ''; }
   mockSess = {};
   saveAll();
   if (pct != null) T((pct >= PASS ? '🎉' : '💪') + ' Thi thử ' + pct + '% — ' + ids.length + ' câu đã ghi vào nhật ký');
+  injectMockBD();
 }
 
 /* ---------- thống kê ---------- */
@@ -359,7 +374,7 @@ css.textContent = [
 '.nr-stat span{font-size:11.5px;color:var(--muted)}',
 '.nr-ready{display:flex;align-items:center;gap:14px;margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08)}',
 '.nr-ring{width:72px;height:72px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;background:conic-gradient(var(--rc) calc(var(--rp)*1%),rgba(255,255,255,.08) 0);position:relative}',
-'.nr-ring:before{content:"";position:absolute;inset:7px;border-radius:50%;background:#131a27}',
+'.nr-ring:before{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--panel)}',
 '.nr-ring span{position:relative}',
 '.nr-task{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line)}',
 '.nr-task:last-child{border-bottom:none}',
@@ -493,6 +508,7 @@ function quickHTML(){
     ['📘', 'Học từ đề thi', (window.HOCDE ? HOCDE.points.length : 700) + ' điểm kiến thức rút từ đề', "go('hocde')"],
     ['📖', 'Tài liệu thi', 'Đề Work Pack, Leading Q, Rings', "go('thi')"],
     ['🎓', 'Thi thử bấm giờ', '3 phần như thi thật', "go('mock')"],
+    ['🔧', 'Thi thực hành', 'Tiêu chí A/B/C, 13 khuyết tật', "go('thi');setTimeout(function(){if(window.TH)TH.open()},150)"],
     ['📕', 'Sổ câu sai', wrongCount() + ' câu chưa thuộc', "go('wrong')"],
     ['🧠', 'Ôn ngắt quãng', 'Spaced repetition + điểm yếu', "go('quiz')"],
     ['📚', 'Bài học 18 chương', 'Giảng giải + tóm tắt', "go('learn')"],
@@ -646,18 +662,11 @@ window.nrImport = function(inp){
   };
   rd.readAsText(f);
 };
-window.nrToggleFree = function(){ var on = localStorage.getItem('cswip_free') === '1'; localStorage.setItem('cswip_free', on ? '0' : '1'); T(on ? '🔐 Đã bật lại khóa theo thứ tự chương' : '🔓 Học tự do: mở tất cả chương'); renderAll(); };
 function profileExtraHTML(){
-  var prem = false; try{ prem = typeof isPremium === 'function' && isPremium(); }catch(e){}
-  var free = localStorage.getItem('cswip_free') === '1';
   var total = 0; for (var k in LOG) total += LOG[k].n || 0;
   var h = '<div class="card"><h3>💾 Sao lưu & khôi phục dữ liệu học</h3><p class="muted" style="font-size:13px">Toàn bộ tiến độ (chương, quiz, sổ câu sai, lịch sử thi thử, mã kích hoạt) nằm trên trình duyệt này. Tải file sao lưu trước khi đổi máy hoặc xóa dữ liệu trình duyệt.</p>'
     + '<div class="row" style="justify-content:flex-start;margin-top:10px;gap:8px"><button class="btn" onclick="nrExport()">⬇️ Tải file sao lưu</button><label class="btn sec" style="cursor:pointer">⬆️ Khôi phục từ file<input type="file" accept="application/json,.json" style="display:none" onchange="nrImport(this)"></label></div>'
     + '<p class="muted" style="font-size:12px;margin-top:8px">Đã ghi nhận ' + total + ' lượt trả lời trong ' + Object.keys(LOG).length + ' ngày học · ' + Object.keys(WRONG).length + ' câu trong sổ câu sai.</p></div>';
-  if (prem){
-    h += '<div class="card"><h3>🔓 Chế độ học tự do</h3><p class="muted" style="font-size:13px">Mặc định phải thi đậu (≥70%) chương trước mới mở chương sau. Gần ngày thi, bật học tự do để vào thẳng chương yếu.</p>'
-      + '<div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn ' + (free ? '' : 'sec') + '" onclick="nrToggleFree()">' + (free ? '🔓 Đang BẬT — mở tất cả chương' : '🔐 Đang TẮT — bấm để mở tất cả chương') + '</button></div></div>';
-  }
   h += '<div class="card"><h3>⌨️ Phím tắt (máy tính)</h3><p class="muted" style="font-size:13px;line-height:1.9"><span class="nr-kbd">1</span>–<span class="nr-kbd">4</span> hoặc <span class="nr-kbd">A</span>–<span class="nr-kbd">D</span> chọn đáp án · <span class="nr-kbd">Enter</span> / <span class="nr-kbd">→</span> câu tiếp · <span class="nr-kbd">←</span> câu trước · <span class="nr-kbd">Space</span> lật thẻ · <span class="nr-kbd">F</span> cắm cờ (thi thử)</p></div>';
   return h;
 }
@@ -746,7 +755,7 @@ window.renderAll = function(){
 };
 
 /* ---------- quan sát DOM cho Tài liệu thi / Thi thử ---------- */
-new MutationObserver(function(){ try{ hookThi(); hookMock(); watchMockResult(); rebuildBotnav(); }catch(e){} }).observe(document.body, {childList:true, subtree:true});
+new MutationObserver(function(){ try{ hookThi(); hookMock(); watchMockResult(); injectMockBD(); rebuildBotnav(); }catch(e){} }).observe(document.body, {childList:true, subtree:true});
 
 /* ---------- khởi động ---------- */
 reorderTabs(); hookMock(); rebuildBotnav();

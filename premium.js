@@ -274,7 +274,7 @@ renderProfile = function(){
     +'<p class="muted" style="font-size:13px">'+bili('Ghi tên để app chấm điểm theo bạn. Dữ liệu lưu trên máy bạn (riêng tư).','Enter your name so the app scores you. Stored privately on your device.')+'</p>'
     +'<div class="tool-grid">'
     +'<label>'+bili('Họ tên','Full name')+'<input id="u_name" value="'+_esc(u.name)+'" oninput="saveUserField(\'name\',this.value)"></label>'
-    +'<label>'+bili('SĐT (kích hoạt)','Phone (activation)')+'<input id="u_phone" value="'+_esc(u.phone)+'" oninput="saveUserField(\'phone\',this.value)"></label>'
+    +'<label>'+bili('Số điện thoại','Phone')+'<input id="u_phone" value="'+_esc(u.phone)+'" oninput="saveUserField(\'phone\',this.value)"></label>'
     +'<label>'+bili('Đơn vị','Company')+'<input id="u_org" value="'+_esc(u.org)+'" oninput="saveUserField(\'org\',this.value)"></label>'
     +'<label>Email<input id="u_email" value="'+_esc(u.email)+'" oninput="saveUserField(\'email\',this.value)"></label>'
     +'</div></div>'
@@ -290,9 +290,7 @@ renderProfile = function(){
     +'<button class="btn sec" onclick="resetProgress()">'+bili('Đặt lại tiến độ','Reset progress')+'</button>'
     +'</div></div>'
     + examResultsHTML()
-    + examHistoryHTML()
-    + premiumCardHTML()
-    + adminPanelHTML();
+    + examHistoryHTML();
 };
 
 /* ---------- wrap renderQuiz to log mock-exam scores ---------- */
@@ -373,12 +371,11 @@ function _appendExamBanner(ci, pct){
   if(pass){
     msg='<div class="card" style="border-color:rgba(52,199,89,.55);text-align:center"><div style="font-size:36px">🎉</div><h3 style="color:var(--green)">'+bili('Đậu Chương '+(ci+1)+'!','Passed Chapter '+(ci+1)+'!')+'</h3>';
     if(hasNext){
-      if(typeof isPremium==='function' && isPremium()) msg+='<p class="muted">'+bili('Đã mở Chương '+(nextI+1)+'. Học tiếp nhé!','Chapter '+(nextI+1)+' unlocked!')+'</p><button class="btn" onclick="go(\'learn\');openChap('+nextI+')">'+bili('Vào Chương ','Go to Ch ')+(nextI+1)+' →</button>';
-      else msg+='<p class="muted">'+bili('Mở khóa PRO để học tiếp Chương '+(nextI+1)+' + toàn bộ.','Unlock PRO to continue.')+'</p>'+unlockBtn();
+      msg+='<p class="muted">'+bili('Sang Chương '+(nextI+1)+' nhé!','On to Chapter '+(nextI+1)+'!')+'</p><button class="btn" onclick="go(\'learn\');openChap('+nextI+')">'+bili('Vào Chương ','Go to Ch ')+(nextI+1)+' →</button>';
     } else { msg+='<p class="muted">'+bili('Bạn đã hoàn thành chương cuối! 👏','You finished the last chapter!')+'</p>'; }
     msg+='</div>';
   } else {
-    msg='<div class="card" style="border-color:rgba(255,122,51,.5);text-align:center"><div style="font-size:36px">💪</div><h3>'+bili('Chưa đạt (cần ≥70%)','Not passed (need ≥70%)')+'</h3><p class="muted">'+bili('Ôn lại Chương '+(ci+1)+' rồi thi lại để mở chương sau.','Review and retry.')+'</p><button class="btn" onclick="examChap('+ci+')">🔁 '+bili('Thi lại','Retry')+'</button> <button class="btn sec" onclick="go(\'learn\');openChap('+ci+')">'+bili('Ôn lại chương','Review')+'</button></div>';
+    msg='<div class="card" style="border-color:rgba(255,122,51,.5);text-align:center"><div style="font-size:36px">💪</div><h3>'+bili('Chưa đạt (cần ≥70%)','Not passed (need ≥70%)')+'</h3><p class="muted">'+bili('Ôn lại Chương '+(ci+1)+' rồi thi lại cho chắc.','Review and retry.')+'</p><button class="btn" onclick="examChap('+ci+')">🔁 '+bili('Thi lại','Retry')+'</button> <button class="btn sec" onclick="go(\'learn\');openChap('+ci+')">'+bili('Ôn lại chương','Review')+'</button></div>';
   }
   el.insertAdjacentHTML('beforeend', msg);
 }
@@ -399,8 +396,8 @@ function examResultsHTML(){
   return '<div class="card"><h3>🎯 '+bili('Kết quả thi từng chương','Chapter exam results')+'</h3><p class="muted" style="font-size:12px">'+bili('Đã đậu ','Passed ')+'<b>'+chaptersPassedCount()+'/'+DATA.chapters.length+'</b> '+bili('chương (mốc 70%)','chapters (70%)')+'</p>'+rows+'</div>';
 }
 /* ===== Cổng chương: Ch1 free; Ch2+ cần PRO + đậu chương liền trước ===== */
-function chapFree(i){ if(i===0) return true; if(!isPremium()) return false; try{ if(localStorage.getItem('cswip_free')==='1') return true; }catch(e){} return chapPassed(i-1); }
-function chapLockReason(i){ if(chapFree(i)) return null; if(!isPremium()) return 'pro'; return 'exam'; }
+function chapFree(i){ return true; } /* đã bỏ khóa: mọi chương mở sẵn, thi chương chỉ để ghi điểm */
+function chapLockReason(i){ return null; }
 function unlockBtn(){ return '<div class="row" style="margin-top:10px;justify-content:flex-start"><button class="btn" onclick="go(\'profile\')">⭐ '+bili('Mở khóa ngay','Unlock now')+' — '+fmtPrice()+'</button></div>'; }
 function lockUpsellHTML(nextVi,nextEn){
   return '<div class="card" style="border-color:rgba(255,122,51,.55);text-align:center">'
@@ -418,7 +415,7 @@ renderLearn=function(){
   var el=document.getElementById('v-learn');
   if(CURCHAP===null){
     el.innerHTML='<div class="card"><h2>📚 '+bili('Chương trình học','Syllabus')+'</h2>'
-      +'<p class="muted">'+bili('Chương 1 học miễn phí. Hoàn thành rồi mở khóa toàn bộ để học tiếp.','Chapter 1 is free. Finish it, then unlock the rest.')+'</p></div>'
+      +'<p class="muted">'+bili('Mọi chương đều mở. Bấm vào chương để học; bấm "Thi chương" để ghi điểm từng chương.','All chapters are open. Tap a chapter to study; take the chapter exam to log a score.')+'</p></div>'
       +'<div class="chap-list">'+DATA.chapters.map(function(c,i){
         var free=chapFree(i), r=chapResult(i), num, sub, done='';
         if(!free){
@@ -444,7 +441,7 @@ renderLearn=function(){
     _origRenderLearnBase();
     var rows=el.querySelectorAll('.card .row'); var row=rows.length?rows[rows.length-1]:null;
     if(row){ row.innerHTML='<button class="btn '+(PROG[CURCHAP]?'sec':'')+'" onclick="toggleDone('+CURCHAP+')">'+(PROG[CURCHAP]?'✓ '+bili('Đã hoàn thành','Done'):bili('Đánh dấu hoàn thành','Mark done'))+'</button><button class="btn sec" onclick="go(\'quiz\');startChap('+CURCHAP+')">'+bili('Ôn quiz (hiện đáp án)','Practice')+'</button><button class="btn" onclick="examChap('+CURCHAP+')">📝 '+bili('Thi chương (chấm điểm)','Take exam')+'</button>'; row.style.flexWrap='wrap'; row.style.gap='8px'; }
-    var extra=(function(){ var r=chapResult(CURCHAP); if(!r) return ''; var p=r.best>=PASS_MARK; return '<div class="card" style="border-color:'+(p?'rgba(52,199,89,.5)':'rgba(255,122,51,.5)')+'"><b>'+(p?'✅ '+bili('Đã đậu chương này','Passed'):'⚠️ '+bili('Chưa đạt — thi lại để mở chương sau','Not passed yet'))+'</b><div class="muted" style="font-size:12px;margin-top:4px">'+bili('Điểm cao nhất','Best')+': '+r.best+'% · '+bili('gần nhất','last')+': '+(r.last||0)+'% · '+bili('số lần thi','attempts')+': '+(r.attempts||0)+'</div></div>'; })()
+    var extra=(function(){ var r=chapResult(CURCHAP); if(!r) return ''; var p=r.best>=PASS_MARK; return '<div class="card" style="border-color:'+(p?'rgba(52,199,89,.5)':'rgba(255,122,51,.5)')+'"><b>'+(p?'✅ '+bili('Đã đậu chương này','Passed'):'⚠️ '+bili('Chưa đạt — ôn rồi thi lại','Not passed yet'))+'</b><div class="muted" style="font-size:12px;margin-top:4px">'+bili('Điểm cao nhất','Best')+': '+r.best+'% · '+bili('gần nhất','last')+': '+(r.last||0)+'% · '+bili('số lần thi','attempts')+': '+(r.attempts||0)+'</div></div>'; })()
       +((!isPremium()&&CURCHAP===0)?'<div class="card" style="border-color:rgba(255,122,51,.55)"><h3>🎉 '+bili('Xong Chương 1! Còn 17 chương nữa','Chapter 1 done! 17 more')+'</h3><p class="muted" style="font-size:13px">'+bili('Chương 2 đang chờ — mở khóa để học tiếp toàn bộ + quiz đầy đủ + công cụ Pro.','Chapter 2 awaits — unlock to continue everything.')+'</p><div style="font-size:22px;font-weight:800;color:var(--accent)">'+fmtPrice()+'</div>'+unlockBtn()+'</div>':'');
     if(extra) el.insertAdjacentHTML('beforeend', extra);
   }
@@ -499,19 +496,19 @@ try{ maybeRegister(); }catch(e){}
   }
   var css='#ai-fab{position:fixed;right:18px;bottom:18px;z-index:150;width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#4ca8ff,#2f7fe0);color:#fff;font-size:24px;box-shadow:0 8px 24px rgba(76,168,255,.45);transition:.2s}'
    +'#ai-fab:hover{transform:scale(1.06)}'
-   +'#ai-panel{position:fixed;right:18px;bottom:84px;z-index:150;width:min(370px,92vw);max-height:72vh;display:none;flex-direction:column;background:#0e1622;border:1px solid rgba(255,255,255,.14);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.55);overflow:hidden}'
+   +'#ai-panel{position:fixed;right:18px;bottom:84px;z-index:150;width:min(370px,92vw);max-height:72vh;display:none;flex-direction:column;background:var(--panel,#0e1622);border:1px solid rgba(255,255,255,.14);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.55);overflow:hidden}'
    +'#ai-panel.on{display:flex}'
-   +'.ai-head{padding:12px 14px;background:linear-gradient(135deg,#1a2738,#101a26);font-weight:800;display:flex;justify-content:space-between;align-items:center;color:#eaeff7;font-size:15px}'
-   +'.ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;font-size:14px;color:#eaeff7;line-height:1.5}'
+   +'.ai-head{padding:12px 14px;background:var(--panel2,#1a2738);font-weight:800;display:flex;justify-content:space-between;align-items:center;color:var(--txt,#eaeff7);font-size:15px}'
+   +'.ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;font-size:14px;color:var(--txt,#eaeff7);line-height:1.5}'
    +'.ai-bot{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px}'
    +'.ai-me{align-self:flex-end;background:linear-gradient(135deg,#4ca8ff,#2f7fe0);color:#06121f;border-radius:12px;padding:8px 12px;font-weight:600;max-width:85%}'
    +'.ai-src{font-size:11px;color:#94a3bb;margin-bottom:4px}'
    +'.ai-lock{color:#ffb15a;font-size:13px;margin-top:4px}'
    +'.ai-unlock{margin-top:7px;background:linear-gradient(135deg,#ff7a33,#ff5a1f);border:none;color:#1a1206;font-weight:700;border-radius:8px;padding:6px 11px;cursor:pointer;font-size:13px}'
    +'.ai-in{display:flex;gap:6px;padding:10px;border-top:1px solid rgba(255,255,255,.1)}'
-   +'.ai-in input{flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#eaeff7;padding:9px;font-size:14px}'
+   +'.ai-in input{flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:var(--txt,#eaeff7);padding:9px;font-size:14px}'
    +'.ai-in button{background:#4ca8ff;border:none;color:#06121f;font-weight:700;border-radius:10px;padding:0 14px;cursor:pointer}'
-   +'.ai-gpt{margin:0 10px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#eaeff7;border-radius:10px;padding:9px;cursor:pointer;font-size:13px;font-weight:600}';
+   +'.ai-gpt{margin:0 10px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--txt,#eaeff7);border-radius:10px;padding:9px;cursor:pointer;font-size:13px;font-weight:600}';
   function build(){
     if(document.getElementById('ai-fab')) return;
     var st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
@@ -576,10 +573,10 @@ function admCopy(btn,c){ try{ navigator.clipboard.writeText(c); }catch(e){} var 
     var items=[['home','🏠','Tổng quan'],['learn','📚','Bài học'],['flash','🃏','Thẻ'],['quiz','📝','Quiz'],['profile','👤','Hồ sơ']];
     var css='#botnav{display:none}'
       +'@media(max-width:860px){'
-      +'#botnav{display:flex;position:fixed!important;left:0;right:0;bottom:0;top:auto!important;height:auto!important;z-index:120;background:rgba(11,15,23,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.1);border-bottom:none;overflow:visible;margin:0;padding:5px 4px;padding-bottom:calc(5px + env(safe-area-inset-bottom,0px));justify-content:space-around}'
-      +'#botnav button{flex:1;background:none;border:none;color:#94a3bb;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;padding:5px 2px;cursor:pointer;border-radius:10px;line-height:1.15}'
+      +'#botnav{display:flex;position:fixed!important;left:0;right:0;bottom:0;top:auto!important;height:auto!important;z-index:120;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.1);border-bottom:none;overflow:visible;margin:0;padding:5px 4px;padding-bottom:calc(5px + env(safe-area-inset-bottom,0px));justify-content:space-around}'
+      +'#botnav button{flex:1;background:none;border:none;color:var(--muted,#94a3bb);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;padding:5px 2px;cursor:pointer;border-radius:10px;line-height:1.15}'
       +'#botnav button .bi{font-size:20px;line-height:1}'
-      +'#botnav button.on{color:#4ca8ff}'
+      +'#botnav button.on{color:var(--accent2,#4ca8ff)}'
       +'#ai-fab{bottom:78px!important}#ai-panel{bottom:144px!important;max-height:56vh!important}'
       +'main{padding-bottom:84px!important}'
       +'}';
