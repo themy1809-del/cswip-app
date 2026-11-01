@@ -1,7 +1,7 @@
 /* ============================================================
    THEME — bảng màu dùng chung + giao diện SÁNG (body.light)
    Tông tối mặc định đã làm sáng hơn (xanh xám thay vì đen).
-   Chọn ở cuối thanh bên: 🌙 Tối / ☀️ Sáng (lưu trong máy).
+   Mặc định là giao diện SÁNG nền trắng; chọn 🌙 Tối / ☀️ Sáng ở cuối thanh bên (lưu trong máy).
    ============================================================ */
 :root{
   --bg:#131a28; --panel:#1b2435; --panel2:#253148; --line:#36456a;
@@ -11,7 +11,7 @@
   --card:#1b2435; --ink:#0f1622; --onaccent:#1a1206; --onaccent2:#06121f;
 }
 body.light{
-  --bg:#f2f5f9; --panel:#ffffff; --panel2:#eaeff6; --line:#d3dae6;
+  --bg:#ffffff; --panel:#ffffff; --panel2:#f3f5f9; --line:#dde3ec;
   --txt:#1b2434; --muted:#5f6c82; --accent:#e4621c; --accent2:#1f6fd0;
   --green:#1d9a48; --red:#d6362c; --yellow:#b7860a;
   --glass:rgba(255,255,255,.86); --glass2:rgba(255,255,255,.7);
@@ -19,10 +19,7 @@ body.light{
   color-scheme:light;
 }
 /* ---------- nền & khung ---------- */
-body.light{background:
-  radial-gradient(1100px 560px at 82% -8%, rgba(228,98,28,.08), transparent 58%),
-  radial-gradient(900px 520px at -8% 6%, rgba(31,111,208,.08), transparent 55%),
-  var(--bg)}
+body.light{background:#fff}
 body.light .sidebar,body.light header,body.light .topbar{background:var(--glass);border-color:var(--line)}
 body.light nav{background:var(--glass2);border-color:var(--line)}
 body.light #nav button,body.light nav button{background:#fff;border-color:var(--line);color:var(--muted)}
@@ -34,7 +31,7 @@ body.light .brand,body.light .topbar-title{color:var(--txt)}
 body.light .menu-btn{background:#fff;border-color:var(--line);color:var(--txt)}
 body.light .lang-toggle,body.light .theme-toggle{background:var(--panel2);border-color:var(--line)}
 body.light .lang-toggle button.on{color:#fff}
-body.light .card,body.light .chap,body.light .thi-card,body.light .mk-card{background:var(--card);border-color:var(--line);box-shadow:0 4px 18px rgba(20,30,60,.07)}
+body.light .card,body.light .chap,body.light .thi-card,body.light .mk-card{background:var(--card);border-color:var(--line);box-shadow:0 2px 12px rgba(20,30,60,.06)}
 body.light .card:hover{border-color:#c4cddc}
 body.light .chap:hover{border-color:var(--accent2);box-shadow:0 8px 22px rgba(20,30,60,.12)}
 body.light .chap .num{background:#fff3ea;border-color:#f6c9ad;color:var(--accent)}

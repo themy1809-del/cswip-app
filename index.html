@@ -14,14 +14,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="theme.css">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#131a28">
+<meta name="theme-color" content="#ffffff">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="CSWIP 3.1">
-<script>try{if(localStorage.getItem("cswip_theme")==="light")document.documentElement.classList.add("light-pre");}catch(e){}</script>
+<script>try{if(localStorage.getItem("cswip_theme")!=="dark")document.documentElement.classList.add("light-pre");}catch(e){document.documentElement.classList.add("light-pre");}</script>
 <style>
-html.light-pre{background:#f2f5f9}
+html.light-pre{background:#fff}
 /* bảng màu: xem theme.css (tông tối sáng hơn + giao diện sáng body.light) */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.55}
@@ -248,8 +248,8 @@ let USER = JSON.parse(localStorage.getItem('cswip_user')||'{}');
 let SRS = JSON.parse(localStorage.getItem('cswip_srs')||'{}');
 
 function save(){localStorage.setItem('cswip_prog',JSON.stringify(PROG));localStorage.setItem('cswip_quiz',JSON.stringify(QUIZSTATE));}
-function setTheme(t){try{localStorage.setItem('cswip_theme',t);}catch(e){}document.body.classList.toggle('light',t==='light');document.documentElement.classList.remove('light-pre');document.querySelectorAll('#theme-toggle button').forEach(function(b){b.classList.toggle('on',b.dataset.th===t);});var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='light'?'#f2f5f9':'#131a28');}
-setTheme((function(){try{return localStorage.getItem('cswip_theme')||'dark';}catch(e){return 'dark';}})());
+function setTheme(t){try{localStorage.setItem('cswip_theme',t);}catch(e){}document.body.classList.toggle('light',t==='light');document.documentElement.classList.remove('light-pre');document.querySelectorAll('#theme-toggle button').forEach(function(b){b.classList.toggle('on',b.dataset.th===t);});var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='light'?'#ffffff':'#131a28');}
+setTheme((function(){try{return localStorage.getItem('cswip_theme')||'light';}catch(e){return 'light';}})());
 function setLang(l){LANG=l;localStorage.setItem('cswip_lang',l);
   ['en','both','vi'].forEach(x=>document.getElementById('lang-'+x).classList.toggle('on',l===x));
   document.body.classList.remove('m-en','m-both','m-vi');
