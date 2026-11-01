@@ -70,7 +70,8 @@ function save(){ SV('cswip_hocde', P); }
 window.hdProgress = function(ci){ var p = P[ci]; var n = (BYCH[ci] || []).length; if (!n) return null; var k = p ? Object.keys(p.k).length : 0; return {n:n, k:k, pct:Math.round(k / n * 100)}; };
 
 /* ---------- trạng thái ---------- */
-var S = {ci:null, set:null, mode:'list', i:0, show:false, qs:null, qi:0, qa:null, right:0};
+var S = {ci:null, set:null, mode:'list', i:0, show:false, qs:null, qi:0, qa:null, right:0, dis:false};
+window.hdDis = function(){ S.dis = !S.dis; render(); };
 var SETCACHE = {};
 function setPoints(label){ if (!SETCACHE[label]) SETCACHE[label] = POINTS.filter(function(p){ return p.src === label; }).sort(function(a, b){ return a.ci - b.ci || (a.li < 0 ? 999 : a.li) - (b.li < 0 ? 999 : b.li); }); return SETCACHE[label]; }
 function cur(){ return S.set ? setPoints(S.set) : (BYCH[S.ci] || []); }
@@ -199,10 +200,11 @@ function studyView(el){
   var h = topBar() + '<div class="card">' + groupHeader(pt, S.ci, S.i === 0)
     + '<div class="hd-src">🎯 Điểm ' + (S.i + 1) + '/' + pts.length + ' · nguồn: ' + esc(pt.src) + (state === 'learned' ? ' · <span style="color:var(--green)">đã nắm</span>' : state === 'unsure' ? ' · <span style="color:var(--yellow)">chưa chắc</span>' : '') + '</div>'
     + (pt.ctx ? '<div class="hd-vq" style="margin:6px 0;padding:8px 10px;border-left:3px solid var(--line);background:rgba(255,255,255,.03);border-radius:0 8px 8px 0">↩ Câu trước đó: <i>' + esc(pt.ctx.q) + '</i> → <b style="color:var(--txt)">' + esc(pt.ctx.ans) + '</b></div>' : '')
-    + '<div class="hd-q" id="hd-q" style="margin-top:6px">Đề hỏi: ' + markQ(pt.q) + '</div>' + (pt.vq ? '<div class="hd-vq">' + esc(pt.vq) + '</div>' : '');
+    + '<div class="hd-q" id="hd-q" style="margin-top:6px">Đề hỏi: ' + markQ(pt.q) + '</div>' + (pt.vq ? '<div class="hd-vq">' + esc(pt.vq) + '</div>' : '')
+    + (S.dis && window.gbDissectHTML ? gbDissectHTML({en:pt.q, vi:pt.vq, opts:(pt.opts || [pt.ans]).map(function(o){ return {en:o}; })}, pt.li >= 0 ? DATA.chapters[pt.ci].lessons[pt.li].t_vi : DATA.chapters[pt.ci].vi) : '');
   if (pt.mcq && pt.opts) h += '<div class="hd-opts">' + pt.opts.map(function(o, k){ return '<div class="hd-opt' + (S.show && k === pt.a ? ' ok' : '') + '" style="cursor:default">' + String.fromCharCode(65 + k) + '. ' + esc(o) + (pt.optsVi && pt.optsVi[k] ? '<span class="sub">' + esc(pt.optsVi[k]) + '</span>' : '') + (S.show && k === pt.a ? ' ✓' : '') + '</div>'; }).join('') + '</div>';
   if (!S.show){
-    h += '<div class="hd-row"><button class="btn" onclick="hdShow()">🤔 Tôi đã tự trả lời → hiện đáp án</button><button class="gb-tbtn" onclick="hdSpeak(\'hd-q\')">🔊 Đọc câu hỏi</button><button class="btn ghost" onclick="hdGo(-1)" ' + (S.i === 0 ? 'disabled style="opacity:.4"' : '') + '>← Trước</button><button class="btn ghost" onclick="hdGo(1)">Bỏ qua →</button></div>';
+    h += '<div class="hd-row"><button class="btn" onclick="hdShow()">🤔 Tôi đã tự trả lời → hiện đáp án</button><button class="gb-tbtn' + (S.dis ? ' on' : '') + '" onclick="hdDis()">🔍 ' + (S.dis ? 'Ẩn mổ xẻ' : 'Mổ xẻ đề') + '</button><button class="gb-tbtn" onclick="hdSpeak(\'hd-q\')">🔊 Đọc câu hỏi</button><button class="btn ghost" onclick="hdGo(-1)" ' + (S.i === 0 ? 'disabled style="opacity:.4"' : '') + '>← Trước</button><button class="btn ghost" onclick="hdGo(1)">Bỏ qua →</button></div>';
   } else {
     h += '<div class="hd-ans"><div class="lbl">✅ Điều phải nhớ</div><div class="a" id="hd-a">' + esc(pt.ans) + (pt.ansVi ? ' <span class="muted" style="font-weight:400">— ' + esc(pt.ansVi) + '</span>' : '') + '</div>' + (pt.why ? '<div class="why">💡 ' + esc(pt.why) + '</div>' : '') + '</div>'
       + '<div class="hd-row"><button class="btn" style="background:linear-gradient(135deg,var(--green),#2a9d4a)" onclick="hdMark(true)">✅ Đã nắm</button><button class="btn sec" onclick="hdMark(false)">😕 Chưa chắc — ôn lại sau</button><button class="gb-tbtn" onclick="hdSpeak(\'hd-a\')">🔊</button>' + (pt.li >= 0 ? '<button class="gb-tbtn" onclick="go(\'learn\');openChap(' + pt.ci + ');setTimeout(function(){if(window.nrJumpLesson)nrJumpLesson(' + pt.ci + ',' + pt.li + ')},200)">📚 Mở bài học</button>' : '') + (window.gbStart ? '<button class="gb-tbtn" onclick="gbStart(' + pt.ci + ')">🎙️ Nghe giảng chương</button>' : '') + '</div>';

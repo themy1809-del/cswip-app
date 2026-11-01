@@ -282,15 +282,69 @@ function glossaryHits(text){
   return hits;
 }
 function markQ(en){ return esc(en).replace(NEG, function(m){ return '<mark>' + m + '</mark>'; }).replace(/(\d+(?:[.,]\d+)?\s?(?:%|°C|mm|MPa|J|A|V|kJ\/mm|ksi|psi|m)?)/g, '<span class="num">$1</span>'); }
+/* ---------- kiểu câu hỏi ("cách họ hỏi") ---------- */
+var PATTERNS = [
+ {re:/\b(not|except|incorrect|false|least|never)\b/i, t:'Phủ định / loại trừ ngược', vi:'Đề hỏi cái SAI hoặc cái KHÔNG thuộc nhóm. Cách làm: đọc từng phương án, gạch ✓ cho cái đúng; phương án còn lại là đáp án. Đừng chọn cái đầu tiên "nghe đúng".'},
+ {re:/reference to the (previous|above)|previous answer|referring to the previous/i, t:'Câu chuỗi (theo câu trước)', vi:'Đáp án phụ thuộc câu trước — nếu câu trước sai thì câu này cũng sai. Ôn kỹ câu gốc; trong bộ này câu chuỗi đã kèm ngữ cảnh.'},
+ {re:/\b(wps|drawing|work ?pack|certificate|wpqr|pqr no|qualification q\d)/i, t:'Đọc hồ sơ (Work Pack)', vi:'Phải mở đúng WPS / chứng chỉ / bản vẽ và tìm đúng Ô dữ liệu (phạm vi dày, Ø, tư thế, interpass, cực tính). Không trả lời bằng trí nhớ.'},
+ {re:/\b(calculate|heat input|arc energy|kj|how many (joules|mm)|what is the (minimum|maximum) (and|&))/i, t:'Tính toán', vi:'HI = U×I×60/(v mm/phút ×1000) × k (SAW 1,0 · MMA/MAG/FCAW 0,8 · TIG 0,6). Arc energy = chưa nhân k. Để ý đơn vị mm/s hay mm/min.'},
+ {re:/\b(effect|happen|result|influence|increas|decreas|higher|lower|too (high|low|fast|slow)|if the)\b/i, t:'Nhân quả biến số', vi:'Dạng "tăng X thì Y ra sao". Nhớ chuỗi: dòng↑ ngấu↑; áp↑ rộng↑ ngấu↓ (rỗ, undercut); tốc độ↑ HI↓ hẹp, cứng; tầm với↑ dòng↓; CO₂↑ ngấu↑ bắn tóe↑; interpass↑ dai↓.'},
+ {re:/\b(according to|in accordance with|bs ?\d|en ?\d|iso ?\d|aws ?a?\d|asme)\b/i, t:'Tra tiêu chuẩn / con số', vi:'Đáp án là con số hoặc quy định cụ thể — không suy luận, phải thuộc (bảng 🔢 Phải thuộc). Chú ý tiêu chuẩn nào: ISO 9606 thợ, ISO 15614 quy trình, ISO 5817 mức, ISO 6520 tên.'},
+ {re:/\b(term|called|another name|known as|defined as|definition|means?)\b/i, t:'Thuật ngữ / định nghĩa', vi:'Nhận diện từ chuẩn ISO: excess weld metal (không phải reinforcement), lack of fusion ≠ lack of penetration, suck-back = root concavity, hot shortness = solidification cracking.'},
+ {re:/\b(cause|caused|due to|reason|why|because)\b/i, t:'Nguyên nhân / cơ chế', vi:'Hỏi "do đâu". Trả lời bằng cơ chế đã học: khuyết tật ↔ nguyên nhân (H → nứt nguội; S → nứt nóng; ẩm → rỗ; dòng thấp → LOF; dòng cao → undercut).'},
+ {re:/\b(detect|detected|ndt|radiograph|ultrason|penetrant|magnetic|inspection method)\b/i, t:'Chọn phương pháp kiểm tra', vi:'3 câu lọc: hở bề mặt hay bên trong? vật liệu từ tính không? khuyết tật phẳng (UT) hay khối (RT)? MT chỉ thép từ tính; PT mọi vật liệu không xốp.'},
+ {re:/\b(qualif|approval|essential variable|re-?qualif|range of)\b/i, t:'Qualify quy trình / thợ', vi:'Phân biệt WPS (hướng dẫn) – PQR (bản ghi) – WPQ (thợ). Đổi biến số thiết yếu → qualify lại. Phạm vi dày/Ø/tư thế tra cột "Range of qualification".'},
+ {re:/\b(most|best|main|primary|most likely|most suitable|first|prime)\b/i, t:'Chọn phương án TỐT NHẤT', vi:'Nhiều phương án đúng một phần — chọn cái đúng nhất/trực tiếp nhất theo giáo trình TWI, không chọn cái "cũng có lý".'},
+ {re:/\b(which of the following|would you|should|what would)\b/i, t:'Tình huống thanh tra', vi:'Đặt mình vào vai thanh tra: báo cáo – không tự quyết – theo spec. Phương án "làm ngay/tự sửa/cho qua" thường sai; "dừng, báo cáo, đối chiếu tiêu chuẩn" thường đúng.'}
+];
+function questionPatterns(q){ var out = []; PATTERNS.forEach(function(p){ if (p.re.test(q.en || '')) out.push(p); }); return out.slice(0, 3); }
+/* ---------- thống kê nhận biết đáp án — tính từ chính bộ đề ---------- */
+var CUES = null;
+function cueStats(){
+  if (CUES) return CUES; var P = (window.HOCDE && HOCDE.points) || []; var st = {n:0, aota:[0, 0], longest:[0, 0], shortest:[0, 0], abs:[0, 0], echo:[0, 0], both:[0, 0], none:[0, 0]};
+  P.forEach(function(p){ if (!p.mcq || !p.opts) return; st.n++; var qw = words(p.q); var L = p.opts.map(function(o){ return String(o).length; }); var li = L.indexOf(Math.max.apply(null, L)), si = L.indexOf(Math.min.apply(null, L));
+    p.opts.forEach(function(o, k){ var s = String(o).toLowerCase(); var right = k === p.a;
+      if (/^all of the above|^all options|^all of these/.test(s)){ st.aota[1]++; if (right) st.aota[0]++; }
+      if (/^none of the above/.test(s)){ st.none[1]++; if (right) st.none[0]++; }
+      if (/^both /.test(s)){ st.both[1]++; if (right) st.both[0]++; }
+      if (/\b(always|never|only|all |every|impossible)\b/.test(s) && !/^all of the above|^all options/.test(s)){ st.abs[1]++; if (right) st.abs[0]++; }
+      if (overlap(words(s), qw) >= 1){ st.echo[1]++; if (right) st.echo[0]++; }
+    });
+    if (p.opts.length > 2){ st.longest[1]++; if (li === p.a) st.longest[0]++; st.shortest[1]++; if (si === p.a) st.shortest[0]++; }
+  });
+  CUES = st; return st;
+}
+function pct(a){ return a[1] ? Math.round(a[0] / a[1] * 100) + '% (' + a[0] + '/' + a[1] + ')' : '—'; }
+function answerCues(q){
+  var st = cueStats(), opts = (q.opts || []).map(function(o){ return String(o.en || ''); }); if (opts.length < 2) return [];
+  var cues = [], qw = words(q.en);
+  opts.forEach(function(o, k){ var s = o.toLowerCase(), L = String.fromCharCode(65 + k);
+    if (/^all of the above|^all options|^all of these/.test(s)) cues.push('<b>' + L + ' "All of the above"</b>: trong bộ đề này phương án kiểu này đúng <b>' + pct(st.aota) + '</b> số lần xuất hiện → nếu ≥3 phương án đều có lý, chọn nó.');
+    if (/^none of the above/.test(s)) cues.push('<b>' + L + ' "None of the above"</b>: đúng ' + pct(st.none) + ' số lần xuất hiện — chỉ chọn khi loại được hết các phương án kia (vd. câu "tiêu chuẩn VT của Anh").');
+    if (/^both /.test(s)) cues.push('<b>' + L + ' "Both…"</b>: đúng ' + pct(st.both) + ' số lần xuất hiện — kiểm tra xem hai ý được ghép có thật sự đều đúng.');
+    if (/\b(always|never|impossible)\b/.test(s) && !/^all of the above/.test(s)) cues.push('<b>' + L + '</b> có từ tuyệt đối (always/never): phương án tuyệt đối đúng chỉ ' + pct(st.abs) + ' — thường là mồi nhử.');
+  });
+  var L = opts.map(function(o){ return o.length; }); var li = L.indexOf(Math.max.apply(null, L));
+  if (opts.length > 2 && L[li] >= 1.6 * (L.reduce(function(a, b){ return a + b; }, 0) / L.length)) cues.push('<b>' + String.fromCharCode(65 + li) + '</b> dài hơn hẳn: phương án dài nhất đúng ' + pct(st.longest) + ' — gợi ý yếu, chỉ dùng khi đã loại được 2 phương án.');
+  var echoes = []; opts.forEach(function(o, k){ var ov = overlap(words(o), qw); if (ov >= 2) echoes.push(String.fromCharCode(65 + k)); });
+  if (echoes.length === 1) cues.push('<b>' + echoes[0] + '</b> lặp lại từ khóa của câu hỏi: phương án lặp từ khóa đúng ' + pct(st.echo) + ' — đáng đọc kỹ trước.');
+  var pairs = [[/\bincreas|higher|more|deeper|faster|wider/, /\bdecreas|lower|less|shallow|slower|narrow/], [/\bdc ?\+|positive|dcep/, /\bdc ?-|negative|dcen/], [/\byes\b/, /\bno\b/]];
+  pairs.forEach(function(pr){ var a = -1, b = -1; opts.forEach(function(o, k){ var s = o.toLowerCase(); if (a < 0 && pr[0].test(s)) a = k; else if (b < 0 && pr[1].test(s)) b = k; }); if (a >= 0 && b >= 0) cues.push('<b>' + String.fromCharCode(65 + a) + '</b> và <b>' + String.fromCharCode(65 + b) + '</b> đối nghịch nhau → đáp án hầu như nằm trong cặp này; quyết bằng cơ chế (tăng cái gì → hệ quả gì).'); });
+  var nums = opts.filter(function(o){ return /\d/.test(o); }).length; if (nums >= 3) cues.push('Các phương án là <b>con số</b> → không suy luận được, phải thuộc bảng 🔢; nếu quên, loại hai số cực đoan rồi chọn theo trí nhớ gần nhất.');
+  return cues.slice(0, 4);
+}
 function dissectHTML(q, hint){
   var negs = []; var m; var re = new RegExp(NEG.source, 'gi'); while ((m = re.exec(q.en || '')) !== null) negs.push(m[1].toUpperCase());
   var hits = glossaryHits((q.en || '') + ' ' + (q.opts || []).map(function(o){ return o.en; }).join(' '));
+  var pats = questionPatterns(q), cues = answerCues(q);
   var h = '<div class="gb-dis">🔍 <b>Mổ xẻ đề</b>';
   if (hint) h += ' — đề đang hỏi về: <b>' + esc(hint) + '</b>';
-  if (negs.length) h += '<div>⚠️ Từ quyết định nghĩa câu: <b>' + negs.map(esc).join(', ') + '</b> — đọc lại câu với từ này, nhiều người chọn ngược chỉ vì bỏ qua nó.</div>';
-  if (q.vi) h += '<div>🇻🇳 Dịch: ' + esc(q.vi) + '</div>';
-  if (hits.length) h += '<div style="margin-top:4px">📖 Từ khó: ' + hits.map(function(x){ return '<span class="gb-chip"><b>' + esc(x[0]) + '</b> = ' + esc(x[1]) + '</span>'; }).join('') + '</div>';
-  h += '<div class="gb-mini" style="margin-top:6px">Cách làm: gạch chân từ khóa → tự trả lời trước khi nhìn đáp án → loại 2 đáp án sai rõ → chọn giữa 2 còn lại theo "cơ chế" đã học.</div></div>';
+  if (pats.length) h += '<div style="margin-top:6px">🗣️ <b>Cách họ hỏi:</b> ' + pats.map(function(p){ return '<span class="gb-chip" style="background:rgba(255,122,51,.12);border-color:rgba(255,122,51,.4)"><b style="color:var(--accent)">' + p.t + '</b></span>'; }).join(' ') + pats.map(function(p){ return '<div style="margin-top:4px;font-size:13px">• <b>' + p.t + ':</b> ' + p.vi + '</div>'; }).join('') + '</div>';
+  if (negs.length) h += '<div style="margin-top:6px">⚠️ Từ quyết định nghĩa câu: <b>' + negs.map(esc).join(', ') + '</b> — đọc lại câu với từ này, nhiều người chọn ngược chỉ vì bỏ qua nó.</div>';
+  if (q.vi) h += '<div style="margin-top:6px">🇻🇳 Dịch: ' + esc(q.vi) + '</div>';
+  if (hits.length) h += '<div style="margin-top:6px">📖 Từ khó: ' + hits.map(function(x){ return '<span class="gb-chip"><b>' + esc(x[0]) + '</b> = ' + esc(x[1]) + '</span>'; }).join('') + '</div>';
+  if (cues.length) h += '<div style="margin-top:8px">🎯 <b>Cách nhận biết đáp án</b> <span class="gb-mini">(thống kê trên ' + cueStats().n + ' câu trắc nghiệm của bộ đề)</span>' + cues.map(function(c){ return '<div style="margin-top:4px;font-size:13px">• ' + c + '</div>'; }).join('') + '</div>';
+  h += '<div class="gb-mini" style="margin-top:8px">Thứ tự làm: gạch từ khóa → tự trả lời trước khi nhìn đáp án → loại 2 phương án sai rõ → quyết giữa 2 còn lại bằng cơ chế đã học, không bằng cảm giác.</div></div>';
   return h;
 }
 
@@ -463,6 +517,7 @@ function render(){
   if (TTS && speakId){ var sp = document.getElementById(speakId); if (sp) speak(sp.textContent, 'vi-VN', (AUTO && autoNext) ? function(){ if (AUTO) autoNext(); } : null); else if (AUTO && autoNext) autoNext(); }
 }
 window.gbKeysRefresh = function(){ setTimeout(render, 30); };
+window.gbDissectHTML = dissectHTML;
 window.renderTeach = render;
 
 /* ---------- tab Bài học: nút "Nghe giảng" + hình minh họa dưới mỗi ý Giảng giải ---------- */

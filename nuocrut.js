@@ -39,9 +39,10 @@ var LOG   = LS('cswip_log', {});     // ngày -> {n,k,thi,mock:[],wr}
 var WRONG = LS('cswip_wrong', {});   // id -> câu sai
 var CAT   = LS('cswip_cat', {});     // chủ đề -> {n,k}
 var SEEN  = LS('cswip_seen', {});    // id -> 1
+var MAST  = LS('cswip_mast', {});    // id -> {s:chuỗi đúng liên tiếp, n, k, last}  "tự trả lời được" = s >= 2
 var TASKS = LS('cswip_tasks', {});   // ngày -> {taskId:true}
 var UND   = LS('cswip_und', {});     // chương -> {keyIndex:true}  "tôi giải thích được ý này"
-function saveAll(){ SV('cswip_log', LOG); SV('cswip_wrong', WRONG); SV('cswip_cat', CAT); SV('cswip_seen', SEEN); SV('cswip_und', UND); }
+function saveAll(){ SV('cswip_log', LOG); SV('cswip_wrong', WRONG); SV('cswip_cat', CAT); SV('cswip_seen', SEEN); SV('cswip_und', UND); SV('cswip_mast', MAST); }
 
 /* ---------- HIỂU BÀI: checklist "tôi giải thích được" theo điểm cần nhớ của chương ---------- */
 function undItems(ci){ var c = DATA.chapters[ci]; if (!c) return []; var a = (c.key && c.key.length) ? c.key.map(function(k){ return k.vi; }) : (c.deep || []).map(function(b){ return b.h_vi; }); return a.slice(0, 12); }
@@ -128,6 +129,7 @@ function record(item, pick, right, opts){
   if (opts.thi) L.thi++;
   if (opts.wr) L.wr++;
   if (item.id) SEEN[item.id] = 1;
+  if (item.id){ var ms = MAST[item.id] || {s:0, n:0, k:0}; ms.n++; if (right){ ms.k++; ms.s = (ms.s || 0) + 1; } else ms.s = 0; ms.last = Date.now(); MAST[item.id] = ms; }
   var c = item.cat || '?'; CAT[c] = CAT[c] || {n:0, k:0}; CAT[c].n++; if (right) CAT[c].k++;
   if (item.id){
     var w = WRONG[item.id];
@@ -145,6 +147,21 @@ function record(item, pick, right, opts){
   if (opts.game && typeof gameTick === 'function'){ try{ gameTick(right); }catch(e){} }
   saveAll();
   try{ if (window.cloudSync) window.cloudSync(); }catch(e){}
+}
+function mastStreak(id){ var m = MAST[id]; return m ? (m.s || 0) : 0; }
+function mcqOfChapter(ci){ return ((window.HOCDE && HOCDE.byChapter[ci]) || []).filter(function(p){ return p.mcq && p.opts && p.opts.length > 1; }); }
+function mastTotals(){ var tot = 0, m = 0, one = 0, per = []; DATA.chapters.forEach(function(c, ci){ var pts = mcqOfChapter(ci), mm = 0, o1 = 0; pts.forEach(function(p){ var st = mastStreak(p.id); if (st >= 2) mm++; else if (st === 1) o1++; }); tot += pts.length; m += mm; one += o1; per.push({ci:ci, n:pts.length, m:mm, one:o1}); }); return {tot:tot, m:m, one:one, per:per}; }
+function masteryHTML(){
+  if (!window.HOCDE) return '';
+  var M = mastTotals(); if (!M.tot) return '';
+  var pc = Math.round(M.m / M.tot * 100);
+  var per = M.per.filter(function(x){ return x.n; }).sort(function(a, b){ return (b.n - b.m) - (a.n - a.m); });
+  var worst = per[0];
+  var h = '<div class="card" style="border-left:3px solid var(--green)"><div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px"><div><h3 style="margin:0">🎯 Mục tiêu cuối: tự trả lời hết ' + M.tot + ' câu đề</h3><div class="muted" style="font-size:12.5px;margin-top:3px">Một câu tính là "tự trả lời được" khi bạn chọn đúng <b>2 lần liên tiếp</b> (ở bất kỳ chế độ nào). Sai là đếm lại từ đầu.</div></div><div style="text-align:right"><div style="font-size:26px;font-weight:800;color:' + (pc >= 100 ? 'var(--green)' : 'var(--accent2)') + '">' + M.m + '<small style="font-size:13px;color:var(--muted)">/' + M.tot + '</small></div><div class="muted" style="font-size:11.5px">' + pc + '% · ' + M.one + ' câu đúng 1 lần, chờ chốt</div></div></div>'
+    + '<div class="nr-bar" style="height:10px;margin:8px 0 10px"><i style="width:' + pc + '%;background:linear-gradient(90deg,var(--accent2),var(--green))"></i></div>'
+    + per.slice(0, 6).map(function(x){ var p = Math.round(x.m / x.n * 100); return '<div class="nr-weak" style="cursor:pointer" onclick="chStart(' + x.ci + ',4)"><div class="nm"><div>' + esc(DATA.chapters[x.ci].vi) + ' <span class="muted" style="font-size:12px">· còn ' + (x.n - x.m) + ' câu</span></div><div class="nr-bar"><i style="width:' + p + '%;background:' + (p >= 100 ? 'var(--green)' : 'var(--accent2)') + '"></i></div></div><div class="pc" style="color:' + (p >= 100 ? 'var(--green)' : 'var(--accent2)') + '">' + x.m + '/' + x.n + '</div></div>'; }).join('')
+    + '<div class="row" style="justify-content:flex-start;margin-top:10px;gap:8px">' + (worst && worst.n > worst.m ? '<button class="btn" onclick="chStart(' + worst.ci + ',4)">▶ Luyện câu chưa trả lời được: ' + esc(DATA.chapters[worst.ci].vi) + '</button>' : '<b style="color:var(--green)">🎉 Bạn đã tự trả lời được toàn bộ câu đề!</b>') + '<button class="btn sec" onclick="go(\'chuong\')">📗 Xem theo chương</button></div></div>';
+  return h;
 }
 function wrongList(includeCleared){ var a = []; for (var id in WRONG){ var w = WRONG[id]; if (!w || !w.q) continue; if (!includeCleared && w.cleared) continue; w.id = id; a.push(w); } a.sort(function(x, y){ return (y.n - y.ok) - (x.n - x.ok) || (y.last || 0) - (x.last || 0); }); return a; }
 function wrongCount(){ return wrongList(false).length; }
@@ -313,7 +330,7 @@ function todayTasks(){
   if (ph.id === 'base' || ph.id === 'drill' || ph.id === 'mock' || ph.id === 'final'){
     var ci = chapOfDay(days), ch = DATA.chapters[ci], up = undPct(ci);
     var gp = (window.gbProgress ? gbProgress(ci) : null);
-    add('chap', '🎙️ Nghe giảng chương "' + (ch ? ch.vi : '') + '" (thầy dẫn từng ý: đoán → giảng → hỏi lại)' + (gp && !gp.done ? ' — đang ' + gp.pct + '%' : '') + (up != null ? ' · hiểu bài ' + up + '%' : ''), (window.gbStart ? "gbStart(" + ci + ")" : "go('learn');openChap(" + ci + ")"), (gp && gp.done) || (up != null && up >= 80));
+    add('chap', '📗 Học gọn chương "' + (ch ? ch.vi : '') + '" — đi 8 bước: nghe giảng → mổ xẻ mục → mổ xẻ câu → tự trả lời hết → thi chương' + (gp && !gp.done ? ' (giảng ' + gp.pct + '%)' : ''), (window.chStart ? "chStart(" + ci + ")" : (window.gbStart ? "gbStart(" + ci + ")" : "go('learn');openChap(" + ci + ")")), (gp && gp.done) || (up != null && up >= 80));
   }
   if ((ph.id === 'drill' || ph.id === 'mock') && window.hdProgress){
     var hci = chapOfDay(days), hp = hdProgress(hci);
@@ -338,6 +355,7 @@ function todayTasks(){
 /* chương của ngày: lần lượt theo độ ưu tiên thi; 3 tuần cuối ưu tiên chương hiểu kém nhất */
 function anchor(){ var a = LS('cswip_plan_anchor', null); if (a == null){ a = daysLeft(); SV('cswip_plan_anchor', a); } return a; }
 function chapOfDay(days){
+  try{ if (window.chCurrent && chCurrent() != null) return chCurrent(); }catch(e){}
   var idx = anchor() - days;                                   // ngày đầu dùng app = chương ưu tiên số 1 (Khuyết tật)
   if (idx >= 0 && idx < CHAP_ORDER.length && days > 7) return CHAP_ORDER[idx];
   if (days <= 21 || idx >= CHAP_ORDER.length){
@@ -456,6 +474,7 @@ function heroHTML(){
     + '<div class="nr-stat"><b style="color:' + (avg == null ? 'var(--muted)' : avg >= PASS ? 'var(--green)' : 'var(--accent)') + '">' + (avg == null ? '—' : avg + '%') + '</b><span>TB 3 đề thi thử gần nhất · cao nhất ' + (best || '—') + (best ? '%' : '') + '</span></div>'
     + '<div class="nr-stat"><b style="color:var(--accent2)">' + wrongCount() + '</b><span>Câu sai chưa thuộc</span></div>'
     + '<div class="nr-stat"><b style="color:' + (undAvg() >= 80 ? 'var(--green)' : 'var(--txt)') + '">' + undAvg() + '%</b><span>Hiểu bài (tự đánh giá 18 chương)</span></div>'
+    + (function(){ if (!window.HOCDE) return ''; var M = mastTotals(); return '<div class="nr-stat"><b style="color:' + (M.m >= M.tot ? 'var(--green)' : 'var(--accent2)') + '">' + M.m + '<small style="font-size:13px;color:var(--muted)">/' + M.tot + '</small></b><span>Câu đề tự trả lời được (đúng 2 lần liên tiếp)</span></div>'; })()
     + '</div>'
     + (R ? '<div class="nr-ready"><div class="nr-ring" style="--rp:' + R.score + ';--rc:' + R.col + '"><span style="color:' + R.col + '">' + R.score + '</span></div>'
         + '<div style="flex:1"><b style="color:' + R.col + ';font-size:15px">Mức sẵn sàng: ' + R.lbl + '</b>'
@@ -504,6 +523,7 @@ function heatHTML(weeks){
 }
 function quickHTML(){
   var items = [
+    ['📗', 'Học gọn chương', 'Một chương, 7 bước, không lan man', "go('chuong')"],
     ['🎙️', 'Giảng bài từng bước', 'Thầy ảo dẫn 18 chương', "go('teach')"],
     ['📘', 'Học từ đề thi', (window.HOCDE ? HOCDE.points.length : 700) + ' điểm kiến thức rút từ đề', "go('hocde')"],
     ['📖', 'Tài liệu thi', 'Đề Work Pack, Leading Q, Rings', "go('thi')"],
@@ -535,8 +555,10 @@ function renderHomeNR(){
   var el = document.getElementById('v-home'); if (!el) return;
   var u = {}; try{ u = JSON.parse(localStorage.getItem('cswip_user') || '{}'); }catch(e){}
   var hi = u.name ? 'Chào <b>' + esc(u.name) + '</b> 👋' : 'Chào bạn 👋';
+  var curCh = (window.chCurrent && chCurrent() != null) ? chCurrent() : null;
+  var curBanner = curCh != null ? '<div class="card" style="border-left:3px solid var(--accent2);display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="font-size:26px">📗</div><div style="flex:1;min-width:200px"><b>Đang học gọn chương ' + (curCh + 1) + ': ' + esc(DATA.chapters[curCh].vi) + '</b><div class="muted" style="font-size:12.5px;margin-top:2px">Học hết chương này rồi mới sang chương khác — không lan man.</div></div><button class="btn" onclick="chStart(' + curCh + ')">▶ Tiếp tục</button></div>' : '';
   el.innerHTML = '<p class="muted" style="margin:-6px 0 10px;font-size:13.5px">' + hi + ' — ' + (daysLeft() > 0 ? 'bám lộ trình, mỗi ngày một ít, đến ngày thi là đủ.' : 'chúc bạn thi tốt!') + '</p>'
-    + heroHTML() + tasksHTML() + weakHTML() + quickHTML() + trendHTML() + heatHTML(10) + howHTML();
+    + heroHTML() + curBanner + masteryHTML() + tasksHTML() + weakHTML() + quickHTML() + trendHTML() + heatHTML(10) + howHTML();
 }
 
 /* ---------- LỘ TRÌNH ĐỘNG ---------- */
@@ -702,8 +724,8 @@ window.addEventListener('error', function(e){
 /* ---------- đăng ký tab, menu, thanh dưới ---------- */
 function ensureView(id){ if (document.getElementById('v-' + id)) return; var main = document.querySelector('main'); if (!main) return; var d = document.createElement('div'); d.id = 'v-' + id; d.className = 'view'; main.appendChild(d); }
 ensureView('wrong');
-var LABELS = {home:'🏠 Tổng quan', teach:'🎙️ Giảng bài', hocde:'📘 Học từ đề', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
-var ORDER = ['home', 'teach', 'hocde', 'thi', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
+var LABELS = {home:'🏠 Tổng quan', chuong:'📗 Học gọn chương', teach:'🎙️ Giảng bài', hocde:'📘 Học từ đề', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
+var ORDER = ['home', 'chuong', 'teach', 'hocde', 'thi', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
 function reorderTabs(){
   if (typeof TABS === 'undefined') return;
   var have = {}; TABS.forEach(function(t){ have[t[0]] = t[1]; });
@@ -716,7 +738,7 @@ function reorderTabs(){
 }
 function rebuildBotnav(){
   var bar = document.getElementById('botnav'); if (!bar || bar._nr) return; bar._nr = true;
-  var items = [['home', '🏠', 'Tổng quan'], ['teach', '🎙️', 'Giảng bài'], ['thi', '📖', 'Tài liệu'], ['mock', '🎓', 'Thi thử'], ['menu', '☰', 'Thêm']];
+  var items = [['home', '🏠', 'Tổng quan'], ['chuong', '📗', 'Chương'], ['thi', '📖', 'Tài liệu'], ['mock', '🎓', 'Thi thử'], ['menu', '☰', 'Thêm']];
   bar.innerHTML = items.map(function(it){ return '<button data-bt="' + it[0] + '"><span class="bi">' + it[1] + '</span>' + it[2] + '</button>'; }).join('');
   bar.querySelectorAll('button').forEach(function(b){ b.onclick = function(){ var t = b.getAttribute('data-bt'); if (t === 'menu'){ document.body.classList.toggle('nav-open'); return; } try{ go(t); }catch(e){} }; });
   syncBot();
@@ -760,5 +782,5 @@ new MutationObserver(function(){ try{ hookThi(); hookMock(); watchMockResult(); 
 /* ---------- khởi động ---------- */
 reorderTabs(); hookMock(); rebuildBotnav();
 try{ renderAll(); }catch(e){}
-window.NR = {log:LOG, wrong:WRONG, cat:CAT, record:record, daysLeft:daysLeft, readiness:readiness, weakTopics:weakTopics, tasks:todayTasks};
+window.NR = {log:LOG, wrong:WRONG, cat:CAT, mast:MAST, mastStreak:mastStreak, mastTotals:mastTotals, record:record, daysLeft:daysLeft, readiness:readiness, weakTopics:weakTopics, tasks:todayTasks};
 })();
