@@ -313,7 +313,7 @@ function todayTasks(){
   if (ph.id === 'base' || ph.id === 'drill' || ph.id === 'mock' || ph.id === 'final'){
     var ci = chapOfDay(days), ch = DATA.chapters[ci], up = undPct(ci);
     var gp = (window.gbProgress ? gbProgress(ci) : null);
-    add('chap', '🎙️ Nghe giảng chương "' + (ch ? ch.vi : '') + '" (thầy dẫn từng ý: đoán → giảng → hỏi lại)' + (gp && !gp.done ? ' — đang ' + gp.pct + '%' : '') + (up != null ? ' · hiểu bài ' + up + '%' : ''), (window.gbStart ? "gbStart(" + ci + ")" : "go('learn');openChap(" + ci + ")"), (gp && gp.done) || (up != null && up >= 80));
+    add('chap', '📗 Học gọn chương "' + (ch ? ch.vi : '') + '" — đi 7 bước: nghe giảng → mổ xẻ mục → mổ xẻ câu → thi chương' + (gp && !gp.done ? ' (giảng ' + gp.pct + '%)' : ''), (window.chStart ? "chStart(" + ci + ")" : (window.gbStart ? "gbStart(" + ci + ")" : "go('learn');openChap(" + ci + ")")), (gp && gp.done) || (up != null && up >= 80));
   }
   if ((ph.id === 'drill' || ph.id === 'mock') && window.hdProgress){
     var hci = chapOfDay(days), hp = hdProgress(hci);
@@ -338,6 +338,7 @@ function todayTasks(){
 /* chương của ngày: lần lượt theo độ ưu tiên thi; 3 tuần cuối ưu tiên chương hiểu kém nhất */
 function anchor(){ var a = LS('cswip_plan_anchor', null); if (a == null){ a = daysLeft(); SV('cswip_plan_anchor', a); } return a; }
 function chapOfDay(days){
+  try{ if (window.chCurrent && chCurrent() != null) return chCurrent(); }catch(e){}
   var idx = anchor() - days;                                   // ngày đầu dùng app = chương ưu tiên số 1 (Khuyết tật)
   if (idx >= 0 && idx < CHAP_ORDER.length && days > 7) return CHAP_ORDER[idx];
   if (days <= 21 || idx >= CHAP_ORDER.length){
@@ -504,6 +505,7 @@ function heatHTML(weeks){
 }
 function quickHTML(){
   var items = [
+    ['📗', 'Học gọn chương', 'Một chương, 7 bước, không lan man', "go('chuong')"],
     ['🎙️', 'Giảng bài từng bước', 'Thầy ảo dẫn 18 chương', "go('teach')"],
     ['📘', 'Học từ đề thi', (window.HOCDE ? HOCDE.points.length : 700) + ' điểm kiến thức rút từ đề', "go('hocde')"],
     ['📖', 'Tài liệu thi', 'Đề Work Pack, Leading Q, Rings', "go('thi')"],
@@ -535,8 +537,10 @@ function renderHomeNR(){
   var el = document.getElementById('v-home'); if (!el) return;
   var u = {}; try{ u = JSON.parse(localStorage.getItem('cswip_user') || '{}'); }catch(e){}
   var hi = u.name ? 'Chào <b>' + esc(u.name) + '</b> 👋' : 'Chào bạn 👋';
+  var curCh = (window.chCurrent && chCurrent() != null) ? chCurrent() : null;
+  var curBanner = curCh != null ? '<div class="card" style="border-left:3px solid var(--accent2);display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="font-size:26px">📗</div><div style="flex:1;min-width:200px"><b>Đang học gọn chương ' + (curCh + 1) + ': ' + esc(DATA.chapters[curCh].vi) + '</b><div class="muted" style="font-size:12.5px;margin-top:2px">Học hết chương này rồi mới sang chương khác — không lan man.</div></div><button class="btn" onclick="chStart(' + curCh + ')">▶ Tiếp tục</button></div>' : '';
   el.innerHTML = '<p class="muted" style="margin:-6px 0 10px;font-size:13.5px">' + hi + ' — ' + (daysLeft() > 0 ? 'bám lộ trình, mỗi ngày một ít, đến ngày thi là đủ.' : 'chúc bạn thi tốt!') + '</p>'
-    + heroHTML() + tasksHTML() + weakHTML() + quickHTML() + trendHTML() + heatHTML(10) + howHTML();
+    + heroHTML() + curBanner + tasksHTML() + weakHTML() + quickHTML() + trendHTML() + heatHTML(10) + howHTML();
 }
 
 /* ---------- LỘ TRÌNH ĐỘNG ---------- */
@@ -702,8 +706,8 @@ window.addEventListener('error', function(e){
 /* ---------- đăng ký tab, menu, thanh dưới ---------- */
 function ensureView(id){ if (document.getElementById('v-' + id)) return; var main = document.querySelector('main'); if (!main) return; var d = document.createElement('div'); d.id = 'v-' + id; d.className = 'view'; main.appendChild(d); }
 ensureView('wrong');
-var LABELS = {home:'🏠 Tổng quan', teach:'🎙️ Giảng bài', hocde:'📘 Học từ đề', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
-var ORDER = ['home', 'teach', 'hocde', 'thi', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
+var LABELS = {home:'🏠 Tổng quan', chuong:'📗 Học gọn chương', teach:'🎙️ Giảng bài', hocde:'📘 Học từ đề', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
+var ORDER = ['home', 'chuong', 'teach', 'hocde', 'thi', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
 function reorderTabs(){
   if (typeof TABS === 'undefined') return;
   var have = {}; TABS.forEach(function(t){ have[t[0]] = t[1]; });
@@ -716,7 +720,7 @@ function reorderTabs(){
 }
 function rebuildBotnav(){
   var bar = document.getElementById('botnav'); if (!bar || bar._nr) return; bar._nr = true;
-  var items = [['home', '🏠', 'Tổng quan'], ['teach', '🎙️', 'Giảng bài'], ['thi', '📖', 'Tài liệu'], ['mock', '🎓', 'Thi thử'], ['menu', '☰', 'Thêm']];
+  var items = [['home', '🏠', 'Tổng quan'], ['chuong', '📗', 'Chương'], ['thi', '📖', 'Tài liệu'], ['mock', '🎓', 'Thi thử'], ['menu', '☰', 'Thêm']];
   bar.innerHTML = items.map(function(it){ return '<button data-bt="' + it[0] + '"><span class="bi">' + it[1] + '</span>' + it[2] + '</button>'; }).join('');
   bar.querySelectorAll('button').forEach(function(b){ b.onclick = function(){ var t = b.getAttribute('data-bt'); if (t === 'menu'){ document.body.classList.toggle('nav-open'); return; } try{ go(t); }catch(e){} }; });
   syncBot();
