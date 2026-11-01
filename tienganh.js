@@ -16,8 +16,8 @@ function strip(h){ return String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/
 function norm(s){ return ' ' + String(s || '').toLowerCase().replace(/[^a-z0-9\- ]/g, ' ').replace(/\s+/g, ' ') + ' '; }
 function T(m){ try{ if (typeof toast === 'function') toast(m); }catch(e){} }
 var G = window.GLOSSARY || {};
-var KEYS = Object.keys(G).filter(function(k){ return k.length >= 3 && !SKIP[k]; }).sort(function(a, b){ return b.length - a.length; });
 var SKIP = {'which of the following':1, 'all of the above':1, 'none of the above':1, 'both':1, 'most likely':1, 'in accordance with':1, 'with reference to':1, 'refer to':1, 'according to':1, 'following':1, 'statement':1, 'true':1, 'false':1, 'correct':1, 'incorrect':1};
+var KEYS = Object.keys(G).filter(function(k){ return k.length >= 3 && !SKIP[k]; }).sort(function(a, b){ return b.length - a.length; });
 var GENERIC = {standard:1, code:1, procedure:1, inspection:1, inspector:1, weld:1, welding:1, metal:1, material:1, joint:1, test:1, testing:1, report:1, defect:1, process:1, quality:1, check:1, record:1, specification:1, equipment:1, temperature:1, steel:1, surface:1, size:1, length:1, width:1, depth:1, thickness:1, position:1, type:1, method:1};
 var CACHE = {};
 

@@ -7,7 +7,7 @@ Bản chạy trực tiếp: https://themy1809-del.github.io/cswip-app/
 
 | Tab | Dùng để | Ghi chú |
 |---|---|---|
-| 🏠 Tổng quan | Đếm ngược ngày thi, **mục tiêu cuối: tự trả lời hết 420 câu trắc nghiệm của bộ đề** (theo từng chương), **việc cần làm hôm nay**, điểm yếu, mức sẵn sàng, lịch sử học | Việc hằng ngày tự sinh theo số ngày còn lại và chỗ bạn yếu |
+| 🏠 Tổng quan | Đếm ngược ngày thi, **mục tiêu cuối: tự trả lời hết 420 câu trắc nghiệm của bộ đề** (theo từng chương; nút trộn 30 câu mọi chương như thi, ôn lại câu đã chốt quá 7 ngày; việc hằng ngày "chốt thêm 15 câu"), **việc cần làm hôm nay**, điểm yếu, mức sẵn sàng, lịch sử học | Việc hằng ngày tự sinh theo số ngày còn lại và chỗ bạn yếu |
 | 📗 Học gọn chương | **Một chương = một đường đi 8 bước**: mục tiêu → nghe giảng → mổ xẻ từng mục (ý chính, giảng giải, hình, đề hỏi gì, bẫy, số liệu) → mổ xẻ từng câu đề → **tự trả lời hết** (đoán trước, mở phương án sau; đúng 2 lần liên tiếp mới tính) → thi chương → câu sai → số liệu & **tiếng Anh chuyên ngành** | Chương đang học được Tổng quan & việc hằng ngày bám theo, không học lan man. Bước ⑤ mặc định "như thi thật": chỉ tiếng Anh, dịch hiện sau khi trả lời |
 | 🎙️ Giảng bài | **Thầy ảo dẫn từng slide**: hình mô phỏng hiện dần từng lớp → giảng từng đoạn → hỏi lại bằng câu đề thật kèm 🔍 mổ xẻ đề → bẫy đề → con số thuộc lòng → chốt thuật ngữ → 5 câu tổng kết | ▶ chạy tự động với giọng đọc tiếng Việt, ô "Hỏi thầy", nhớ tiến độ học dở |
 | 📘 Học từ đề | **711 câu đề thật lật thành bài học**: Đề hỏi gì → Điều phải nhớ → Vì sao, xếp theo từng mục của 18 chương; gợi nhớ chủ động, bảng tóm tắt in được, kiểm tra lại bằng chính các câu đó | Câu sai vào Sổ câu sai & SRS |
@@ -41,7 +41,7 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `phantich.js` | 🔎 Phân tích bộ đề (tỉ trọng chương, mục hỏi nhiều, kiểu câu, độ phủ trọng tâm) + nút "Kiến thức bộ này" và hộp "Kiến thức bám sát" trong Tài liệu thi + huy hiệu "đề hỏi N lần" trong Bài học |
 | `hocde.js` | 📘 Học từ đề thi: gom 510 câu Tài liệu thi + 206 câu ngân hàng thành điểm kiến thức theo chương/mục (THI_LESSON_MAP + khớp từ khóa); nút 🔍 mổ xẻ trong màn học |
 | `tienganh.js` | 🇬🇧 Tiếng Anh chuyên ngành sát tài liệu: với mỗi mục/chương, lọc thuật ngữ (từ điển 502 từ) xuất hiện trong chính mục đó, trong lời giảng tiếng Anh của giáo trình và trong câu đề thật; mỗi từ có nghĩa, câu giáo trình, câu đề chứa nó, số lần đề dùng, đọc giọng Anh; ôn nhanh EN → nghĩa |
-| `chuong.js` | 📗 Học gọn chương: hub 18 chương, 8 bước tuyến tính, thẻ mổ xẻ mục & câu đề, bước ⑤ luyện "tự trả lời hết" (câu sai/đúng 1 lần quay lại trong phiên), tiến độ từng chương (`cswip_chuong`), "chương đang học" cho Tổng quan |
+| `chuong.js` | 📗 Học gọn chương: hub 18 chương, 8 bước tuyến tính, thẻ mổ xẻ mục & câu đề, bước ⑤ luyện "tự trả lời hết" (câu sai/đúng 1 lần quay lại trong phiên; chế độ trộn mọi chương `chDrillAll()`, chế độ ôn câu đã chốt lâu chưa gặp; nút đọc câu hỏi tiếng Anh), tiến độ từng chương (`cswip_chuong`), "chương đang học" cho Tổng quan |
 | `giangbai_data.js` | Lời thầy viết tay 18 chương: hình dung đời thường, bẫy đề, con số thuộc lòng, thần chú, ý giảng bổ sung |
 | `img_book/` + `img_book.js` | 223 hình trích từ giáo trình WIS5 (chú thích Anh/Việt, gắn chương) + 14 trang Work Pack mẫu; thư viện & phóng to trong tab Bài học, slide ảnh thật trong Giảng bài |
 | `workpack.js` | 📎 Hồ sơ Work Pack mẫu TWI (WPS, chứng chỉ thợ, bản vẽ): trình xem, cửa sổ nổi khi làm bài, 👨‍🏫 hướng dẫn đọc từng ô (khoanh đỏ trên ảnh thật, 19 bước) |

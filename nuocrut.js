@@ -79,7 +79,8 @@ function relatedLesson(w){
   DATA.chapters.forEach(function(_, ci){ if (chaps.indexOf(ci) < 0) scan(ci, 0); });
   return (best && (best.tm >= 1 || best.sc >= 0.45)) ? best : null;
 }
-function todayLog(){ var k = dkey(); if (!LOG[k]) LOG[k] = {n:0, k:0, thi:0, mock:[], wr:0}; if (!LOG[k].mock) LOG[k].mock = []; return LOG[k]; }
+function todayLog(){ var k = dkey(); if (!LOG[k]) LOG[k] = {n:0, k:0, thi:0, mock:[], wr:0}; if (!LOG[k].mock) LOG[k].mock = []; if (LOG[k].m0 == null && window.HOCDE){ try{ LOG[k].m0 = mastTotals().m; }catch(e){} } return LOG[k]; }
+function mastToday(){ var L = todayLog(); if (L.m0 == null || !window.HOCDE) return 0; try{ return Math.max(0, mastTotals().m - L.m0); }catch(e){ return 0; } }
 
 /* ---------- ngày thi ---------- */
 function examDate(){
@@ -151,6 +152,7 @@ function record(item, pick, right, opts){
 function mastStreak(id){ var m = MAST[id]; return m ? (m.s || 0) : 0; }
 function mcqOfChapter(ci){ return ((window.HOCDE && HOCDE.byChapter[ci]) || []).filter(function(p){ return p.mcq && p.opts && p.opts.length > 1; }); }
 function mastTotals(){ var tot = 0, m = 0, one = 0, per = []; DATA.chapters.forEach(function(c, ci){ var pts = mcqOfChapter(ci), mm = 0, o1 = 0; pts.forEach(function(p){ var st = mastStreak(p.id); if (st >= 2) mm++; else if (st === 1) o1++; }); tot += pts.length; m += mm; one += o1; per.push({ci:ci, n:pts.length, m:mm, one:o1}); }); return {tot:tot, m:m, one:one, per:per}; }
+function mastDue(days){ var lim = Date.now() - (days || 7) * 864e5, n = 0; DATA.chapters.forEach(function(c, ci){ mcqOfChapter(ci).forEach(function(p){ var m = MAST[p.id]; if (m && (m.s || 0) >= 2 && (m.last || 0) < lim) n++; }); }); return n; }
 function masteryHTML(){
   if (!window.HOCDE) return '';
   var M = mastTotals(); if (!M.tot) return '';
@@ -160,7 +162,8 @@ function masteryHTML(){
   var h = '<div class="card" style="border-left:3px solid var(--green)"><div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px"><div><h3 style="margin:0">🎯 Mục tiêu cuối: tự trả lời hết ' + M.tot + ' câu đề</h3><div class="muted" style="font-size:12.5px;margin-top:3px">Một câu tính là "tự trả lời được" khi bạn chọn đúng <b>2 lần liên tiếp</b> (ở bất kỳ chế độ nào). Sai là đếm lại từ đầu.</div></div><div style="text-align:right"><div style="font-size:26px;font-weight:800;color:' + (pc >= 100 ? 'var(--green)' : 'var(--accent2)') + '">' + M.m + '<small style="font-size:13px;color:var(--muted)">/' + M.tot + '</small></div><div class="muted" style="font-size:11.5px">' + pc + '% · ' + M.one + ' câu đúng 1 lần, chờ chốt</div></div></div>'
     + '<div class="nr-bar" style="height:10px;margin:8px 0 10px"><i style="width:' + pc + '%;background:linear-gradient(90deg,var(--accent2),var(--green))"></i></div>'
     + per.slice(0, 6).map(function(x){ var p = Math.round(x.m / x.n * 100); return '<div class="nr-weak" style="cursor:pointer" onclick="chStart(' + x.ci + ',4)"><div class="nm"><div>' + esc(DATA.chapters[x.ci].vi) + ' <span class="muted" style="font-size:12px">· còn ' + (x.n - x.m) + ' câu</span></div><div class="nr-bar"><i style="width:' + p + '%;background:' + (p >= 100 ? 'var(--green)' : 'var(--accent2)') + '"></i></div></div><div class="pc" style="color:' + (p >= 100 ? 'var(--green)' : 'var(--accent2)') + '">' + x.m + '/' + x.n + '</div></div>'; }).join('')
-    + '<div class="row" style="justify-content:flex-start;margin-top:10px;gap:8px">' + (worst && worst.n > worst.m ? '<button class="btn" onclick="chStart(' + worst.ci + ',4)">▶ Luyện câu chưa trả lời được: ' + esc(DATA.chapters[worst.ci].vi) + '</button>' : '<b style="color:var(--green)">🎉 Bạn đã tự trả lời được toàn bộ câu đề!</b>') + '<button class="btn sec" onclick="go(\'chuong\')">📗 Xem theo chương</button></div></div>';
+    + (function(){ var due = mastDue(7), td = mastToday(); return '<div class="muted" style="font-size:12.5px;margin-top:8px">Hôm nay chốt thêm <b style="color:var(--green)">+' + td + '</b> câu' + (due ? ' · ⏰ <b style="color:var(--yellow)">' + due + '</b> câu đã chốt nhưng hơn 7 ngày chưa gặp lại — nên ôn để khỏi quên' : '') + '</div>'; })()
+    + '<div class="row" style="justify-content:flex-start;margin-top:10px;gap:8px">' + (worst && worst.n > worst.m ? '<button class="btn" onclick="chStart(' + worst.ci + ',4)">▶ Luyện chương còn nhiều nhất: ' + esc(DATA.chapters[worst.ci].vi) + '</button>' : '<b style="color:var(--green)">🎉 Bạn đã tự trả lời được toàn bộ câu đề!</b>') + (M.m < M.tot && window.chDrillAll ? '<button class="btn sec" onclick="chDrillAll()">🎲 Trộn 30 câu mọi chương (như thi)</button>' : '') + (mastDue(7) && window.chDrillAll ? '<button class="btn sec" onclick="chDrillAll(\'due\')">⏰ Ôn lại câu lâu chưa gặp</button>' : '') + '<button class="btn ghost" onclick="go(\'chuong\')">📗 Theo chương</button></div></div>';
   return h;
 }
 function wrongList(includeCleared){ var a = []; for (var id in WRONG){ var w = WRONG[id]; if (!w || !w.q) continue; if (!includeCleared && w.cleared) continue; w.id = id; a.push(w); } a.sort(function(x, y){ return (y.n - y.ok) - (x.n - x.ok) || (y.last || 0) - (x.last || 0); }); return a; }
@@ -279,13 +282,14 @@ function readiness(){
   if (acc.n < 20 && mock == null) return null;
   var und = undAvg();
   var base = mock != null ? mock : acc.p;
-  var score = Math.round(base * 0.5 + acc.p * 0.2 + cov * 100 * 0.1 + und * 0.2);
+  var mast = null; try{ if (window.HOCDE){ var M = mastTotals(); if (M.tot) mast = Math.round(M.m / M.tot * 100); } }catch(e){}
+  var score = mast == null ? Math.round(base * 0.5 + acc.p * 0.2 + cov * 100 * 0.1 + und * 0.2) : Math.round(base * 0.4 + acc.p * 0.15 + cov * 100 * 0.1 + und * 0.15 + mast * 0.2);
   var lbl, col;
   if (score >= 80){ lbl = 'Sẵn sàng'; col = 'var(--green)'; }
   else if (score >= 70){ lbl = 'Gần đạt'; col = 'var(--accent2)'; }
   else if (score >= 55){ lbl = 'Cần cày thêm'; col = 'var(--accent)'; }
   else { lbl = 'Còn yếu'; col = 'var(--red)'; }
-  return {score:score, lbl:lbl, col:col, mock:mock, acc:acc, cov:Math.round(cov * 100), und:und};
+  return {score:score, lbl:lbl, col:col, mock:mock, acc:acc, cov:Math.round(cov * 100), und:und, mast:mast};
 }
 /* chủ đề yếu: gộp QUIZSTATE (theo cat của poolAll) + CAT */
 function weakTopics(){
@@ -332,6 +336,7 @@ function todayTasks(){
     var gp = (window.gbProgress ? gbProgress(ci) : null);
     add('chap', '📗 Học gọn chương "' + (ch ? ch.vi : '') + '" — đi 8 bước: nghe giảng → mổ xẻ mục → mổ xẻ câu → tự trả lời hết → thi chương' + (gp && !gp.done ? ' (giảng ' + gp.pct + '%)' : ''), (window.chStart ? "chStart(" + ci + ")" : (window.gbStart ? "gbStart(" + ci + ")" : "go('learn');openChap(" + ci + ")")), (gp && gp.done) || (up != null && up >= 80));
   }
+  if (window.HOCDE && window.chDrillAll){ var mg = ph.id === 'final' ? 25 : 15, td = mastToday(); add('mast', '🎯 Chốt thêm ' + mg + ' câu "tự trả lời được" (đúng 2 lần liên tiếp) — hôm nay +' + td, "chDrillAll()", td >= mg); }
   if ((ph.id === 'drill' || ph.id === 'mock') && window.hdProgress){
     var hci = chapOfDay(days), hp = hdProgress(hci);
     if (hp) add('hocde', '📘 Học từ đề: chương "' + DATA.chapters[hci].vi + '" — ' + hp.n + ' điểm kiến thức rút từ đề thật' + (hp.k ? ' (đã nắm ' + hp.k + ')' : ''), "hdStart(" + hci + ")", hp.pct >= 80);
@@ -478,7 +483,7 @@ function heroHTML(){
     + '</div>'
     + (R ? '<div class="nr-ready"><div class="nr-ring" style="--rp:' + R.score + ';--rc:' + R.col + '"><span style="color:' + R.col + '">' + R.score + '</span></div>'
         + '<div style="flex:1"><b style="color:' + R.col + ';font-size:15px">Mức sẵn sàng: ' + R.lbl + '</b>'
-        + '<div class="muted" style="font-size:12.5px;margin-top:3px;line-height:1.5">Ước tính từ thi thử (' + (R.mock == null ? 'chưa thi' : R.mock + '%') + '), độ chính xác chung (' + R.acc.p + '% trên ' + R.acc.n + ' câu), độ phủ ngân hàng (' + R.cov + '%) và mức hiểu bài tự đánh giá (' + R.und + '%). Mốc đậu thật là 70% từng phần — hãy nhắm ≥80% ở thi thử.</div></div></div>'
+        + '<div class="muted" style="font-size:12.5px;margin-top:3px;line-height:1.5">Ước tính từ thi thử (' + (R.mock == null ? 'chưa thi' : R.mock + '%') + '), độ chính xác chung (' + R.acc.p + '% trên ' + R.acc.n + ' câu), độ phủ ngân hàng (' + R.cov + '%), mức hiểu bài tự đánh giá (' + R.und + '%)' + (R.mast != null ? ' và tỉ lệ câu đề tự trả lời được (' + R.mast + '%)' : '') + '. Mốc đậu thật là 70% từng phần — hãy nhắm ≥80% ở thi thử.</div></div></div>'
         : '<div class="nr-ready"><div class="nr-ring" style="--rp:0;--rc:var(--muted)"><span class="muted">?</span></div><div class="muted" style="font-size:13px;line-height:1.5"><b style="color:var(--txt)">Mức sẵn sàng: chưa đủ dữ liệu.</b><br>Làm ≥20 câu hoặc 1 đề thi thử để app ước tính khả năng đậu.</div></div>')
     + '</div>';
 }
@@ -782,5 +787,5 @@ new MutationObserver(function(){ try{ hookThi(); hookMock(); watchMockResult(); 
 /* ---------- khởi động ---------- */
 reorderTabs(); hookMock(); rebuildBotnav();
 try{ renderAll(); }catch(e){}
-window.NR = {log:LOG, wrong:WRONG, cat:CAT, mast:MAST, mastStreak:mastStreak, mastTotals:mastTotals, record:record, daysLeft:daysLeft, readiness:readiness, weakTopics:weakTopics, tasks:todayTasks};
+window.NR = {log:LOG, wrong:WRONG, cat:CAT, mast:MAST, mastStreak:mastStreak, mastTotals:mastTotals, mastDue:mastDue, mastToday:mastToday, record:record, daysLeft:daysLeft, readiness:readiness, weakTopics:weakTopics, tasks:todayTasks};
 })();
