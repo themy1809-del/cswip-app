@@ -22,6 +22,8 @@ function words(s){ return String(s || '').toLowerCase().replace(/<[^>]+>/g, ' ')
 function wset(s){ var o = {}; words(s).forEach(function(w){ o[w] = 1; }); return o; }
 function overlap(set, s){ var n = 0, seen = {}; words(s).forEach(function(w){ if (set[w] && !seen[w]){ seen[w] = 1; n++; } }); return n; }
 
+var VI = window.WIS5_VI || {titles:{}, intro:{}, para:{}};
+function tvi(id){ return (VI.titles || {})[id] || ''; }
 var SECS = WIS5.sections;                       // tất cả (phần + mục)
 var SUBS = SECS.filter(function(s){ return s.id.indexOf('.') > 0; });   // mục con có nội dung
 var TOPS = SECS.filter(function(s){ return s.id.indexOf('.') < 0; });
@@ -109,7 +111,7 @@ function sotayView(el){
 /* ---------- vẽ ---------- */
 var S = {view:'toc', id:null, filterCi:null, open:{}, reveal:{}};
 function blockHTML(b){
-  if (b.t === 'p') return '<p class="bk-p">' + mark(b.en) + '</p>';
+  if (b.t === 'p'){ var pv = P.vi && VI.para ? VI.para[String(b.en).slice(0, 48)] : null; return '<p class="bk-p">' + mark(b.en) + '</p>' + (pv ? '<div class="bk-pvi">🇻🇳 ' + esc(pv) + '</div>' : ''); }
   if (b.t === 'h') return '<h4 class="bk-h">' + mark(b.en) + '</h4>';
   if (b.t === 'ul') return '<ul class="bk-ul">' + b.items.map(function(i){ return '<li>' + mark(i) + '</li>'; }).join('') + '</ul>';
   if (b.t === 'tbl'){ var head = /^(causes|prevention|description)/i.test(b.rows[0][0] || '') || b.rows[0].length === 2 && /^[A-Z][a-z]+$/.test(b.rows[0][1] || ''); return '<div class="bk-tw"><table class="bk-tbl">' + b.rows.map(function(r, i){ return '<tr>' + r.map(function(c){ return (i === 0 && head ? '<th>' : '<td>') + mark(c) + (i === 0 && head ? '</th>' : '</td>'); }).join('') + '</tr>'; }).join('') + '</table></div>'; }
@@ -129,8 +131,8 @@ function tocView(el){
   TOPS.forEach(function(t){
     var subs = subsOf(t); if (S.filterCi != null && t.ci !== S.filterCi) return;
     var d = subs.filter(function(s){ return P.done[s.id]; }).length, open = S.open[t.id] !== undefined ? !!S.open[t.id] : !!(nx && nx.id.indexOf(t.id + '.') === 0);
-    h += '<div class="bk-top' + (d >= subs.length && subs.length ? ' done' : '') + '"><div class="bk-top-h" onclick="sachToggle(' + jsq(t.id) + ')"><div class="ch-num">' + t.id + '</div><div style="flex:1;min-width:0"><b>' + esc(t.t) + '</b><div class="muted" style="font-size:12px">' + subs.length + ' mục · đã ngấm ' + d + ' · 📗 ' + esc(DATA.chapters[t.ci].vi) + '</div><div class="ch-prog" style="margin-top:4px;max-width:220px"><i style="width:' + (subs.length ? Math.round(d / subs.length * 100) : 0) + '%"></i></div></div><div class="ch-st">' + (open ? '▾' : '▸') + '</div></div>';
-    if (open) h += '<div class="bk-subs">' + subs.map(function(s){ return '<div class="bk-sub' + (P.done[s.id] ? ' done' : '') + (P.pos === s.id ? ' cur' : '') + '" onclick="sachOpen(' + jsq(s.id) + ')">' + (P.done[s.id] ? '✅' : '○') + ' <b>' + s.id + '</b> ' + esc(s.t) + '<span class="muted" style="font-size:11.5px;margin-left:6px">tr.' + s.page + '</span></div>'; }).join('') + '</div>';
+    h += '<div class="bk-top' + (d >= subs.length && subs.length ? ' done' : '') + '"><div class="bk-top-h" onclick="sachToggle(' + jsq(t.id) + ')"><div class="ch-num">' + t.id + '</div><div style="flex:1;min-width:0"><b>' + esc(t.t) + '</b>' + (tvi(t.id) ? '<div style="font-size:13px;color:var(--accent)">' + esc(tvi(t.id)) + '</div>' : '') + '<div class="muted" style="font-size:12px">' + subs.length + ' mục · đã ngấm ' + d + ' · 📗 ' + esc(DATA.chapters[t.ci].vi) + '</div><div class="ch-prog" style="margin-top:4px;max-width:220px"><i style="width:' + (subs.length ? Math.round(d / subs.length * 100) : 0) + '%"></i></div></div><div class="ch-st">' + (open ? '▾' : '▸') + '</div></div>';
+    if (open) h += '<div class="bk-subs">' + subs.map(function(s){ return '<div class="bk-sub' + (P.done[s.id] ? ' done' : '') + (P.pos === s.id ? ' cur' : '') + '" onclick="sachOpen(' + jsq(s.id) + ')">' + (P.done[s.id] ? '✅' : '○') + ' <b>' + s.id + '</b> ' + esc(s.t) + (tvi(s.id) ? ' <span style="color:var(--accent);font-size:12.5px">— ' + esc(tvi(s.id)) + '</span>' : '') + '<span class="muted" style="font-size:11.5px;margin-left:6px">tr.' + s.page + '</span></div>'; }).join('') + '</div>';
     h += '</div>';
   });
   el.innerHTML = '<div class="ch-wrap">' + h + '</div></div>';
@@ -139,9 +141,9 @@ function secView(el){
   var s = BYID[S.id]; if (!s){ S.view = 'toc'; tocView(el); return; }
   var i = SUBS.indexOf(s), prev = SUBS[i - 1], next = SUBS[i + 1], V = viFor(s), top = BYID[s.id.split('.')[0]];
   var bar = '<div class="card bk-bar"><div class="row" style="justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap"><button class="back" onclick="sachToc()">← Mục lục</button><div class="muted" style="font-size:12px">' + (i + 1) + '/' + SUBS.length + ' · tr.' + s.page + ' · ' + doneCount() + ' đã ngấm</div><div class="row" style="gap:4px"><button class="gb-tbtn" onclick="sachFont(-1)">A−</button><button class="gb-tbtn" onclick="sachFont(1)">A+</button><button class="gb-tbtn' + (P.vi ? ' on' : '') + '" onclick="sachVi()">🇻🇳 Tóm tắt</button><button class="gb-tbtn' + (SPK.on ? ' play' : '') + '" onclick="sachSpeak(' + jsq(s.id) + ')">' + (SPK.on ? '⏹ Dừng đọc' : '🔊 Nghe đọc') + '</button></div></div></div>';
-  var h = bar + '<div class="card bk-body" style="font-size:' + P.font + 'px"><div class="muted" style="font-size:12px">Phần ' + top.id + ' · ' + esc(top.t) + '</div><h2 style="margin:2px 0 10px">' + s.id + ' ' + esc(s.t) + '</h2>';
+  var h = bar + '<div class="card bk-body" style="font-size:' + P.font + 'px"><div class="muted" style="font-size:12px">Phần ' + top.id + ' · ' + esc(top.t) + '</div><h2 style="margin:2px 0 2px">' + s.id + ' ' + esc(s.t) + '</h2>' + (tvi(s.id) ? '<div style="color:var(--accent);font-weight:600;margin-bottom:10px">🇻🇳 ' + esc(tvi(s.id)) + '</div>' : '<div style="margin-bottom:10px"></div>');
   if (P.vi){
-    h += '<div class="bk-vi"><div class="ch-lbl" style="color:var(--accent)">🇻🇳 Thầy tóm tắt trước khi đọc</div>';
+    h += '<div class="bk-vi"><div class="ch-lbl" style="color:var(--accent)">🇻🇳 Thầy tóm tắt trước khi đọc</div>' + ((VI.intro || {})[s.id] ? '<div class="bk-intro"><b>Dịch chuyên ngành phần mở đầu:</b> ' + esc(VI.intro[s.id]) + '</div>' : '');
     if (V.les.length) h += '<ul class="lesson" style="margin:4px 0">' + V.les.map(function(x){ return '<li><b>' + esc(x.L.t_vi) + ':</b> ' + esc(x.L.vi) + '</li>'; }).join('') + '</ul>';
     if (V.deep) h += '<details class="bk-deep"><summary>🎓 Giảng giải liên quan: ' + strip(V.deep.h_vi) + '</summary><div style="margin-top:6px;line-height:1.65">' + ((V.deep.body || []).map(function(p){ return '<p>' + p.vi + '</p>'; }).join('') || (V.deep.rows || []).map(function(r){ return '<div>• ' + r.vi + '</div>'; }).join('')) + '</div></details>';
     if (!V.les.length && !V.deep) h += '<div class="muted" style="font-size:13px">Mục này app chưa có tóm tắt riêng — đọc tiếng Anh, chạm vào thuật ngữ gạch chân để xem nghĩa, bôi đen đoạn để dịch.</div>';
@@ -199,6 +201,9 @@ function ensure(){
   '.bk-subs{padding:2px 12px 10px;border-top:1px dashed var(--line)}',
   '.bk-sub{padding:6px 8px;border-radius:8px;cursor:pointer;font-size:13.5px}.bk-sub:hover{background:rgba(93,177,255,.1)}.bk-sub.done{color:var(--muted)}.bk-sub.cur{background:rgba(93,177,255,.14)}',
   '.bk-bar{padding:8px 12px;position:sticky;top:0;z-index:5}',
+  '.bk-pvi{margin:-4px 0 12px;padding:6px 10px;border-left:3px solid var(--accent);background:rgba(255,138,68,.06);border-radius:0 8px 8px 0;font-size:.9em;line-height:1.6}',
+  'body.light .bk-pvi{background:#fff7f0}',
+  '.bk-intro{margin:4px 0 8px;line-height:1.65}',
   '.st-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}',
   '.st-pg{border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;background:#fff}.st-pg img{width:100%;display:block;aspect-ratio:1.41;object-fit:cover}.st-pg:hover{border-color:var(--accent2)}',
   '.st-cap{font-size:11.5px;padding:5px 7px;color:var(--muted);line-height:1.4}.st-cap b{color:var(--txt)}',

@@ -104,9 +104,9 @@ function phase(days){
 
 /* ---------- bản đồ câu hỏi Tài liệu thi (theo text) ---------- */
 var THI_SETS = {}, THI_BY_TEXT = {};
-var THI_LABEL = {wp1:'Work Pack 1', wp2:'Work Pack 2', wptwi:'Work Pack TWI', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết'};
+var THI_LABEL = {wp1:'Work Pack 1', wp2:'Work Pack 2', wptwi:'Work Pack TWI', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết', hw:'Homework TWI', hoq:'Quiz đầu khóa', hos:'Ôn chương Handout'};
 (function(){
-  ['THI_WP1','THI_WP2','THI_WPTWI','THI_LEAD','THI_RING','THI_FB'].forEach(function(k){
+  ['THI_WP1','THI_WP2','THI_WPTWI','THI_HW','THI_HOQ','THI_HOS','THI_LEAD','THI_RING','THI_FB'].forEach(function(k){
     var s = window[k]; if (!s || !s.items) return;
     THI_SETS[s.id] = s;
     s.items.forEach(function(it, i){
@@ -224,7 +224,7 @@ function hookThi(){
     if (key === lastThi) continue;
     lastThi = key;
     var it = m.it;
-    record({id:m.id, qe:it.q, qv:it.vq || '', oe:it.o, ov:[], a:it.a, ee:'', ev:(it.va || '') + (it.n ? ' ⚠️ ' + it.n : ''), cat:m.cat, src:'Tài liệu thi — ' + m.cat, lesson:lessonFor(it.q)}, bad >= 0 ? bad : ok, bad < 0, {thi:true, game:true});
+    record({id:m.id, qe:it.q, qv:it.vq || '', oe:it.o, ov:it.ov || [], a:it.a, ee:'', ev:(it.va || '') + (it.n ? ' ⚠️ ' + it.n : ''), cat:m.cat, src:'Tài liệu thi — ' + m.cat, lesson:lessonFor(it.q)}, bad >= 0 ? bad : ok, bad < 0, {thi:true, game:true});
   }
 }
 function lessonFor(q){ try{ var map = window.THI_LESSON_MAP; if (!map) return null; var k = String(q).toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 60); return map[k] || null; }catch(e){ return null; } }
