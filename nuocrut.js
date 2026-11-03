@@ -146,6 +146,7 @@ function record(item, pick, right, opts){
     }
   }
   if (opts.game && typeof gameTick === 'function'){ try{ gameTick(right); }catch(e){} }
+  if (!right && window.SOTU_onWrong){ try{ SOTU_onWrong(item); }catch(e){} }
   saveAll();
   try{ if (window.cloudSync) window.cloudSync(); }catch(e){}
 }
@@ -378,6 +379,7 @@ function todayTasks(){
     add('weak', '🎯 Luyện điểm yếu 20 câu', "go('quiz');startWeak()", false);
     add('vocab', '🔤 Lướt 120 từ vựng đề thi (10 phút)', "location.href='tuvung.html'", false, true);
   }
+  if (window.sotuStats){ var sw = sotuStats(); if (sw.total < 15) add('sotu', '🔤 Sổ từ: thêm 20 từ đề hay ra của chương đang học (sổ đang có ' + sw.total + ' từ)', "go('sotu');sotuSeedChapter()", sw.total >= 15); else add('sotu', '🔤 Sổ từ: ôn ' + sw.due + ' từ đến hạn (10–15 phút, nghe & nói to)', sw.due ? "sotuStart()" : "go('sotu')", sw.due === 0 && sw.today > 0); }
   add('goal', '🎯 Trả lời ≥' + goal + ' câu hôm nay (' + L.n + '/' + goal + ')', null, L.n >= goal);
   return tasks;
 }
@@ -763,8 +765,8 @@ window.addEventListener('error', function(e){
 /* ---------- đăng ký tab, menu, thanh dưới ---------- */
 function ensureView(id){ if (document.getElementById('v-' + id)) return; var main = document.querySelector('main'); if (!main) return; var d = document.createElement('div'); d.id = 'v-' + id; d.className = 'view'; main.appendChild(d); }
 ensureView('wrong');
-var LABELS = {home:'🏠 Tổng quan', chuong:'📗 Học gọn chương', sach:'📖 Đọc sách', teach:'🎙️ Giảng bài', hocde:'📘 Học từ đề', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
-var ORDER = ['home', 'thi', 'chuong', 'sach', 'teach', 'hocde', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
+var LABELS = {sotu:'🔤 Sổ từ', home:'🏠 Tổng quan', chuong:'📗 Học gọn chương', sach:'📖 Đọc sách', teach:'🎙️ Giảng bài', hocde:'📘 Học từ đề', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
+var ORDER = ['home', 'thi', 'chuong', 'sach', 'sotu', 'teach', 'hocde', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
 function reorderTabs(){
   if (typeof TABS === 'undefined') return;
   var have = {}; TABS.forEach(function(t){ have[t[0]] = t[1]; });
