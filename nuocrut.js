@@ -398,7 +398,7 @@ function chapOfDay(days){
 var THI_DRILL_ORDER = ['hoq', 'hw', 'hos', 'lead', 'wptwi', 'ring', 'fb', 'wp1', 'wp2'];
 var THI_EXAM_ORDER = ['hoq', 'hw1', 'wptwi', 'hw2', 'hos', 'wp1', 'hw3', 'wp2', 'lead'];
 function thiDrillOfDay(days){ var k = anchor() - days; var arr = THI_DRILL_ORDER; try{ if (window.THI && THI.mastery){ var open = arr.filter(function(id){ var r = THI.mastery(id); return r.n && r.m < r.n; }); if (open.length) arr = open; } }catch(e){} return arr[((k % arr.length) + arr.length) % arr.length]; }
-function thiExamOfDay(days){ return days % 3 === 0 ? THI_EXAM_ORDER[Math.floor(days / 3) % THI_EXAM_ORDER.length] : null; }
+function thiExamOfDay(days){ if (days % 3 !== 0) return null; if (days <= 21) return ['tp1', 'wp2', 'tp1', 'wptwi', 'tp1', 'wp1', 'tp1'][Math.floor(days / 3) % 7]; return THI_EXAM_ORDER[Math.floor(days / 3) % THI_EXAM_ORDER.length]; }
 function thiName(id){ try{ return THI.setName(id); }catch(e){ return id; } }
 function thiExamName(id){ try{ return THI.examName(id); }catch(e){ return id; } }
 function weakThiSet(){

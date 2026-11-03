@@ -1,6 +1,8 @@
 /* ============================================================
-   TAB "THI THỬ" — mô phỏng kỳ thi CSWIP 3.1 (2026): 3 phần
-   Phần 1: 80 câu / 120 phút · Phần 2: 40 câu / 90 phút · Phần 3: 24 câu / 90 phút
+   TAB "THI THỬ" — mô phỏng kỳ thi CSWIP 3.1 theo cấu trúc scheme WI-6-92 (06/2024):
+   Theory Part 1: 80 câu / 120 phút · Theory Part 2 (WPS & chứng chỉ thợ): 40 câu / 90 phút ·
+   Practical: kiểm tra 8 mẫu theo tiêu chuẩn trung tâm cấp (app luyện ở 🔧 Thi thực hành) · đậu 70% mỗi phần.
+   "Phần 3 — Tổng hợp" là đề ôn thêm của app, KHÔNG phải một phần của đề thật.
    Mỗi lần thi rút đề NGẪU NHIÊN từ ngân hàng "Tài liệu thi" — thi lại vô hạn.
    Có đồng hồ đếm ngược, tô cờ xem lại, nộp bài, chấm 70%, lưu lịch sử điểm.
    ============================================================ */
@@ -20,9 +22,9 @@
   function P3(){ return pool(['THI_WP1','THI_WP2','THI_LEAD','THI_RING','THI_FB']).concat(pool2(['THI_HW','THI_HOS'])); }
 
   var PAPERS=[
-    {id:'p1', icon:'1️⃣', vi:'Phần 1 — Lý thuyết tổng quát', n:80, min:120, pool:P1, note:'Leading Questions + WPS Rings + điền khuyết + Homework/Handout TWI + đề thật CSWIP'},
-    {id:'p2', icon:'2️⃣', vi:'Phần 2 — Work Pack (WPS/bản vẽ)', n:40, min:90, pool:P2, note:'Rút từ 2 đề Work Pack thật + Work Pack TWI'},
-    {id:'p3', icon:'3️⃣', vi:'Phần 3 — Tổng hợp', n:24, min:90, pool:P3, note:'Trộn toàn bộ ngân hàng (mô phỏng phần 3)'}
+    {id:'p1', icon:'1️⃣', vi:'Theory Part 1 — Lý thuyết thanh tra hàn', n:80, min:120, pool:P1, note:'Như đề thật: 80 câu / 120 phút (90 giây/câu). Rút từ Homework/Handout TWI, Leading Questions, WPS Rings, điền khuyết, đề thật CSWIP'},
+    {id:'p2', icon:'2️⃣', vi:'Theory Part 2 — WPS & chứng chỉ thợ hàn (Work Pack)', n:40, min:90, pool:P2, note:'Như đề thật: 40 câu / 90 phút. Rút từ 2 đề Work Pack thật + Work Pack TWI; mở hồ sơ bên cạnh khi làm'},
+    {id:'p3', icon:'➕', vi:'Đề ôn tổng hợp (không phải phần thi thật)', n:24, min:36, pool:P3, note:'Trộn toàn bộ ngân hàng để ôn nhanh. Phần thực hành thật là kiểm tra 8 mẫu — luyện ở Tài liệu thi → 🔧 Thi thực hành'}
   ];
 
   var H=[]; try{ H=JSON.parse(localStorage.getItem('MOCKH')||'[]'); }catch(e){}

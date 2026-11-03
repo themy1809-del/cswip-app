@@ -57,9 +57,9 @@
   /* ---------- MENU ---------- */
   /* ---------- NHÓM THEO CẤU TRÚC BÀI THI CSWIP 3.1 ---------- */
   var GROUPS=[
-    {id:'lt', icon:'📘', vi:'PHẦN 1 — LÝ THUYẾT TỔNG QUÁT', sub:'Trắc nghiệm 4 phương án, kéo–thả nhiều đáp án, điền khuyết — toàn tiếng Anh, câu chuỗi "with reference to the previous question". Nhịp 45 giây/câu như quiz TWI.', sets:['hoq','hw','hwdd','hos','lead','ring','fb','dd']},
-    {id:'wp', icon:'📎', vi:'PHẦN 2 — WORK PACK (đọc hồ sơ)', sub:'Câu hỏi dựa trên WPS, WPQR, chứng chỉ thợ hàn, bản vẽ — mở hồ sơ bên cạnh khi làm, tìm đúng ô dữ liệu.', sets:['wptwi','wp1','wp2']},
-    {id:'th', icon:'🔧', vi:'PHẦN 3 — THỰC HÀNH (nhận dạng & kết án khuyết tật)', sub:'Nhìn mẫu/ảnh → gọi đúng tên khuyết tật tiếng Anh → đo → so tiêu chí → kết luận.', sets:['hod']},
+    {id:'lt', icon:'📘', vi:'THEORY PART 1 — LÝ THUYẾT THANH TRA HÀN', sub:'Đề thật: 80 câu trắc nghiệm trong 2 giờ (90 giây/câu), đậu 70%. Có câu kéo–thả nhiều đáp án, điền khuyết, câu chuỗi "with reference to the previous question" — toàn tiếng Anh.', sets:['hoq','hw','hwdd','hos','lead','ring','fb','dd']},
+    {id:'wp', icon:'📎', vi:'THEORY PART 2 — WPS & CHỨNG CHỈ THỢ HÀN (Work Pack)', sub:'Đề thật: 40 câu trong 1 giờ 30 phút, đậu 70%. Câu hỏi dựa trên WPS, WPQR, chứng chỉ thợ hàn, bản vẽ — mở hồ sơ bên cạnh, tìm đúng ô dữ liệu.', sets:['wptwi','wp1','wp2']},
+    {id:'th', icon:'🔧', vi:'PRACTICAL — KIỂM TRA 8 MẪU', sub:'Đề thật: kiểm tra ngoại quan 8 mẫu thi theo tiêu chuẩn do trung tâm cung cấp, đậu 70%. Nhìn mẫu → gọi đúng tên khuyết tật tiếng Anh → đo → so tiêu chí → kết luận. App luyện nhận dạng và kết án; tay đo cần tập trên mẫu thật.', sets:['hod']},
     {id:'kn', icon:'💬', vi:'KINH NGHIỆM THI — hỏi–đáp ôn nhanh', sub:'Câu hỏi–đáp từ người đã thi: lật thẻ, tự trả lời trước khi lật.', sets:['c21','c22','c23']}
   ];
   /* đề "thi như thật": giữ thứ tự như bài thật, bấm giờ */
@@ -67,14 +67,15 @@
   function allOf(id,n,rand){ var s=getSet(id); if(!s) return []; var out=s.items.map(function(_,i){ return {s:s,i:i}; }); if(rand){ for(var j=out.length-1;j>0;j--){ var k=Math.floor(Math.random()*(j+1)); var t=out[j]; out[j]=out[k]; out[k]=t; } } return n?out.slice(0,n):out; }
   var EXAMS=[
     {id:'hoq', g:'lt', vi:'Quiz đầu khóa TWI — 30 câu', sec:45, pick:function(){ return allOf('hoq'); }},
-    {id:'hw1', g:'lt', vi:'Homework Paper 1 — 49 câu', sec:45, pick:function(){ return byPrefix(['hw','hwdd'],'P1-'); }},
-    {id:'hw2', g:'lt', vi:'Homework Paper 2 — 51 câu', sec:45, pick:function(){ return byPrefix(['hw','hwdd'],'P2-'); }},
-    {id:'hw3', g:'lt', vi:'Homework Paper 3 — 50 câu', sec:45, pick:function(){ return byPrefix(['hw','hwdd'],'P3-'); }},
-    {id:'hos', g:'lt', vi:'Ôn chương Handout — 40 câu ngẫu nhiên', sec:45, pick:function(){ return allOf('hos',40,true); }},
-    {id:'lead', g:'lt', vi:'Leading Questions — trọn bộ', sec:45, pick:function(){ return allOf('lead'); }},
-    {id:'wptwi', g:'wp', vi:'Work Pack TWI — 20 câu', sec:90, pick:function(){ return allOf('wptwi'); }},
-    {id:'wp1', g:'wp', vi:'Work Pack 1 — 31 câu', sec:90, pick:function(){ return allOf('wp1'); }},
-    {id:'wp2', g:'wp', vi:'Work Pack 2 — 40 câu', sec:90, pick:function(){ return allOf('wp2'); }}
+    {id:'tp1', g:'lt', vi:'Mô phỏng Theory Part 1 — 80 câu / 120 phút', sec:90, pick:function(){ var out=[]; ['hw','hwdd','hos','hoq','lead','ring','fb'].forEach(function(id){ var s=getSet(id); if(s) s.items.forEach(function(it,i){ if(!/reference to the previous|previous (question|answer)|sketch above/i.test(it.q)) out.push({s:s,i:i}); }); }); for(var j=out.length-1;j>0;j--){ var k=Math.floor(Math.random()*(j+1)); var t=out[j]; out[j]=out[k]; out[k]=t; } return out.slice(0,80); }},
+    {id:'hw1', g:'lt', vi:'Homework Paper 1 — 49 câu', sec:90, pick:function(){ return byPrefix(['hw','hwdd'],'P1-'); }},
+    {id:'hw2', g:'lt', vi:'Homework Paper 2 — 51 câu', sec:90, pick:function(){ return byPrefix(['hw','hwdd'],'P2-'); }},
+    {id:'hw3', g:'lt', vi:'Homework Paper 3 — 50 câu', sec:90, pick:function(){ return byPrefix(['hw','hwdd'],'P3-'); }},
+    {id:'hos', g:'lt', vi:'Ôn chương Handout — 40 câu ngẫu nhiên', sec:90, pick:function(){ return allOf('hos',40,true); }},
+    {id:'lead', g:'lt', vi:'Leading Questions — trọn bộ', sec:90, pick:function(){ return allOf('lead'); }},
+    {id:'wptwi', g:'wp', vi:'Work Pack TWI — 20 câu', sec:135, pick:function(){ return allOf('wptwi'); }},
+    {id:'wp1', g:'wp', vi:'Work Pack 1 — 31 câu', sec:135, pick:function(){ return allOf('wp1'); }},
+    {id:'wp2', g:'wp', vi:'Work Pack 2 — 40 câu', sec:135, pick:function(){ return allOf('wp2'); }}
   ];
   function mst(id){ try{ return window.NR&&NR.mastStreak?NR.mastStreak(id):0; }catch(e){ return 0; } }
   function setMast(s){ if(!quizable(s)) return null; var m=0; s.items.forEach(function(_,i){ if(mst('t:'+s.id+':'+i)>=2) m++; }); return {m:m,n:s.items.length}; }
@@ -83,9 +84,9 @@
     var el=document.getElementById('v-thi'); if(!el)return;
     var total=0, qm=0, qn=0; SETS.forEach(function(s){ total+=s.items.length; var x=setMast(s); if(x){ qm+=x.m; qn+=x.n; } });
     var h='<div class="thi-card"><h2>📖 '+((typeof bili==='function')?bili('Tài liệu thi — học chắc, thi sát đề','Exam pack — master & sit like the real exam'):'Tài liệu thi')+'</h2>'
-      +'<p class="thi-muted" style="margin-top:6px;line-height:1.6">'+total+' câu từ bộ tài liệu TWI bạn gửi, xếp theo đúng các phần của bài thi CSWIP 3.1. Mỗi bộ có 3 cách học: <b>🎯 Học chắc</b> (chỉ câu chưa chắc, tự trả lời trước, đúng 2 lần liên tiếp mới tính), <b>⏱ Thi như thật</b> (bấm giờ, chỉ tiếng Anh, không hiện đáp án tới khi nộp) và <b>🃏 Học thuộc</b> (lật thẻ). Sau mỗi câu có nút <b>📖 Đọc trong sách</b> mở đúng mục giáo trình.</p>'
+      +'<p class="thi-muted" style="margin-top:6px;line-height:1.6">'+total+' câu từ bộ tài liệu TWI bạn gửi, xếp theo đúng các phần của bài thi CSWIP 3.1 hiện hành (scheme WI-6-92, 06/2024): <b>Theory Part 1</b> 80 câu/2 giờ · <b>Theory Part 2</b> (WPS & chứng chỉ thợ) 40 câu/1 giờ 30 · <b>Practical</b> kiểm tra 8 mẫu · đậu <b>70% mỗi phần</b>. Đề Thi như thật dùng đúng nhịp này (90 giây/câu lý thuyết, 135 giây/câu Work Pack; riêng Quiz đầu khóa 45 giây/câu theo TWI). Mỗi bộ có 3 cách học: <b>🎯 Học chắc</b> (chỉ câu chưa chắc, tự trả lời trước, đúng 2 lần liên tiếp mới tính), <b>⏱ Thi như thật</b> (bấm giờ, chỉ tiếng Anh, không hiện đáp án tới khi nộp) và <b>🃏 Học thuộc</b> (lật thẻ). Sau mỗi câu có nút <b>📖 Đọc trong sách</b> mở đúng mục giáo trình.</p>'
       +'<div style="margin-top:8px"><b>'+qm+'</b><span class="thi-muted"> / '+qn+' câu trắc nghiệm đã tự trả lời được</span>'+bar(qm,qn)+'</div>'
-      +'<div class="thi-muted" style="margin-top:8px;line-height:1.6"><b>Thứ tự khuyên dùng:</b> ① Quiz đầu khóa để biết mình đang ở đâu → ② Học chắc Homework + Handout ôn chương song song với chương đang học → ③ Work Pack: xem hướng dẫn đọc hồ sơ rồi Học chắc Work Pack TWI → WP1 → WP2 → ④ 15 ảnh khuyết tật + thi thực hành → ⑤ mỗi tuần 1 đề Thi như thật (mốc đậu 70%, nhắm ≥80%).</div>'
+      +'<div class="thi-muted" style="margin-top:8px;line-height:1.6"><b>Thứ tự khuyên dùng:</b> ① Quiz đầu khóa để biết mình đang ở đâu → ② Học chắc Homework + Handout ôn chương song song với chương đang học → ③ Work Pack: xem hướng dẫn đọc hồ sơ rồi Học chắc Work Pack TWI → WP1 → WP2 → ④ 15 ảnh khuyết tật + thi thực hành → ⑤ mỗi tuần 1 đề Thi như thật, trong 3 tuần cuối làm "Mô phỏng Theory Part 1 — 80 câu" ít nhất 3 lần (mốc đậu 70%, nhắm ≥80%).</div>'
       +'</div>';
     var used={};
     GROUPS.forEach(function(g){
