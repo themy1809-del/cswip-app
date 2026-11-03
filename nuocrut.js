@@ -365,6 +365,7 @@ function todayTasks(){
     var ws = weakThiSet();
     add('thi', '📖 Làm ' + (ph.id === 'base' ? 15 : 25) + ' câu Tài liệu thi — ' + ws.label + (ws.p != null ? ' (đang ' + ws.p + '%)' : ''), "go('thi');THI.quiz('" + ws.id + "')", L.thi >= (ph.id === 'base' ? 15 : 25));
   }
+  if (window.THI && THI.exam && days % 3 === 0 && ph.id !== 'final'){ var EXR = [['hoq','Quiz đầu khóa TWI'],['hw1','Homework Paper 1'],['wptwi','Work Pack TWI'],['hw2','Homework Paper 2'],['hos','Ôn chương Handout 40 câu'],['wp1','Work Pack 1'],['hw3','Homework Paper 3'],['wp2','Work Pack 2']], ex = EXR[Math.floor(days / 3) % EXR.length]; var exb = 0; try{ var EH = JSON.parse(localStorage.getItem('cswip_thiexam') || '{}'); exb = EH[ex[0]] ? EH[ex[0]].n : 0; }catch(e){} add('thiex', '⏱ Tài liệu thi — Thi như thật: ' + ex[1] + ' (bấm giờ, chỉ tiếng Anh, chấm 70%)', "go('thi');THI.exam('" + ex[0] + "')", false); }
   var needMock = (ph.id === 'mock') || (ph.id === 'drill' && days % 3 === 0) || (ph.id === 'base' && days % 7 === 0);
   if (needMock){
     var p = ['p1', 'p2', 'p3'][days % 3];
@@ -752,7 +753,7 @@ window.addEventListener('error', function(e){
 function ensureView(id){ if (document.getElementById('v-' + id)) return; var main = document.querySelector('main'); if (!main) return; var d = document.createElement('div'); d.id = 'v-' + id; d.className = 'view'; main.appendChild(d); }
 ensureView('wrong');
 var LABELS = {home:'🏠 Tổng quan', chuong:'📗 Học gọn chương', sach:'📖 Đọc sách', teach:'🎙️ Giảng bài', hocde:'📘 Học từ đề', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
-var ORDER = ['home', 'chuong', 'sach', 'teach', 'hocde', 'thi', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
+var ORDER = ['home', 'thi', 'chuong', 'sach', 'teach', 'hocde', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
 function reorderTabs(){
   if (typeof TABS === 'undefined') return;
   var have = {}; TABS.forEach(function(t){ have[t[0]] = t[1]; });

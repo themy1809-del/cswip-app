@@ -127,7 +127,7 @@ function inject(){
   var d = document.createElement('div'); d.className = 'thi-card'; d.id = 'wp-card'; d.style.borderLeft = '3px solid var(--yellow,#ffd60a)';
   d.innerHTML = '<div style="display:flex;align-items:center;gap:10px"><div style="font-size:26px">📎</div><div style="flex:1"><b>Hồ sơ Work Pack mẫu TWI</b><span class="thi-tag">' + WP.length + ' trang</span><span class="thi-tag">WPS · chứng chỉ thợ · bản vẽ</span><div class="thi-muted">Tập đọc WPS 7/9/17/25, chứng chỉ Q1D4–Q4D4 và bản vẽ TRAIN 1 như đề Work Pack thật. Kèm gợi ý của thầy cho từng trang.</div></div></div>'
     + '<div class="thi-row"><button class="btn" onclick="WORKPACK.guide()">👨‍🏫 Hướng dẫn đọc từng ô</button><button class="btn sec" onclick="WORKPACK.open(0)">📖 Mở hồ sơ</button><button class="btn sec" onclick="WORKPACK.open(10)">Bản vẽ TRAIN 1</button></div>';
-  first.insertAdjacentElement('afterend', d);
+  (el.querySelector('#grp-wp') || first).insertAdjacentElement('afterend', d);
 }
 new MutationObserver(function(){ try{ inject(); injectSetBtn(); }catch(e){} }).observe(document.body, {childList:true, subtree:true});
 /* đổi tab thì đóng viewer */

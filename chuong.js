@@ -39,7 +39,7 @@ function wrongOfChapter(ci){
   return out;
 }
 function mst(id){ try{ return window.NR && NR.mastStreak ? NR.mastStreak(id) : 0; }catch(e){ return 0; } }
-function mcqOf(ci){ if (ci < 0){ var all = []; DATA.chapters.forEach(function(_, i){ all = all.concat(mcqOf(i)); }); return all; } return ((window.HOCDE && HOCDE.byChapter[ci]) || []).filter(function(p){ return p.mcq && p.opts && p.opts.length > 1; }); }
+function mcqOf(ci){ if (ci === -2) return (S.custom && S.custom.pts) || []; if (ci < 0){ var all = []; DATA.chapters.forEach(function(_, i){ all = all.concat(mcqOf(i)); }); return all; } return ((window.HOCDE && HOCDE.byChapter[ci]) || []).filter(function(p){ return p.mcq && p.opts && p.opts.length > 1; }); }
 function mlast(id){ try{ var m = window.NR && NR.mast && NR.mast[id]; return m ? (m.last || 0) : 0; }catch(e){ return 0; } }
 function mastOf(ci){ var pts = mcqOf(ci), m = 0, one = 0; pts.forEach(function(p){ var st = mst(p.id); if (st >= 2) m++; else if (st === 1) one++; }); return {n:pts.length, m:m, one:one}; }
 function chapterPct(ci){
@@ -143,6 +143,7 @@ function ensure(){
 window.chStart = function(ci, step){ if (ci < 0){ chDrillAll(); return; } S.ci = ci; P.cur = ci; save(); S.step = step == null ? recommendedStep(ci) : step; S.openL = firstUndone(ci); S.openQ = firstUndoneQ(ci); go('chuong'); };
 window.chList = function(){ S.ci = null; render(); };
 window.chStep = function(s){ if (S.ci < 0){ chList(); return; } S.step = s; if (s !== 4) S.dr = null; render(); window.scrollTo(0, 0); };
+window.chDrillPoints = function(label, pts, mode){ S.custom = {label:label, pts:pts}; S.ci = -2; S.step = 4; S.dr = null; go('chuong'); chDrillStart(-2, mode || false); };
 window.chDrillAll = function(mode){ S.ci = -1; S.step = 4; S.dr = null; go('chuong'); chDrillStart(-1, mode === 'due' ? 'due' : (mode === 'all')); };
 window.chToggle = function(li){ S.openL = (S.openL === li) ? -1 : li; render(); var el = document.getElementById('ch-les-' + li); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); };
 window.chOpenLesson = function(li, ci){ if (ci != null && ci >= 0 && ci !== S.ci){ S.ci = ci; P.cur = ci; save(); } if (S.ci < 0) return; S.step = 2; S.openL = li; render(); var el = document.getElementById('ch-les-' + li); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); };
@@ -166,7 +167,7 @@ window.chDrillStart = function(ci, all){
   // câu chưa thử bao giờ / đang 0 lên trước, câu đã đúng 1 lần (chờ chốt) xuống sau
   if (all === 'due') pool = shuf(pool).slice(0, 30);
   else pool = shuf(pool.filter(function(p){ return mst(p.id) === 0; })).concat(shuf(pool.filter(function(p){ return mst(p.id) === 1; })), shuf(pool.filter(function(p){ return mst(p.id) >= 2; })));
-  if (ci < 0 && pool.length > 30) pool = pool.slice(0, 30);
+  if (ci === -1 && pool.length > 30) pool = pool.slice(0, 30);
   S.dr = {ci:ci, pool:pool, i:0, show:false, pick:-1, dis:false, k:0, n:0, again:0, done:false, mode:all === 'due' ? 'due' : all ? 'all' : 'todo'}; render(); window.scrollTo(0, 0);
 };
 window.chDrillReveal = function(){ if (!S.dr) return; S.dr.show = true; render(); };
@@ -184,15 +185,15 @@ window.chDrillNext = function(){ var D = S.dr; if (!D) return; D.i++; D.show = f
 function drillHTML(ci){
   var M = mastOf(ci), pc = M.n ? Math.round(M.m / M.n * 100) : 0, D = S.dr;
   var ALL = ci < 0;
-  var head = '<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap"><h3 style="margin:0 0 6px">' + (ALL ? '🎯 Tổng ôn trộn mọi chương — ' + M.m + '/' + M.n + ' câu đã tự trả lời được' : '⑤ Tự trả lời hết câu đề của chương — ' + M.m + '/' + M.n + ' câu đã trả lời được') + '</h3><button class="gb-tbtn' + (ENMODE ? ' on' : '') + '" onclick="chEnMode()">🇬🇧 Như thi thật: ' + (ENMODE ? 'BẬT' : 'TẮT') + '</button></div><p class="muted" style="line-height:1.6">Đọc câu, <b>nói câu trả lời ra trước</b>, rồi mới mở phương án và chọn. Một câu tính là "tự trả lời được" khi đúng <b>2 lần liên tiếp</b>; sai là tính lại từ đầu. Câu sai/mới đúng 1 lần sẽ quay lại trong cùng phiên cho tới khi chốt.</p><div class="ch-prog"><i style="width:' + pc + '%"></i></div><div class="muted" style="font-size:12px;margin-top:4px">' + M.one + ' câu đã đúng 1 lần (chờ chốt) · ' + (M.n - M.m - M.one) + ' câu chưa đúng lần nào</div>';
+  var head = '<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap"><h3 style="margin:0 0 6px">' + (ci === -2 ? '🎯 Học chắc: ' + esc(S.custom.label) + ' — ' + M.m + '/' + M.n + ' câu đã tự trả lời được' : '') + (ci === -2 ? '' : ALL ? '🎯 Tổng ôn trộn mọi chương — ' + M.m + '/' + M.n + ' câu đã tự trả lời được' : '⑤ Tự trả lời hết câu đề của chương — ' + M.m + '/' + M.n + ' câu đã trả lời được') + '</h3><button class="gb-tbtn' + (ENMODE ? ' on' : '') + '" onclick="chEnMode()">🇬🇧 Như thi thật: ' + (ENMODE ? 'BẬT' : 'TẮT') + '</button></div><p class="muted" style="line-height:1.6">Đọc câu, <b>nói câu trả lời ra trước</b>, rồi mới mở phương án và chọn. Một câu tính là "tự trả lời được" khi đúng <b>2 lần liên tiếp</b>; sai là tính lại từ đầu. Câu sai/mới đúng 1 lần sẽ quay lại trong cùng phiên cho tới khi chốt.</p><div class="ch-prog"><i style="width:' + pc + '%"></i></div><div class="muted" style="font-size:12px;margin-top:4px">' + M.one + ' câu đã đúng 1 lần (chờ chốt) · ' + (M.n - M.m - M.one) + ' câu chưa đúng lần nào</div>';
   if (!D){
     return head + '<div class="gb-row" style="margin-top:12px">' + (M.m < M.n ? '<button class="btn" onclick="chDrillStart(' + ci + ')">▶ Luyện ' + (ALL ? '30 câu trộn' : (M.n - M.m) + ' câu') + ' chưa trả lời được</button>' : '<b style="color:var(--green)">🎉 Đã tự trả lời được toàn bộ ' + M.n + ' câu.</b>') + '<button class="btn sec" onclick="chDrillStart(' + ci + ',\'due\')">⏰ Ôn câu đã chốt lâu chưa gặp</button><button class="btn sec" onclick="chDrillStart(' + ci + ',true)">🔁 Ôn lại tất cả' + (ALL ? '' : ' ' + M.n + ' câu') + '</button>' + (M.m >= M.n && M.n && !ALL ? '<button class="btn" onclick="chStep(5)">Sang ⑥ Thi chương →</button>' : '') + '</div></div>';
   }
   if (D.done){
     var M2 = mastOf(ci);
-    return head + '<div class="ch-dfb ok" style="margin-top:12px"><b>Xong phiên:</b> đúng ' + D.k + '/' + D.n + ' lượt' + (D.again ? ' · ' + D.again + ' lượt sai phải làm lại' : '') + '.<br>Chương này: <b>' + M2.m + '/' + M2.n + '</b> câu đã tự trả lời được.</div><div class="gb-row" style="margin-top:12px">' + (M2.m < M2.n ? '<button class="btn" onclick="chDrillStart(' + ci + ')">▶ Luyện tiếp ' + (ALL ? '30 câu' : (M2.n - M2.m) + ' câu còn lại') + '</button>' : '') + (ALL ? '<button class="btn sec" onclick="go(\'home\')">🏠 Về Tổng quan</button>' : '<button class="btn sec" onclick="chStep(5)">Sang ⑥ Thi chương →</button>') + '</div></div>';
+    return head + '<div class="ch-dfb ok" style="margin-top:12px"><b>Xong phiên:</b> đúng ' + D.k + '/' + D.n + ' lượt' + (D.again ? ' · ' + D.again + ' lượt sai phải làm lại' : '') + '.<br>Chương này: <b>' + M2.m + '/' + M2.n + '</b> câu đã tự trả lời được.</div><div class="gb-row" style="margin-top:12px">' + (M2.m < M2.n ? '<button class="btn" onclick="chDrillStart(' + ci + ')">▶ Luyện tiếp ' + (ALL ? '30 câu' : (M2.n - M2.m) + ' câu còn lại') + '</button>' : '') + (ci === -2 ? '<button class="btn sec" onclick="go(\'thi\')">← Về Tài liệu thi</button>' : ALL ? '<button class="btn sec" onclick="go(\'home\')">🏠 Về Tổng quan</button>' : '<button class="btn sec" onclick="chStep(5)">Sang ⑥ Thi chương →</button>') + '</div></div>';
   }
-  var p = D.pool[D.i], st = mst(p.id), pci = p.ci != null ? p.ci : ci, lesson = p.li >= 0 ? DATA.chapters[pci].lessons[p.li] : null;
+  var p = D.pool[D.i], st = mst(p.id), pci = (p.ci != null && p.ci >= 0) ? p.ci : (ci >= 0 ? ci : 0), lesson = (p.li >= 0 && DATA.chapters[pci].lessons[p.li]) ? DATA.chapters[pci].lessons[p.li] : null;
   var h = head + '<div class="muted" style="font-size:12.5px;margin-top:10px">Câu ' + (D.i + 1) + '/' + D.pool.length + ' · phiên này đúng ' + D.k + '/' + D.n + ' · <span class="ch-tag">' + esc(p.src) + '</span>' + (ALL ? '<span class="ch-tag" style="color:var(--accent2)">Ch.' + (pci + 1) + ' ' + esc(DATA.chapters[pci].vi) + '</span>' : '') + (lesson ? '<span class="ch-tag">mục ' + (p.li + 1) + ': ' + esc(lesson.t_vi) + '</span>' : '') + (st === 1 ? '<span class="ch-tag" style="color:var(--yellow)">đã đúng 1 lần — chốt lần 2</span>' : st >= 2 ? '<span class="ch-tag" style="color:var(--green)">ôn lại câu đã chốt</span>' : '') + '' + '</div>';
   if (p.ctx) h += '<div class="muted" style="font-size:13px;margin-top:6px">↩ Câu trước đó: <i>' + esc(p.ctx.q) + '</i> → <b style="color:var(--txt)">' + esc(p.ctx.ans) + '</b></div>';
   var showVi = !ENMODE || D.pick >= 0 || D.vi;
@@ -227,6 +228,7 @@ function listView(el){
 function render(){
   var el = document.getElementById('v-chuong'); if (!el) return;
   if (S.ci === null){ listView(el); return; }
+  if (S.ci === -2){ el.innerHTML = '<div class="ch-wrap"><div class="card" style="padding:14px 16px"><button class="back" onclick="go(\'thi\')">← Tài liệu thi</button><div class="muted" style="font-size:12.5px;margin-top:4px">Chỉ luyện câu chưa chắc của bộ này. Tiếng Anh trước, tự trả lời rồi mới mở phương án; đúng 2 lần liên tiếp mới tính là chắc.</div></div>' + drillHTML(-2) + '</div>'; return; }
   if (S.ci < 0){ el.innerHTML = '<div class="ch-wrap"><div class="card" style="padding:14px 16px"><button class="back" onclick="chList()">← Các chương</button><div class="muted" style="font-size:12.5px;margin-top:4px">Trộn câu đề của mọi chương như đề thi thật. Muốn học gọn từng chương thì quay lại danh sách.</div></div>' + drillHTML(-1) + '</div>'; return; }
   var ci = S.ci, c = DATA.chapters[ci], X = EXTRA[ci] || {}, pts = (window.HOCDE && HOCDE.byChapter[ci]) || [];
   var h = '<div class="card" style="padding:14px 16px"><button class="back" onclick="chList()">← Các chương</button><div class="row" style="justify-content:space-between;align-items:flex-start;margin-top:6px"><div><span class="pill">Chương ' + (ci + 1) + '</span><h2 style="margin-top:4px">' + esc(c.vi) + '</h2><div class="muted" style="font-size:12.5px">' + esc(c.en || '') + '</div></div><div style="text-align:right;min-width:90px"><div style="font-size:22px;font-weight:800;color:var(--accent2)">' + chapterPct(ci) + '%</div><div class="muted" style="font-size:11px">hoàn thành chương</div></div></div>'

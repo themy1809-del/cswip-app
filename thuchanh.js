@@ -124,7 +124,7 @@ function inject(){
   var first = el.querySelector('.thi-card'); if (!first) return; var mh2 = first.querySelector('h2'); if (!mh2 || !/^📖/.test(mh2.textContent.trim())) return;
   var d = document.createElement('div'); d.className = 'thi-card'; d.id = 'th-card'; d.style.borderLeft = '3px solid var(--green)';
   d.innerHTML = '<div style="display:flex;align-items:center;gap:10px"><div style="font-size:26px">🔧</div><div style="flex:1"><b>Thi thực hành (plate/pipe) — cách TWI chấm</b><span class="thi-tag">13 loại khuyết tật</span><span class="thi-tag">nhóm A/B/C</span><div class="thi-muted">3 câu hỏi cho mỗi mẫu, bảng tiêu chí chấp nhận đúng theo phụ lục, ảnh thật từng loại, bài tập kết án có chấm.</div></div></div><div class="thi-row"><button class="btn" onclick="TH.open()">🔧 Mở bài thực hành</button></div>';
-  var anchor = el.querySelector('#wp-card') || first; anchor.insertAdjacentElement('afterend', d);
+  var anchor = el.querySelector('#grp-th') || first; anchor.insertAdjacentElement('afterend', d);
 }
 new MutationObserver(function(){ try{ inject(); }catch(e){} }).observe(document.body, {childList:true, subtree:true});
 if (typeof window.go === 'function' && !window._thGoWrapped){ var og = window.go; window.go = function(t){ if (t !== 'thi'){ OPEN = false; } return og.apply(this, arguments); }; window._thGoWrapped = true; }

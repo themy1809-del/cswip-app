@@ -164,6 +164,15 @@ window.sachOpen = function(id){ if (!BYID[id]) return; if (SPK.on){ SPK.on = fal
 window.sachToc = function(){ if (SPK.on){ SPK.on = false; try{ speechSynthesis.cancel(); }catch(e){} } S.view = 'toc'; if (CUR !== 'sach') go('sach'); else render(); window.scrollTo(0, 0); };
 window.sachToggle = function(id){ var nx = sachStats().next; var cur = S.open[id] !== undefined ? !!S.open[id] : !!(nx && nx.indexOf(id + '.') === 0); S.open[id] = !cur; render(); };
 window.sachFilter = function(ci){ S.filterCi = ci; S.view = 'toc'; if (CUR !== 'sach') go('sach'); else render(); };
+/* tìm mục sách khớp nhất với một câu hỏi (dùng cho Tài liệu thi → 📖 Đọc trong sách) */
+var SUBSET = null, DF = null;
+window.sachFind = function(text, ci){
+  if (!SUBSET){ DF = {}; SUBSET = SUBS.map(function(x){ var w = wset(secText(x).slice(0, 8000)), tw = wset(x.t); for (var k in w) DF[k] = (DF[k] || 0) + 1; return {s:x, w:w, tw:tw}; }); }
+  text = String(text || '').replace(/^\s*(P\d-\d+a?|S\d+-QU\d+|Q\d+|QU ?\d+)\.\s*/i, '').replace(/with reference to the previous (question|answer)( and the correct answer)?,?/ig, ' ').replace(/\b(reference|previous|question|answer|correct|statement|true|following|options?)\b/ig, ' ');
+  var N = SUBSET.length, qs = wset(text), best = null, bs = 0;
+  SUBSET.forEach(function(o){ var sc = 0; for (var k in qs){ var idf = Math.log(N / (1 + (DF[k] || 0))); if (o.w[k]) sc += Math.max(0.2, idf); if (o.tw[k]) sc += 2 * Math.max(0.5, idf); } if (ci != null && o.s.ci === ci) sc *= 1.35; if (sc > bs){ bs = sc; best = o.s; } });
+  return bs >= 4 ? best.id : null;
+};
 window.sachChapter = function(ci){ var first = SUBS.filter(function(s){ return s.ci === ci && !P.done[s.id]; })[0] || SUBS.filter(function(s){ return s.ci === ci; })[0]; S.filterCi = ci; if (first){ sachOpen(first.id); } else sachFilter(ci); };
 window.sachFont = function(d){ P.font = Math.max(13, Math.min(22, P.font + d)); save(); render(); };
 window.sachVi = function(){ P.vi = P.vi ? 0 : 1; save(); render(); };
