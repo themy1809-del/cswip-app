@@ -18,7 +18,7 @@
 if (typeof DATA === 'undefined' || typeof go !== 'function') return;
 
 var DAY = 86400000;
-var DEFAULT_EXAM = '2026-12-01';
+var DEFAULT_EXAM = '2026-12-23';
 var PASS = 70;
 
 /* ---------- tiện ích ---------- */
@@ -153,6 +153,25 @@ function mastStreak(id){ var m = MAST[id]; return m ? (m.s || 0) : 0; }
 function mcqOfChapter(ci){ return ((window.HOCDE && HOCDE.byChapter[ci]) || []).filter(function(p){ return p.mcq && p.opts && p.opts.length > 1; }); }
 function mastTotals(){ var tot = 0, m = 0, one = 0, per = []; DATA.chapters.forEach(function(c, ci){ var pts = mcqOfChapter(ci), mm = 0, o1 = 0; pts.forEach(function(p){ var st = mastStreak(p.id); if (st >= 2) mm++; else if (st === 1) o1++; }); tot += pts.length; m += mm; one += o1; per.push({ci:ci, n:pts.length, m:mm, one:o1}); }); return {tot:tot, m:m, one:one, per:per}; }
 function mastDue(days){ var lim = Date.now() - (days || 7) * 864e5, n = 0; DATA.chapters.forEach(function(c, ci){ mcqOfChapter(ci).forEach(function(p){ var m = MAST[p.id]; if (m && (m.s || 0) >= 2 && (m.last || 0) < lim) n++; }); }); return n; }
+function roadmapHTML(){
+  var days = daysLeft(); if (days < 0) return '';
+  var chDone = 0; try{ DATA.chapters.forEach(function(_, ci){ var r = chapResult(ci); if (r && r.best >= PASS) chDone++; }); }catch(e){}
+  var M = null; try{ if (window.HOCDE) M = mastTotals(); }catch(e){}
+  var bk = null; try{ if (window.sachStats) bk = sachStats(); }catch(e){}
+  var mock = recentMockAvg(3), ph = phase(days);
+  function st(id){ return ph.id === id ? ' cur' : (['base', 'drill', 'mock', 'final', 'rest'].indexOf(id) < ['base', 'drill', 'mock', 'final', 'rest'].indexOf(ph.id) ? ' past' : ''); }
+  function bar(v, t, lbl, col){ var p = t ? Math.min(100, Math.round(v / t * 100)) : 0; return '<div class="nr-weak"><div class="nm"><div>' + lbl + ' <span class="muted" style="font-size:12px">' + v + '/' + t + '</span></div><div class="nr-bar"><i style="width:' + p + '%;background:' + (col || 'var(--accent2)') + '"></i></div></div><div class="pc" style="color:' + (p >= 100 ? 'var(--green)' : 'var(--txt)') + '">' + p + '%</div></div>'; }
+  var h = '<details class="card nr-road" ' + (days > 40 || days % 7 === 0 ? 'open' : '') + '><summary style="cursor:pointer"><b>🗺️ Kế hoạch ' + days + ' ngày để thi đậu CSWIP 3.1</b> <span class="muted" style="font-size:12.5px">— đang ở giai đoạn: <b style="color:' + ph.col + '">' + ph.name + '</b></span></summary>'
+    + '<div style="margin-top:8px;font-size:13.5px;line-height:1.6"><b>Đích đến trước ngày thi:</b> thi thử ổn định ≥80% cả 3 phần · tự trả lời được 420/420 câu đề · đọc & ngấm hết 120 mục sách · thi chương đậu 18/18.</div>'
+    + '<div style="margin-top:8px">' + bar(chDone, DATA.chapters.length, '📗 Chương đã thi đậu (≥70%)') + (M ? bar(M.m, M.tot, '🎯 Câu đề tự trả lời được', 'var(--green)') : '') + (bk ? bar(bk.done, bk.total, '📖 Mục sách đã ngấm', 'var(--accent)') : '') + bar(mock == null ? 0 : mock, 80, '🎓 TB 3 đề thi thử gần nhất (mục tiêu 80%)', 'var(--yellow)') + '</div>'
+    + '<div class="nr-steps">'
+    + '<div class="nr-step' + st('base') + st('drill') + '"><b>① Ngày ' + days + ' → 22 · Hiểu + cày từng chương</b><div>Mỗi ngày <b>1 chương</b> ở 📗 Học gọn chương (nghe giảng → mổ xẻ mục → mổ xẻ câu → tự trả lời hết → thi chương ≥70%). Thứ tự: chương hay ra đề trước (Khuyết tật, Quá trình hàn, NDT, WPS…). Song song: 📖 đọc sách 3 mục/ngày, 🎯 chốt 10 câu/ngày, 📖 25 câu Tài liệu thi. Mỗi 3 ngày 1 đề thi thử để quen áp lực giờ.</div></div>'
+    + '<div class="nr-step' + st('mock') + '"><b>② Ngày 21 → 8 · Thi thử + vá lỗ hổng</b><div>Cách ngày 1 đề thi thử bấm giờ (P1/P2/P3 luân phiên) → mổ xẻ từng câu sai → về đúng chương yếu nhất (bước ⑤ + ⑦). Ngày xen kẽ: ôn chương yếu + đọc nốt sách + chốt 15 câu/ngày. Bắt đầu lướt 📝 sổ tay tóm tắt sau mỗi phần.</div></div>'
+    + '<div class="nr-step' + st('final') + '"><b>③ Ngày 7 → 3 · Chốt</b><div>Không học mới. Mỗi ngày: 📕 Sổ câu sai → ⏰ câu đã chốt lâu chưa gặp → 🔢 số liệu & thần chú 18 chương → 📝 sổ tay 12 trang → 🔤 120 từ vựng. Ngày thứ 5 làm đề thi thử cuối cùng đủ 3 phần.</div></div>'
+    + '<div class="nr-step' + st('rest') + '"><b>④ Ngày 2 → 0 · Nghỉ & chuẩn bị</b><div>Lướt sổ tay 20 phút, chuẩn bị kính, dưỡng đo, bút, giấy tờ, lộ trình đến điểm thi. Ngủ đủ. Vào phòng thi: đọc kỹ từ phủ định, loại 2 phương án sai rõ, quyết bằng cơ chế đã học.</div></div>'
+    + '</div><div class="muted" style="font-size:12px;margin-top:6px">Ngày thi hiện đặt ' + examDate().toLocaleDateString('vi-VN') + ' — đổi ở thẻ đếm ngược nếu khác. Việc hằng ngày bên dưới tự sinh theo kế hoạch này.</div></details>';
+  return h;
+}
 function masteryHTML(){
   if (!window.HOCDE) return '';
   var M = mastTotals(); if (!M.tot) return '';
@@ -336,6 +355,7 @@ function todayTasks(){
     var gp = (window.gbProgress ? gbProgress(ci) : null);
     add('chap', '📗 Học gọn chương "' + (ch ? ch.vi : '') + '" — đi 8 bước: nghe giảng → mổ xẻ mục → mổ xẻ câu → tự trả lời hết → thi chương' + (gp && !gp.done ? ' (giảng ' + gp.pct + '%)' : ''), (window.chStart ? "chStart(" + ci + ")" : (window.gbStart ? "gbStart(" + ci + ")" : "go('learn');openChap(" + ci + ")")), (gp && gp.done) || (up != null && up >= 80));
   }
+  if (window.sachStats){ var ss = sachStats(); if (ss.goal) add('sach', '📖 Đọc sách để ngấm: ' + ss.goal + ' mục (hôm nay ' + ss.today + ')' + (ss.next ? ' — tiếp ' + ss.next + ' ' + ss.nextTitle : ''), "sachResume()", ss.today >= ss.goal); }
   if (window.HOCDE && window.chDrillAll){ var mg = ph.id === 'final' ? 25 : 15, td = mastToday(); add('mast', '🎯 Chốt thêm ' + mg + ' câu "tự trả lời được" (đúng 2 lần liên tiếp) — hôm nay +' + td, "chDrillAll()", td >= mg); }
   if ((ph.id === 'drill' || ph.id === 'mock') && window.hdProgress){
     var hci = chapOfDay(days), hp = hdProgress(hci);
@@ -392,6 +412,7 @@ css.textContent = [
 '.nr-hero .nr-days small{font-size:15px;color:var(--muted);font-weight:600;letter-spacing:0}',
 '.nr-phase{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid currentColor;margin-left:6px}',
 '.nr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}',
+'.nr-steps{margin-top:10px}.nr-step{border-left:3px solid var(--line);padding:6px 10px;margin:6px 0;font-size:13px;line-height:1.55;color:var(--muted)}.nr-step b{color:var(--txt)}.nr-step.cur{border-left-color:var(--accent);background:rgba(255,138,68,.07);color:var(--txt)}.nr-step.past{opacity:.6}body.light .nr-step.cur{background:#fff5ec}.nr-road summary::-webkit-details-marker{display:none}',
 '.nr-stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px}',
 '.nr-stat b{display:block;font-size:22px;line-height:1.2}',
 '.nr-stat span{font-size:11.5px;color:var(--muted)}',
@@ -563,7 +584,7 @@ function renderHomeNR(){
   var curCh = (window.chCurrent && chCurrent() != null) ? chCurrent() : null;
   var curBanner = curCh != null ? '<div class="card" style="border-left:3px solid var(--accent2);display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="font-size:26px">📗</div><div style="flex:1;min-width:200px"><b>Đang học gọn chương ' + (curCh + 1) + ': ' + esc(DATA.chapters[curCh].vi) + '</b><div class="muted" style="font-size:12.5px;margin-top:2px">Học hết chương này rồi mới sang chương khác — không lan man.</div></div><button class="btn" onclick="chStart(' + curCh + ')">▶ Tiếp tục</button></div>' : '';
   el.innerHTML = '<p class="muted" style="margin:-6px 0 10px;font-size:13.5px">' + hi + ' — ' + (daysLeft() > 0 ? 'bám lộ trình, mỗi ngày một ít, đến ngày thi là đủ.' : 'chúc bạn thi tốt!') + '</p>'
-    + heroHTML() + curBanner + masteryHTML() + tasksHTML() + weakHTML() + quickHTML() + trendHTML() + heatHTML(10) + howHTML();
+    + heroHTML() + roadmapHTML() + curBanner + masteryHTML() + tasksHTML() + weakHTML() + quickHTML() + trendHTML() + heatHTML(10) + howHTML();
 }
 
 /* ---------- LỘ TRÌNH ĐỘNG ---------- */
@@ -571,10 +592,10 @@ function dayPlan(days, d){
   var ph = phase(days), L = LOG[dkey(d)];
   var txt;
   if (ph.id === 'rest') txt = 'Nghỉ. Lướt Sổ câu sai 20 phút. Chuẩn bị dụng cụ & giấy tờ. Ngủ sớm.';
-  else if (ph.id === 'final') txt = '📚 Ôn hiểu chương yếu nhất (Giảng giải). Sổ câu sai + Luyện điểm yếu 20 câu. Bảng thuộc lòng (tư thế, ký hiệu que, NDT). Lướt 120 từ vựng.';
-  else if (ph.id === 'mock') txt = '📚 Hiểu bài: ' + chName(chapOfDay(days)) + '. ' + (days % 2 === 0 ? '🎓 Thi thử Phần ' + (['1', '2', '3'][Math.floor(days / 2) % 3]) + ' bấm giờ → xem lại câu sai.' : '📖 25 câu Tài liệu thi + Sổ câu sai.') + ' Ôn ngắt quãng nếu có câu đến hạn.';
-  else if (ph.id === 'drill') txt = '📚 Hiểu bài: ' + chName(chapOfDay(days)) + ' (Giảng giải + tự kiểm). 📖 25 câu Tài liệu thi + Sổ câu sai.' + (days % 3 === 0 ? ' 🎓 1 đề thi thử bấm giờ.' : '');
-  else if (ph.id === 'base'){ txt = '📚 Chương "' + chName(chapOfDay(days)) + '" + quiz chương. 15 câu Tài liệu thi.' + (days % 7 === 0 ? ' 🎓 Thi thử cuối tuần.' : ''); }
+  else if (ph.id === 'final') txt = '📝 Sổ tay tóm tắt viết tay (12 trang) + 🔢 số liệu & thần chú từng chương · 📕 Sổ câu sai · ⏰ câu đã chốt lâu chưa gặp · 🔤 120 từ vựng. Không học chủ đề mới.' + (days === 5 ? ' 🎓 Đề thi thử CUỐI CÙNG (đủ 3 phần).' : '');
+  else if (ph.id === 'mock') txt = (days % 2 === 0 ? '🎓 Thi thử Phần ' + (['1', '2', '3'][Math.floor(days / 2) % 3]) + ' bấm giờ → mổ xẻ câu sai → về Học gọn chương yếu nhất.' : '📗 Ôn chương yếu: ' + chName(chapOfDay(days)) + ' (bước ⑤ tự trả lời + ⑦ câu sai).') + ' 📖 Đọc sách 3 mục · 🎯 chốt 15 câu · 📝 lướt sổ tay tóm tắt.';
+  else if (ph.id === 'drill') txt = '📗 Học gọn chương "' + chName(chapOfDay(days)) + '" đủ 8 bước · 📖 Đọc sách 3 mục · 🎯 chốt 10 câu tự trả lời · 📖 25 câu Tài liệu thi · Sổ câu sai.' + (days % 3 === 0 ? ' 🎓 1 đề thi thử bấm giờ.' : '');
+  else if (ph.id === 'base'){ txt = '📗 Học gọn chương "' + chName(chapOfDay(days)) + '" (nghe giảng → mổ xẻ → tự trả lời → thi chương) · 📖 Đọc sách 3 mục · 🎯 chốt 10 câu · 15 câu Tài liệu thi.' + (days % 7 === 0 ? ' 🎓 Thi thử cuối tuần.' : ''); }
   else txt = '—';
   var st = '';
   if (L && (L.n || (L.mock && L.mock.length))) st = '<span style="color:var(--green)">✓ ' + L.n + ' câu, đúng ' + L.k + (L.mock && L.mock.length ? ' · thi thử ' + L.mock.join('%, ') + '%' : '') + '</span>';
@@ -584,7 +605,7 @@ function chName(ci){ return (DATA.chapters[ci] && DATA.chapters[ci].vi) || ('Ch�
 function renderPlanNR(){
   var el = document.getElementById('v-plan'); if (!el) return;
   var days = daysLeft(), e = examDate(), today = fromKey(dkey());
-  var h = '<div class="card"><h2>🗓️ Lộ trình tới ngày thi ' + pad2(e.getDate()) + '/' + pad2(e.getMonth() + 1) + '/' + e.getFullYear() + '</h2>'
+  var h = roadmapHTML() + '<div class="card"><h2>🗓️ Lộ trình tới ngày thi ' + pad2(e.getDate()) + '/' + pad2(e.getMonth() + 1) + '/' + e.getFullYear() + '</h2>'
     + '<p class="muted" style="margin-top:6px">Kế hoạch tính tự động từ số ngày còn lại (<b style="color:var(--accent)">' + Math.max(0, days) + ' ngày</b>). Ngày đã qua hiện kết quả thật; hôm nay được tô cam. Đổi ngày thi ở Tổng quan.</p>'
     + '<div class="warn">⚠️ CSWIP 3.1 yêu cầu <b>kinh nghiệm thanh tra hàn tối thiểu</b> và đăng ký qua trung tâm được TWI phê duyệt. App ôn lý thuyết; phần thực hành (plate/pipe/macro) cần luyện trên mẫu thật tại khóa học.</div></div>';
   // các giai đoạn
@@ -729,8 +750,8 @@ window.addEventListener('error', function(e){
 /* ---------- đăng ký tab, menu, thanh dưới ---------- */
 function ensureView(id){ if (document.getElementById('v-' + id)) return; var main = document.querySelector('main'); if (!main) return; var d = document.createElement('div'); d.id = 'v-' + id; d.className = 'view'; main.appendChild(d); }
 ensureView('wrong');
-var LABELS = {home:'🏠 Tổng quan', chuong:'📗 Học gọn chương', teach:'🎙️ Giảng bài', hocde:'📘 Học từ đề', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
-var ORDER = ['home', 'chuong', 'teach', 'hocde', 'thi', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
+var LABELS = {home:'🏠 Tổng quan', chuong:'📗 Học gọn chương', sach:'📖 Đọc sách', teach:'🎙️ Giảng bài', hocde:'📘 Học từ đề', thi:'📖 Tài liệu thi', mock:'🎓 Thi thử', quiz:'📝 Quiz & Ôn tập', wrong:'📕 Sổ câu sai', learn:'📚 Bài học', flash:'🃏 Flashcard', plan:'🗓️ Lộ trình', tools:'🛠️ Công cụ', tutor:'🤖 AI Gia sư', profile:'👤 Hồ sơ', cwi:'🇺🇸 CWI (tham khảo)'};
+var ORDER = ['home', 'chuong', 'sach', 'teach', 'hocde', 'thi', 'mock', 'quiz', 'wrong', 'learn', 'flash', 'plan', 'tools', 'tutor', 'profile', 'cwi'];
 function reorderTabs(){
   if (typeof TABS === 'undefined') return;
   var have = {}; TABS.forEach(function(t){ have[t[0]] = t[1]; });

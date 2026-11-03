@@ -7,8 +7,9 @@ Bản chạy trực tiếp: https://themy1809-del.github.io/cswip-app/
 
 | Tab | Dùng để | Ghi chú |
 |---|---|---|
-| 🏠 Tổng quan | Đếm ngược ngày thi, **mục tiêu cuối: tự trả lời hết 420 câu trắc nghiệm của bộ đề** (theo từng chương; nút trộn 30 câu mọi chương như thi, ôn lại câu đã chốt quá 7 ngày; việc hằng ngày "chốt thêm 15 câu"), **việc cần làm hôm nay**, điểm yếu, mức sẵn sàng, lịch sử học | Việc hằng ngày tự sinh theo số ngày còn lại và chỗ bạn yếu |
+| 🏠 Tổng quan | Đếm ngược ngày thi, **🗺️ kế hoạch N ngày để thi đậu** (4 giai đoạn, thước đo chương/câu/sách/thi thử), **mục tiêu cuối: tự trả lời hết 420 câu trắc nghiệm của bộ đề** (theo từng chương; nút trộn 30 câu mọi chương như thi, ôn lại câu đã chốt quá 7 ngày; việc hằng ngày "chốt thêm 15 câu"), **việc cần làm hôm nay**, điểm yếu, mức sẵn sàng, lịch sử học | Việc hằng ngày tự sinh theo số ngày còn lại và chỗ bạn yếu |
 | 📗 Học gọn chương | **Một chương = một đường đi 8 bước**: mục tiêu → nghe giảng → mổ xẻ từng mục (ý chính, giảng giải, hình, đề hỏi gì, bẫy, số liệu) → mổ xẻ từng câu đề → **tự trả lời hết** (đoán trước, mở phương án sau; đúng 2 lần liên tiếp mới tính) → thi chương → câu sai → số liệu & **tiếng Anh chuyên ngành** | Chương đang học được Tổng quan & việc hằng ngày bám theo, không học lan man. Bước ⑤ mặc định "như thi thật": chỉ tiếng Anh, dịch hiện sau khi trả lời |
+| 📖 Đọc sách | **Toàn bộ giáo trình WIS5** (24 phần, 120 mục, 223 hình) đọc trong app: thầy tóm tắt tiếng Việt trước → nguyên văn tiếng Anh (chạm thuật ngữ ra nghĩa, 🔊 nghe đọc) → "Ngấm chưa?" bằng câu đề thật về đúng mục → đánh dấu đã ngấm; kế hoạch đọc xong trước ngày thi; 📝 sổ tay tóm tắt viết tay 12 trang | Tiến độ `cswip_sach`; việc hằng ngày "đọc N mục" |
 | 🎙️ Giảng bài | **Thầy ảo dẫn từng slide**: hình mô phỏng hiện dần từng lớp → giảng từng đoạn → hỏi lại bằng câu đề thật kèm 🔍 mổ xẻ đề → bẫy đề → con số thuộc lòng → chốt thuật ngữ → 5 câu tổng kết | ▶ chạy tự động với giọng đọc tiếng Việt, ô "Hỏi thầy", nhớ tiến độ học dở |
 | 📘 Học từ đề | **711 câu đề thật lật thành bài học**: Đề hỏi gì → Điều phải nhớ → Vì sao, xếp theo từng mục của 18 chương; gợi nhớ chủ động, bảng tóm tắt in được, kiểm tra lại bằng chính các câu đó | Câu sai vào Sổ câu sai & SRS |
 | 📖 Tài liệu thi | Đề Work Pack, Leading Questions, WPS Rings, điền khuyết, bộ hỏi–đáp kinh nghiệm | Chọn đáp án tiếng Anh trước, xem dịch sau |
@@ -40,6 +41,8 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 | `giangbai.js` | 🎙️ Giảng bài dạng slide (tự sinh từ `deep` + `lessons` + `key` + `quiz` + đề thật theo chủ đề) + 🔍 **mổ xẻ đề** dùng chung (`gbDissectHTML`): 12 kiểu "cách họ hỏi" kèm lời khuyên, từ phủ định, dịch, từ khó, và "cách nhận biết đáp án" thống kê từ chính bộ đề (All of the above, None/Both, từ tuyệt đối, phương án dài nhất, lặp từ khóa, cặp đối lập, số liệu) |
 | `phantich.js` | 🔎 Phân tích bộ đề (tỉ trọng chương, mục hỏi nhiều, kiểu câu, độ phủ trọng tâm) + nút "Kiến thức bộ này" và hộp "Kiến thức bám sát" trong Tài liệu thi + huy hiệu "đề hỏi N lần" trong Bài học |
 | `hocde.js` | 📘 Học từ đề thi: gom 510 câu Tài liệu thi + 206 câu ngân hàng thành điểm kiến thức theo chương/mục (THI_LESSON_MAP + khớp từ khóa); nút 🔍 mổ xẻ trong màn học |
+| `book_wis5.js` | Văn bản giáo trình WIS5 trích tự động từ PDF (mục, đoạn, gạch đầu dòng, bảng, hình gắn theo caption); mỗi mục gắn chương app tương ứng. © TWI — chỉ học tập cá nhân |
+| `docsach.js` | 📖 Đọc sách: mục lục, trình đọc (thuật ngữ gạch chân + popup nghĩa, đọc giọng Anh, cỡ chữ), tóm tắt VI tự ghép từ `deep`/`lessons`, câu đề khớp mục, tiến độ & kế hoạch đọc, 📝 sổ tay viết tay (`img_book/sotay/`) |
 | `tienganh.js` | 🇬🇧 Tiếng Anh chuyên ngành sát tài liệu: với mỗi mục/chương, lọc thuật ngữ (từ điển 502 từ) xuất hiện trong chính mục đó, trong lời giảng tiếng Anh của giáo trình và trong câu đề thật; mỗi từ có nghĩa, câu giáo trình, câu đề chứa nó, số lần đề dùng, đọc giọng Anh; ôn nhanh EN → nghĩa |
 | `chuong.js` | 📗 Học gọn chương: hub 18 chương, 8 bước tuyến tính, thẻ mổ xẻ mục & câu đề, bước ⑤ luyện "tự trả lời hết" (câu sai/đúng 1 lần quay lại trong phiên; chế độ trộn mọi chương `chDrillAll()`, chế độ ôn câu đã chốt lâu chưa gặp; nút đọc câu hỏi tiếng Anh), tiến độ từng chương (`cswip_chuong`), "chương đang học" cho Tổng quan |
 | `giangbai_data.js` | Lời thầy viết tay 18 chương: hình dung đời thường, bẫy đề, con số thuộc lòng, thần chú, ý giảng bổ sung |
@@ -54,12 +57,12 @@ Tất cả là JS thuần, nạp theo thứ tự trong `index.html`. Các module
 
 ## Bản quyền hình giáo trình
 
-Thư mục `img_book/` chứa hình trích từ tài liệu WIS5 và phụ lục của TWI (© TWI Ltd), do chủ app cung cấp để **học tập cá nhân**. Không phân phối lại thương mại. Nếu cần hạn chế, chuyển repo sang private hoặc xóa thư mục này (app vẫn chạy, chỉ mất hình sách).
+Thư mục `img_book/` chứa hình trích từ tài liệu WIS5 và phụ lục của TWI (© TWI Ltd), `book_wis5.js` chứa văn bản giáo trình, `img_book/sotay/` là sổ tay viết tay của chủ app, do chủ app cung cấp để **học tập cá nhân**. Không phân phối lại thương mại. Nếu cần hạn chế, chuyển repo sang private hoặc xóa thư mục này (app vẫn chạy, chỉ mất hình sách).
 
 ## Dữ liệu lưu trên máy (localStorage)
 
 `cswip_prog`, `cswip_quiz`, `cswip_srs`, `cswip_user`, `cswip_game`, `cswip_exam`, `THIP`, `MOCKH`,
-`cswip_log` (nhật ký ngày), `cswip_wrong` (sổ câu sai), `cswip_cat`, `cswip_seen`, `cswip_und` (hiểu bài), `cswip_teach` (tiến độ giảng bài), `cswip_tasks`, `cswip_exam_date`, `cswip_free`, `cswip_tts`, `cswip_chuong` (tiến độ học gọn chương), `cswip_mast` (chuỗi trả lời đúng liên tiếp từng câu — "tự trả lời được" khi ≥ 2), `cswip_enmode` (bước ⑤ chỉ tiếng Anh).
+`cswip_log` (nhật ký ngày), `cswip_wrong` (sổ câu sai), `cswip_cat`, `cswip_seen`, `cswip_und` (hiểu bài), `cswip_teach` (tiến độ giảng bài), `cswip_tasks`, `cswip_exam_date`, `cswip_free`, `cswip_tts`, `cswip_chuong` (tiến độ học gọn chương), `cswip_mast` (chuỗi trả lời đúng liên tiếp từng câu — "tự trả lời được" khi ≥ 2), `cswip_enmode` (bước ⑤ chỉ tiếng Anh), `cswip_sach` (mục sách đã ngấm, vị trí, cỡ chữ).
 Nút **Sao lưu** ở tab Hồ sơ xuất toàn bộ ra một file JSON.
 
 ## Chạy thử tại chỗ
