@@ -22,7 +22,7 @@ var STOP = {the:1, of:1, and:1, to:1, in:1, a:1, is:1, for:1, on:1, with:1, whic
 function words(s){ return String(s || '').toLowerCase().replace(/<[^>]+>/g, ' ').replace(/[^a-z0-9\- ]/g, ' ').split(/\s+/).filter(function(w){ return w.length >= 3 && !STOP[w]; }); }
 function mapKey(q){ return String(q).toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 60); }
 var ORDER = [4, 1, 6, 7, 2, 8, 9, 5, 3, 11, 10, 15, 0, 12, 13, 14, 16, 17];
-var SRC = {wp1:'Work Pack 1', wp2:'Work Pack 2', wptwi:'Work Pack TWI', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết', dd:'Kéo-thả', c21:'Hỏi đáp 2.1', c22:'Kinh nghiệm 2.2', c23:'Hỏi đáp 2.3'};
+var SRC = {wp1:'Work Pack 1', wp2:'Work Pack 2', wptwi:'Work Pack TWI', lead:'Leading Q', ring:'WPS Rings', fb:'Điền khuyết', dd:'Kéo-thả', c21:'Hỏi đáp 2.1', c22:'Kinh nghiệm 2.2', c23:'Hỏi đáp 2.3', hw:'Homework TWI', hwdd:'Homework kéo-thả', hoq:'Quiz đầu khóa', hos:'Ôn chương Handout', hod:'Ảnh khuyết tật'};
 
 /* ---------- gom điểm kiến thức ---------- */
 var POINTS = [], BYCH = {}, seenQ = {};
@@ -37,20 +37,20 @@ function bestLesson(ci, text){
 function add(p){ var k = mapKey(p.q); if (seenQ[k]) return; seenQ[k] = 1; POINTS.push(p); (BYCH[p.ci] = BYCH[p.ci] || []).push(p); }
 (function build(){
   var M = window.THI_LESSON_MAP || {};
-  ['THI_WP1', 'THI_WP2', 'THI_WPTWI', 'THI_LEAD', 'THI_RING', 'THI_FB', 'THI_DD', 'THI_C21', 'THI_C22', 'THI_C23'].forEach(function(k){
+  ['THI_WP1', 'THI_WP2', 'THI_WPTWI', 'THI_HW', 'THI_HWDD', 'THI_HOQ', 'THI_HOS', 'THI_HOD', 'THI_LEAD', 'THI_RING', 'THI_FB', 'THI_DD', 'THI_C21', 'THI_C22', 'THI_C23'].forEach(function(k){
     var s = window[k]; if (!s || !s.items) return;
     var prev = null;
     s.items.forEach(function(it, i){
       var m = M[mapKey(it.q)]; var mcq = !!(it.o && typeof it.a === 'number');
       var ctx = null; if (prev && /reference to the (previous|above)|previous answer|the answer above|referring to the previous/i.test(it.q)) ctx = {q:prev.q, ans:prev.ans, vq:prev.vq || ''};
-      prev = {q:it.q, ans:mcq ? it.o[it.a] : (it.a || ''), vq:it.vq};
-      var ci = m ? m[0] : null, li = m ? m[1] : -1;
-      var ans = mcq ? it.o[it.a] : (it.a || '');
+      var ans = mcq ? it.o[it.a] : Array.isArray(it.a) ? it.a.map(function(k){ return it.o[k]; }).join(' · ') : (it.a || '');
+      prev = {q:it.q, ans:ans, vq:it.vq};
+      var ci = m ? m[0] : (typeof it.c === 'number' ? it.c : null), li = m ? m[1] : -1;
       if (ci == null){ // chưa map: đoán chương theo từ khóa
         var bestC = -1, bs = 0; DATA.chapters.forEach(function(c, cj){ var li2 = bestLesson(cj, it.q + ' ' + ans); if (li2 >= 0){ bs = 1; bestC = cj; } }); if (bestC < 0) return; ci = bestC;
       }
       if (li < 0) li = bestLesson(ci, it.q + ' ' + ans);
-      add({id:'t:' + s.id + ':' + i, ci:ci, li:li, src:SRC[s.id] || s.vi, mcq:mcq, q:it.q, vq:it.vq || '', opts:mcq ? it.o : null, a:mcq ? it.a : -1, ans:ans, ansVi:'', why:(it.va || '') + (it.n ? ' ⚠️ ' + it.n : ''), cat:SRC[s.id] || s.vi, ctx:ctx});
+      add({id:'t:' + s.id + ':' + i, ci:ci, li:li, src:SRC[s.id] || s.vi, mcq:mcq, q:it.q, vq:it.vq || '', opts:mcq ? it.o : null, optsVi:it.ov || null, img:it.img || null, a:mcq ? it.a : -1, ans:ans, ansVi:(mcq && it.ov) ? it.ov[it.a] : '', why:(it.va || '') + (it.n ? ' ⚠️ ' + it.n : ''), cat:SRC[s.id] || s.vi, ctx:ctx});
     });
   });
   function bank(arr, pre, label){ if (!arr) return; arr.forEach(function(q, i){ if (!q.o || typeof q.a !== 'number') return; var ci = CAT2CH[q.c]; if (ci == null) return; var li = bestLesson(ci, q.q + ' ' + q.o[q.a]); add({id:pre + i, ci:ci, li:li, src:label, mcq:true, q:q.q, vq:q.qv || '', opts:q.o, a:q.a, ans:q.o[q.a], ansVi:(q.ov && q.ov[q.a]) || '', optsVi:q.ov || null, why:q.ev || q.e || '', cat:q.c}); }); }
@@ -200,7 +200,7 @@ function studyView(el){
   var h = topBar() + '<div class="card">' + groupHeader(pt, S.ci, S.i === 0)
     + '<div class="hd-src">🎯 Điểm ' + (S.i + 1) + '/' + pts.length + ' · nguồn: ' + esc(pt.src) + (state === 'learned' ? ' · <span style="color:var(--green)">đã nắm</span>' : state === 'unsure' ? ' · <span style="color:var(--yellow)">chưa chắc</span>' : '') + '</div>'
     + (pt.ctx ? '<div class="hd-vq" style="margin:6px 0;padding:8px 10px;border-left:3px solid var(--line);background:rgba(255,255,255,.03);border-radius:0 8px 8px 0">↩ Câu trước đó: <i>' + esc(pt.ctx.q) + '</i> → <b style="color:var(--txt)">' + esc(pt.ctx.ans) + '</b></div>' : '')
-    + '<div class="hd-q" id="hd-q" style="margin-top:6px">Đề hỏi: ' + markQ(pt.q) + '</div>' + (pt.vq ? '<div class="hd-vq">' + esc(pt.vq) + '</div>' : '')
+    + '<div class="hd-q" id="hd-q" style="margin-top:6px">Đề hỏi: ' + markQ(pt.q) + '</div>' + (pt.img ? '<img src="' + pt.img + '" alt="" style="max-width:100%;border-radius:10px;margin-top:6px;border:1px solid var(--line);background:#fff">' : '') + (pt.vq ? '<div class="hd-vq">' + esc(pt.vq) + '</div>' : '')
     + (S.dis && window.gbDissectHTML ? gbDissectHTML({en:pt.q, vi:pt.vq, opts:(pt.opts || [pt.ans]).map(function(o){ return {en:o}; })}, pt.li >= 0 ? DATA.chapters[pt.ci].lessons[pt.li].t_vi : DATA.chapters[pt.ci].vi) : '');
   if (pt.mcq && pt.opts) h += '<div class="hd-opts">' + pt.opts.map(function(o, k){ return '<div class="hd-opt' + (S.show && k === pt.a ? ' ok' : '') + '" style="cursor:default">' + String.fromCharCode(65 + k) + '. ' + esc(o) + (pt.optsVi && pt.optsVi[k] ? '<span class="sub">' + esc(pt.optsVi[k]) + '</span>' : '') + (S.show && k === pt.a ? ' ✓' : '') + '</div>'; }).join('') + '</div>';
   if (!S.show){
@@ -228,7 +228,7 @@ function quizView(el){
   var q = S.qs[S.qi];
   var h = topBar() + '<div class="card"><div class="hd-src">📝 Kiểm tra lại — câu ' + (S.qi + 1) + '/' + S.qs.length + ' · đúng ' + S.right + ' · ' + esc(q.src) + ' · đọc tiếng Anh như đề thật</div>'
     + (q.ctx ? '<div class="hd-vq" style="margin:6px 0">↩ Câu trước: <i>' + esc(q.ctx.q) + '</i> → <b style="color:var(--txt)">' + esc(q.ctx.ans) + '</b></div>' : '')
-    + '<div class="hd-q" style="margin-top:6px">' + markQ(q.q) + '</div>'
+    + '<div class="hd-q" style="margin-top:6px">' + markQ(q.q) + '</div>' + (q.img ? '<img src="' + q.img + '" alt="" style="max-width:100%;border-radius:10px;margin-top:6px;border:1px solid var(--line);background:#fff">' : '')
     + '<div class="hd-opts">' + q.opts.map(function(o, k){ var cls = ''; if (S.qa !== null){ if (k === q.a) cls = ' ok'; else if (k === S.qa) cls = ' bad'; } return '<button class="hd-opt' + cls + '" ' + (S.qa === null ? 'onclick="hdPick(' + k + ')"' : 'disabled') + '>' + String.fromCharCode(65 + k) + '. ' + esc(o) + '</button>'; }).join('') + '</div>';
   if (S.qa !== null) h += '<div class="hd-ans" style="' + (S.qa === q.a ? '' : 'background:rgba(255,69,58,.08);border-color:rgba(255,69,58,.4)') + '"><div class="lbl" style="' + (S.qa === q.a ? '' : 'color:var(--red)') + '">' + (S.qa === q.a ? '✅ Chuẩn' : '❌ Chưa đúng — đáp án: ' + String.fromCharCode(65 + q.a)) + '</div>' + (q.vq ? '<div class="hd-vq">' + esc(q.vq) + '</div>' : '') + (q.why ? '<div class="why">💡 ' + esc(q.why) + '</div>' : '') + '</div><div class="hd-row"><button class="btn" onclick="hdQNext()">' + (S.qi + 1 >= S.qs.length ? 'Xem kết quả →' : 'Câu tiếp →') + '</button></div>';
   h += '</div>';

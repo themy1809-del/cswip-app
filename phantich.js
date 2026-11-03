@@ -79,7 +79,7 @@ function injectThi(){
   var mh2 = cards.length ? cards[0].querySelector('h2') : null; var isMenu = !!(mh2 && /^📖/.test(mh2.textContent.trim()));
   if (isMenu && !el.querySelector('#pt-card')){
     var d = document.createElement('div'); d.innerHTML = analysisHTML(true); var card = d.firstChild; card.className = 'thi-card'; card.style.borderLeft = '3px solid var(--yellow)';
-    (el.querySelector('#wp-card') || cards[0]).insertAdjacentElement('afterend', card);
+    el.appendChild(card); // cuối menu: các phần thi đứng trước
   }
   cards.forEach(function(c){
     if (c.querySelector('.pt-setbtn')) return;

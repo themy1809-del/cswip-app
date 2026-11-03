@@ -39,7 +39,8 @@ function wrongOfChapter(ci){
   return out;
 }
 function mst(id){ try{ return window.NR && NR.mastStreak ? NR.mastStreak(id) : 0; }catch(e){ return 0; } }
-function mcqOf(ci){ return ((window.HOCDE && HOCDE.byChapter[ci]) || []).filter(function(p){ return p.mcq && p.opts && p.opts.length > 1; }); }
+function mcqOf(ci){ if (ci === -2) return (S.custom && S.custom.pts) || []; if (ci < 0){ var all = []; DATA.chapters.forEach(function(_, i){ all = all.concat(mcqOf(i)); }); return all; } return ((window.HOCDE && HOCDE.byChapter[ci]) || []).filter(function(p){ return p.mcq && p.opts && p.opts.length > 1; }); }
+function mlast(id){ try{ var m = window.NR && NR.mast && NR.mast[id]; return m ? (m.last || 0) : 0; }catch(e){ return 0; } }
 function mastOf(ci){ var pts = mcqOf(ci), m = 0, one = 0; pts.forEach(function(p){ var st = mst(p.id); if (st >= 2) m++; else if (st === 1) one++; }); return {n:pts.length, m:m, one:one}; }
 function chapterPct(ci){
   var c = DATA.chapters[ci], nL = (c.lessons || []).length, nQ = ((window.HOCDE && HOCDE.byChapter[ci]) || []).length, M = mastOf(ci);
@@ -69,6 +70,7 @@ function lessonCardHTML(ci, li, open){
     if (I.pts.length) h += '<div class="ch-sec"><div class="ch-lbl">🎯 Đề thi hỏi gì ở mục này (' + I.pts.length + ')</div>' + I.pts.slice(0, 6).map(function(p){ return '<div class="ch-q"><div>' + esc(p.q) + (p.vq ? '<div class="muted" style="font-size:12.5px">' + esc(p.vq) + '</div>' : '') + '</div><div class="ch-a">→ ' + esc(p.ans) + (p.why ? '<div class="muted" style="font-size:12.5px;font-weight:400">' + esc(p.why) + '</div>' : '') + '</div></div>'; }).join('') + (I.pts.length > 6 ? '<div class="muted" style="font-size:12.5px;margin-top:4px">… và ' + (I.pts.length - 6) + ' câu nữa — xem ở bước ④.</div>' : '') + '</div>';
     if (I.traps.length) h += '<div class="ch-sec" style="border-left-color:var(--red)"><div class="ch-lbl" style="color:var(--red)">⚠️ Bẫy đề</div>' + I.traps.map(function(t){ return '<div style="font-size:13.5px;line-height:1.6;margin-top:4px">' + t + '</div>'; }).join('') + '</div>';
     if (I.nums.length) h += '<div class="ch-sec" style="border-left-color:var(--accent2)"><div class="ch-lbl" style="color:var(--accent2)">🔢 Số liệu phải thuộc</div>' + I.nums.map(function(t){ return '<div style="font-size:13.5px;line-height:1.6;margin-top:4px">' + t + '</div>'; }).join('') + '</div>';
+    if (window.ENT) try{ h += ENT.lessonHTML(ci, li); }catch(e){}
     h += '<div class="gb-row"><button class="btn" onclick="chDone(' + ci + ',' + li + ',true)">' + (done ? '✅ Đã nắm' : '✅ Tôi nắm mục này → mục tiếp') + '</button>' + (done ? '<button class="btn ghost" onclick="chDone(' + ci + ',' + li + ',false)">Bỏ đánh dấu</button>' : '') + '<button class="gb-tbtn" onclick="chSpeak(' + li + ')">🔊</button>' + (window.hdStart && I.pts.length ? '<button class="gb-tbtn" onclick="hdJumpTo(' + JSON.stringify(I.pts[0].id).replace(/"/g, '&quot;') + ')">📘 Luyện các câu của mục</button>' : '') + '</div></div>';
   }
   return h + '</div>';
@@ -80,7 +82,7 @@ function questionCardHTML(ci, p, idx, open){
   var h = '<div class="ch-les' + (done ? ' done' : '') + '" id="ch-q-' + idx + '"><div class="ch-les-h" onclick="chQToggle(' + idx + ')"><div class="ch-num">' + (idx + 1) + '</div><div style="flex:1;min-width:0"><b style="font-weight:600">' + esc(p.q) + '</b><div class="ch-tags"><span class="ch-tag">' + esc(p.src) + '</span>' + (p.li >= 0 ? '<span class="ch-tag">mục ' + (p.li + 1) + '</span>' : '') + '</div></div><div class="ch-st">' + (done ? '✅' : (open ? '▾' : '▸')) + '</div></div>';
   if (open){
     var q = {en:p.q, vi:p.vq, opts:(p.opts || [p.ans]).map(function(o){ return {en:o}; })};
-    h += '<div class="ch-les-b">' + (window.gbDissectHTML ? gbDissectHTML(q, p.li >= 0 ? DATA.chapters[ci].lessons[p.li].t_vi : DATA.chapters[ci].vi) : '');
+    h += '<div class="ch-les-b">' + (p.img ? '<img src="' + p.img + '" alt="" style="max-width:100%;border-radius:10px;margin-top:6px;border:1px solid var(--line);background:#fff">' : '') + (window.gbDissectHTML ? gbDissectHTML(q, p.li >= 0 ? DATA.chapters[ci].lessons[p.li].t_vi : DATA.chapters[ci].vi) : '');
     if (p.ctx) h += '<div class="muted" style="font-size:13px;margin-top:8px">↩ Câu trước đó: <i>' + esc(p.ctx.q) + '</i> → <b style="color:var(--txt)">' + esc(p.ctx.ans) + '</b></div>';
     if (p.opts) h += '<div style="margin-top:8px">' + p.opts.map(function(o, k){ return '<div class="gb-opt' + (k === p.a ? ' ok' : '') + '" style="cursor:default;padding:9px 12px">' + String.fromCharCode(65 + k) + '. ' + esc(o) + (p.optsVi && p.optsVi[k] ? '<span class="lang-en" style="display:block;color:var(--muted);font-size:12.5px">' + esc(p.optsVi[k]) + '</span>' : '') + (k === p.a ? ' ✓' : '') + '</div>'; }).join('') + '</div>';
     h += '<div class="hd-ans" style="margin-top:10px"><div class="lbl">✅ Điều phải nhớ</div><div class="a">' + esc(p.ans) + '</div>' + (p.why ? '<div class="why">💡 ' + esc(p.why) + '</div>' : '') + '</div>';
@@ -91,6 +93,9 @@ function questionCardHTML(ci, p, idx, open){
 
 /* ---------- trạng thái & tab ---------- */
 var S = {ci:null, step:0, openL:0, openQ:0, qfilter:'', dr:null};
+var ENMODE = LS('cswip_enmode', true); // ⑤: như thi thật — chỉ tiếng Anh, dịch hiện sau khi trả lời
+window.chEnMode = function(){ ENMODE = !ENMODE; SV('cswip_enmode', ENMODE); T(ENMODE ? '🇬🇧 Như thi thật: câu hỏi & phương án chỉ tiếng Anh, dịch hiện sau khi trả lời' : '🇻🇳 Hiện dịch tiếng Việt ngay'); render(); };
+window.chDrillVi = function(){ if (S.dr){ S.dr.vi = !S.dr.vi; render(); } };
 function ensure(){
   if (document.getElementById('v-chuong')) return;
   var main = document.querySelector('main'); if (!main) return;
@@ -135,11 +140,13 @@ function ensure(){
 }
 
 /* ---------- API ---------- */
-window.chStart = function(ci, step){ S.ci = ci; P.cur = ci; save(); S.step = step == null ? recommendedStep(ci) : step; S.openL = firstUndone(ci); S.openQ = firstUndoneQ(ci); go('chuong'); };
+window.chStart = function(ci, step){ if (ci < 0){ chDrillAll(); return; } S.ci = ci; P.cur = ci; save(); S.step = step == null ? recommendedStep(ci) : step; S.openL = firstUndone(ci); S.openQ = firstUndoneQ(ci); go('chuong'); };
 window.chList = function(){ S.ci = null; render(); };
-window.chStep = function(s){ S.step = s; if (s !== 4) S.dr = null; render(); window.scrollTo(0, 0); };
+window.chStep = function(s){ if (S.ci < 0){ chList(); return; } S.step = s; if (s !== 4) S.dr = null; render(); window.scrollTo(0, 0); };
+window.chDrillPoints = function(label, pts, mode){ S.custom = {label:label, pts:pts}; S.ci = -2; S.step = 4; S.dr = null; go('chuong'); chDrillStart(-2, mode || false); };
+window.chDrillAll = function(mode){ S.ci = -1; S.step = 4; S.dr = null; go('chuong'); chDrillStart(-1, mode === 'due' ? 'due' : (mode === 'all')); };
 window.chToggle = function(li){ S.openL = (S.openL === li) ? -1 : li; render(); var el = document.getElementById('ch-les-' + li); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); };
-window.chOpenLesson = function(li){ S.step = 2; S.openL = li; render(); var el = document.getElementById('ch-les-' + li); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); };
+window.chOpenLesson = function(li, ci){ if (ci != null && ci >= 0 && ci !== S.ci){ S.ci = ci; P.cur = ci; save(); } if (S.ci < 0) return; S.step = 2; S.openL = li; render(); var el = document.getElementById('ch-les-' + li); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); };
 window.chDone = function(ci, li, ok){ P.les[ci] = P.les[ci] || {}; if (ok) P.les[ci][li] = 1; else delete P.les[ci][li]; save(); if (ok){ try{ if (window.nrUnd){} }catch(e){} var n = DATA.chapters[ci].lessons.length; var nx = -1; for (var i = li + 1; i < n; i++) if (!P.les[ci][i]){ nx = i; break; } S.openL = nx; if (nx < 0 && lessonsDone(ci) >= n) T('🎉 Xong mổ xẻ ' + n + ' mục — sang bước ④ câu hỏi'); } render(); var el = document.getElementById('ch-les-' + (S.openL >= 0 ? S.openL : li)); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); };
 window.chQToggle = function(i){ S.openQ = (S.openQ === i) ? -1 : i; render(); var el = document.getElementById('ch-q-' + i); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); };
 window.chQDone = function(ci, i, ok){ var pts = qlist(ci); var p = pts[i]; if (!p) return; P.qd[ci] = P.qd[ci] || {}; if (ok) P.qd[ci][p.id] = 1; else delete P.qd[ci][p.id]; save(); var nx = -1; for (var k = i + 1; k < pts.length; k++) if (!P.qd[ci][pts[k].id]){ nx = k; break; } S.openQ = nx; render(); var el = document.getElementById('ch-q-' + (nx >= 0 ? nx : i)); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); };
@@ -154,11 +161,14 @@ function recommendedStep(ci){ if (teachPct(ci) < 100) return 1; var n = DATA.cha
 /* ---------- ⑤ TỰ TRẢ LỜI HẾT: đoán trước → mở phương án → chấm → đúng 2 lần liên tiếp mới tính ---------- */
 function shuf(a){ for (var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 window.chDrillStart = function(ci, all){
-  var pool = mcqOf(ci).filter(function(p){ return all || mst(p.id) < 2; });
-  if (!pool.length){ T('🎉 Chương này bạn đã tự trả lời được hết'); S.dr = null; render(); return; }
+  var lim = Date.now() - 7 * 864e5;
+  var pool = mcqOf(ci).filter(function(p){ return all === 'due' ? (mst(p.id) >= 2 && mlast(p.id) < lim) : (all || mst(p.id) < 2); });
+  if (!pool.length){ T(all === 'due' ? 'Không có câu nào đến hạn ôn lại' : ci < 0 ? '🎉 Bạn đã tự trả lời được toàn bộ câu đề' : '🎉 Chương này bạn đã tự trả lời được hết'); S.dr = null; render(); return; }
   // câu chưa thử bao giờ / đang 0 lên trước, câu đã đúng 1 lần (chờ chốt) xuống sau
-  pool = shuf(pool.filter(function(p){ return mst(p.id) === 0; })).concat(shuf(pool.filter(function(p){ return mst(p.id) === 1; })));
-  S.dr = {ci:ci, pool:pool, i:0, show:false, pick:-1, dis:false, k:0, n:0, again:0, done:false}; render(); window.scrollTo(0, 0);
+  if (all === 'due') pool = shuf(pool).slice(0, 30);
+  else pool = shuf(pool.filter(function(p){ return mst(p.id) === 0; })).concat(shuf(pool.filter(function(p){ return mst(p.id) === 1; })), shuf(pool.filter(function(p){ return mst(p.id) >= 2; })));
+  if (ci === -1 && pool.length > 30) pool = pool.slice(0, 30);
+  S.dr = {ci:ci, pool:pool, i:0, show:false, pick:-1, dis:false, k:0, n:0, again:0, done:false, mode:all === 'due' ? 'due' : all ? 'all' : 'todo'}; render(); window.scrollTo(0, 0);
 };
 window.chDrillReveal = function(){ if (!S.dr) return; S.dr.show = true; render(); };
 window.chDrillDis = function(){ if (!S.dr) return; S.dr.dis = !S.dr.dis; render(); };
@@ -174,35 +184,38 @@ window.chDrillPick = function(k){
 window.chDrillNext = function(){ var D = S.dr; if (!D) return; D.i++; D.show = false; D.pick = -1; D.dis = false; if (D.i >= D.pool.length) D.done = true; render(); window.scrollTo(0, 0); };
 function drillHTML(ci){
   var M = mastOf(ci), pc = M.n ? Math.round(M.m / M.n * 100) : 0, D = S.dr;
-  var head = '<div class="card"><h3 style="margin:0 0 6px">⑤ Tự trả lời hết câu đề của chương — ' + M.m + '/' + M.n + ' câu đã trả lời được</h3><p class="muted" style="line-height:1.6">Đọc câu, <b>nói câu trả lời ra trước</b>, rồi mới mở phương án và chọn. Một câu tính là "tự trả lời được" khi đúng <b>2 lần liên tiếp</b>; sai là tính lại từ đầu. Câu sai/mới đúng 1 lần sẽ quay lại trong cùng phiên cho tới khi chốt.</p><div class="ch-prog"><i style="width:' + pc + '%"></i></div><div class="muted" style="font-size:12px;margin-top:4px">' + M.one + ' câu đã đúng 1 lần (chờ chốt) · ' + (M.n - M.m - M.one) + ' câu chưa đúng lần nào</div>';
+  var ALL = ci < 0;
+  var head = '<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap"><h3 style="margin:0 0 6px">' + (ci === -2 ? '🎯 Học chắc: ' + esc(S.custom.label) + ' — ' + M.m + '/' + M.n + ' câu đã tự trả lời được' : '') + (ci === -2 ? '' : ALL ? '🎯 Tổng ôn trộn mọi chương — ' + M.m + '/' + M.n + ' câu đã tự trả lời được' : '⑤ Tự trả lời hết câu đề của chương — ' + M.m + '/' + M.n + ' câu đã trả lời được') + '</h3><button class="gb-tbtn' + (ENMODE ? ' on' : '') + '" onclick="chEnMode()">🇬🇧 Như thi thật: ' + (ENMODE ? 'BẬT' : 'TẮT') + '</button></div><p class="muted" style="line-height:1.6">Đọc câu, <b>nói câu trả lời ra trước</b>, rồi mới mở phương án và chọn. Một câu tính là "tự trả lời được" khi đúng <b>2 lần liên tiếp</b>; sai là tính lại từ đầu. Câu sai/mới đúng 1 lần sẽ quay lại trong cùng phiên cho tới khi chốt.</p><div class="ch-prog"><i style="width:' + pc + '%"></i></div><div class="muted" style="font-size:12px;margin-top:4px">' + M.one + ' câu đã đúng 1 lần (chờ chốt) · ' + (M.n - M.m - M.one) + ' câu chưa đúng lần nào</div>';
   if (!D){
-    return head + '<div class="gb-row" style="margin-top:12px">' + (M.m < M.n ? '<button class="btn" onclick="chDrillStart(' + ci + ')">▶ Luyện ' + (M.n - M.m) + ' câu chưa trả lời được</button>' : '<b style="color:var(--green)">🎉 Đã tự trả lời được toàn bộ ' + M.n + ' câu.</b>') + '<button class="btn sec" onclick="chDrillStart(' + ci + ',true)">🔁 Ôn lại tất cả ' + M.n + ' câu</button>' + (M.m >= M.n && M.n ? '<button class="btn" onclick="chStep(5)">Sang ⑥ Thi chương →</button>' : '') + '</div></div>';
+    return head + '<div class="gb-row" style="margin-top:12px">' + (M.m < M.n ? '<button class="btn" onclick="chDrillStart(' + ci + ')">▶ Luyện ' + (ALL ? '30 câu trộn' : (M.n - M.m) + ' câu') + ' chưa trả lời được</button>' : '<b style="color:var(--green)">🎉 Đã tự trả lời được toàn bộ ' + M.n + ' câu.</b>') + '<button class="btn sec" onclick="chDrillStart(' + ci + ',\'due\')">⏰ Ôn câu đã chốt lâu chưa gặp</button><button class="btn sec" onclick="chDrillStart(' + ci + ',true)">🔁 Ôn lại tất cả' + (ALL ? '' : ' ' + M.n + ' câu') + '</button>' + (M.m >= M.n && M.n && !ALL ? '<button class="btn" onclick="chStep(5)">Sang ⑥ Thi chương →</button>' : '') + '</div></div>';
   }
   if (D.done){
     var M2 = mastOf(ci);
-    return head + '<div class="ch-dfb ok" style="margin-top:12px"><b>Xong phiên:</b> đúng ' + D.k + '/' + D.n + ' lượt' + (D.again ? ' · ' + D.again + ' lượt sai phải làm lại' : '') + '.<br>Chương này: <b>' + M2.m + '/' + M2.n + '</b> câu đã tự trả lời được.</div><div class="gb-row" style="margin-top:12px">' + (M2.m < M2.n ? '<button class="btn" onclick="chDrillStart(' + ci + ')">▶ Luyện tiếp ' + (M2.n - M2.m) + ' câu còn lại</button>' : '') + '<button class="btn sec" onclick="chStep(5)">Sang ⑥ Thi chương →</button></div></div>';
+    return head + '<div class="ch-dfb ok" style="margin-top:12px"><b>Xong phiên:</b> đúng ' + D.k + '/' + D.n + ' lượt' + (D.again ? ' · ' + D.again + ' lượt sai phải làm lại' : '') + '.<br>Chương này: <b>' + M2.m + '/' + M2.n + '</b> câu đã tự trả lời được.</div><div class="gb-row" style="margin-top:12px">' + (M2.m < M2.n ? '<button class="btn" onclick="chDrillStart(' + ci + ')">▶ Luyện tiếp ' + (ALL ? '30 câu' : (M2.n - M2.m) + ' câu còn lại') + '</button>' : '') + (ci === -2 ? '<button class="btn sec" onclick="go(\'thi\')">← Về Tài liệu thi</button>' : ALL ? '<button class="btn sec" onclick="go(\'home\')">🏠 Về Tổng quan</button>' : '<button class="btn sec" onclick="chStep(5)">Sang ⑥ Thi chương →</button>') + '</div></div>';
   }
-  var p = D.pool[D.i], st = mst(p.id), lesson = p.li >= 0 ? DATA.chapters[ci].lessons[p.li] : null;
-  var h = head + '<div class="muted" style="font-size:12.5px;margin-top:10px">Câu ' + (D.i + 1) + '/' + D.pool.length + ' · phiên này đúng ' + D.k + '/' + D.n + ' · <span class="ch-tag">' + esc(p.src) + '</span>' + (lesson ? '<span class="ch-tag">mục ' + (p.li + 1) + ': ' + esc(lesson.t_vi) + '</span>' : '') + (st === 1 ? '<span class="ch-tag" style="color:var(--yellow)">đã đúng 1 lần — chốt lần 2</span>' : '') + '</div>';
+  var p = D.pool[D.i], st = mst(p.id), pci = (p.ci != null && p.ci >= 0) ? p.ci : (ci >= 0 ? ci : 0), lesson = (p.li >= 0 && DATA.chapters[pci].lessons[p.li]) ? DATA.chapters[pci].lessons[p.li] : null;
+  var h = head + '<div class="muted" style="font-size:12.5px;margin-top:10px">Câu ' + (D.i + 1) + '/' + D.pool.length + ' · phiên này đúng ' + D.k + '/' + D.n + ' · <span class="ch-tag">' + esc(p.src) + '</span>' + (ALL ? '<span class="ch-tag" style="color:var(--accent2)">Ch.' + (pci + 1) + ' ' + esc(DATA.chapters[pci].vi) + '</span>' : '') + (lesson ? '<span class="ch-tag">mục ' + (p.li + 1) + ': ' + esc(lesson.t_vi) + '</span>' : '') + (st === 1 ? '<span class="ch-tag" style="color:var(--yellow)">đã đúng 1 lần — chốt lần 2</span>' : st >= 2 ? '<span class="ch-tag" style="color:var(--green)">ôn lại câu đã chốt</span>' : '') + '' + '</div>';
   if (p.ctx) h += '<div class="muted" style="font-size:13px;margin-top:6px">↩ Câu trước đó: <i>' + esc(p.ctx.q) + '</i> → <b style="color:var(--txt)">' + esc(p.ctx.ans) + '</b></div>';
-  h += '<div class="ch-dq">' + esc(p.q) + '</div>' + (p.vq ? '<div class="muted" style="font-size:13.5px;margin-top:2px">' + esc(p.vq) + '</div>' : '');
+  var showVi = !ENMODE || D.pick >= 0 || D.vi;
+  h += (p.img ? '<img src="' + p.img + '" alt="" style="max-width:100%;border-radius:10px;margin-top:8px;border:1px solid var(--line);background:#fff">' : '') + '<div class="ch-dq">' + esc(p.q) + ' <button class="en-sp" style="vertical-align:middle" onclick="entSpeak(' + JSON.stringify(p.q).replace(/"/g, '&quot;') + ')" title="Đọc câu hỏi tiếng Anh">🔊</button></div>' + (p.vq ? (showVi ? '<div class="muted" style="font-size:13.5px;margin-top:2px">' + esc(p.vq) + '</div>' : '<button class="gb-tbtn" style="margin-top:4px" onclick="chDrillVi()">🇻🇳 Xem dịch (hạn chế — thi thật không có)</button>') : '');
   if (!D.show){
     h += '<div class="gb-bubble hook" style="margin-top:12px">🤔 Nói (hoặc nghĩ) câu trả lời của bạn trước. Chỉ khi đã có câu trả lời mới mở phương án — đây là cách duy nhất để biết bạn <b>tự</b> trả lời được hay chỉ nhận ra đáp án.</div>'
-      + '<div class="gb-row"><button class="btn" onclick="chDrillReveal()">Tôi đoán xong → hiện phương án</button>' + (lesson ? '<button class="gb-tbtn" onclick="chOpenLesson(' + p.li + ')">📚 Xem lại mục ' + (p.li + 1) + '</button>' : '') + '</div>';
+      + '<div class="gb-row"><button class="btn" onclick="chDrillReveal()">Tôi đoán xong → hiện phương án</button>' + (lesson ? '<button class="gb-tbtn" onclick="chOpenLesson(' + p.li + ',' + pci + ')">📚 Xem lại mục ' + (p.li + 1) + '</button>' : '') + '</div>';
   } else {
-    h += '<div style="margin-top:10px">' + p.opts.map(function(o, k){ var cls = 'gb-opt'; if (D.pick >= 0){ if (k === p.a) cls += ' ok'; else if (k === D.pick) cls += ' bad'; } return '<button class="' + cls + '" ' + (D.pick >= 0 ? 'disabled' : 'onclick="chDrillPick(' + k + ')"') + '>' + String.fromCharCode(65 + k) + '. ' + esc(o) + (D.pick >= 0 && p.optsVi && p.optsVi[k] ? '<span style="display:block;color:var(--muted);font-size:12.5px">' + esc(p.optsVi[k]) + '</span>' : '') + '</button>'; }).join('') + '</div>';
+    h += '<div style="margin-top:10px">' + p.opts.map(function(o, k){ var cls = 'gb-opt'; if (D.pick >= 0){ if (k === p.a) cls += ' ok'; else if (k === D.pick) cls += ' bad'; } return '<button class="' + cls + '" ' + (D.pick >= 0 ? 'disabled' : 'onclick="chDrillPick(' + k + ')"') + '>' + String.fromCharCode(65 + k) + '. ' + esc(o) + ((D.pick >= 0 || !ENMODE) && p.optsVi && p.optsVi[k] ? '<span style="display:block;color:var(--muted);font-size:12.5px">' + esc(p.optsVi[k]) + '</span>' : '') + '</button>'; }).join('') + '</div>';
     if (D.pick >= 0){
       var right = D.pick === p.a, st2 = mst(p.id);
       h += '<div class="ch-dfb ' + (right ? 'ok' : 'bad') + '"><b>' + (right ? '✅ Đúng' : '❌ Sai — đáp án: ' + String.fromCharCode(65 + p.a) + '. ' + esc(p.ans)) + '</b>' + (right ? (st2 >= 2 ? ' · 🎯 <b>Tự trả lời được</b> (2 lần liên tiếp)' : ' · đúng lần 1, gặp lại lần nữa để chốt') : ' · chuỗi về 0, câu này sẽ quay lại cuối phiên') + (p.why ? '<div style="margin-top:6px;font-size:13.5px;line-height:1.6">💡 ' + esc(p.why) + '</div>' : '') + '</div>';
-      if (D.dis && window.gbDissectHTML) h += gbDissectHTML({en:p.q, vi:p.vq, opts:p.opts.map(function(o){ return {en:o}; })}, lesson ? lesson.t_vi : DATA.chapters[ci].vi);
-      h += '<div class="gb-row"><button class="btn" onclick="chDrillNext()">Câu tiếp →</button><button class="gb-tbtn' + (D.dis ? ' on' : '') + '" onclick="chDrillDis()">🔍 Mổ xẻ: cách hỏi & nhận biết đáp án</button>' + (lesson ? '<button class="gb-tbtn" onclick="chOpenLesson(' + p.li + ')">📚 Về mục ' + (p.li + 1) + '</button>' : '') + '</div>';
+      if (!D.dis && window.ENT){ try{ var tq = ENT.lesson(pci, p.li).filter(function(t){ return (' ' + (p.q + ' ' + p.opts.join(' ')).toLowerCase() + ' ').indexOf(t.en) >= 0; }).slice(0, 4); if (tq.length) h += '<div class="muted" style="font-size:12.5px;margin-top:6px">🇬🇧 ' + tq.map(function(t){ return '<b style="color:#7c5cff">' + esc(t.en) + '</b> = ' + esc(t.vi); }).join(' · ') + '</div>'; }catch(e){} }
+      if (D.dis && window.gbDissectHTML) h += gbDissectHTML({en:p.q, vi:p.vq, opts:p.opts.map(function(o){ return {en:o}; })}, lesson ? lesson.t_vi : DATA.chapters[pci].vi);
+      h += '<div class="gb-row"><button class="btn" onclick="chDrillNext()">Câu tiếp →</button><button class="gb-tbtn' + (D.dis ? ' on' : '') + '" onclick="chDrillDis()">🔍 Mổ xẻ: cách hỏi & nhận biết đáp án</button>' + (lesson ? '<button class="gb-tbtn" onclick="chOpenLesson(' + p.li + ',' + pci + ')">📚 Về mục ' + (p.li + 1) + '</button>' : '') + '</div>';
     }
   }
   return h + '</div>';
 }
 
 /* ---------- vẽ ---------- */
-var STEPS = ['① Mục tiêu', '② Nghe giảng', '③ Mổ xẻ mục', '④ Mổ xẻ câu', '⑤ Tự trả lời hết', '⑥ Thi chương', '⑦ Câu sai', '⑧ Số liệu'];
+var STEPS = ['① Mục tiêu', '② Nghe giảng', '③ Mổ xẻ mục', '④ Mổ xẻ câu', '⑤ Tự trả lời hết', '⑥ Thi chương', '⑦ Câu sai', '⑧ Số liệu & 🇬🇧 thuật ngữ'];
 function stepDone(ci, s){ var c = DATA.chapters[ci]; switch (s){ case 1: return teachPct(ci) >= 100; case 2: return lessonsDone(ci) >= c.lessons.length; case 3: return questionsDone(ci) >= ((window.HOCDE && HOCDE.byChapter[ci]) || []).length; case 4: { var M = mastOf(ci); return M.n > 0 && M.m >= M.n; } case 5: return examBest(ci) != null && examBest(ci) >= 70; case 6: return wrongOfChapter(ci).length === 0 && !!examBest(ci); default: return false; } }
 function listView(el){
   var cur = P.cur;
@@ -215,6 +228,8 @@ function listView(el){
 function render(){
   var el = document.getElementById('v-chuong'); if (!el) return;
   if (S.ci === null){ listView(el); return; }
+  if (S.ci === -2){ el.innerHTML = '<div class="ch-wrap"><div class="card" style="padding:14px 16px"><button class="back" onclick="go(\'thi\')">← Tài liệu thi</button><div class="muted" style="font-size:12.5px;margin-top:4px">Chỉ luyện câu chưa chắc của bộ này. Tiếng Anh trước, tự trả lời rồi mới mở phương án; đúng 2 lần liên tiếp mới tính là chắc.</div></div>' + drillHTML(-2) + '</div>'; return; }
+  if (S.ci < 0){ el.innerHTML = '<div class="ch-wrap"><div class="card" style="padding:14px 16px"><button class="back" onclick="chList()">← Các chương</button><div class="muted" style="font-size:12.5px;margin-top:4px">Trộn câu đề của mọi chương như đề thi thật. Muốn học gọn từng chương thì quay lại danh sách.</div></div>' + drillHTML(-1) + '</div>'; return; }
   var ci = S.ci, c = DATA.chapters[ci], X = EXTRA[ci] || {}, pts = (window.HOCDE && HOCDE.byChapter[ci]) || [];
   var h = '<div class="card" style="padding:14px 16px"><button class="back" onclick="chList()">← Các chương</button><div class="row" style="justify-content:space-between;align-items:flex-start;margin-top:6px"><div><span class="pill">Chương ' + (ci + 1) + '</span><h2 style="margin-top:4px">' + esc(c.vi) + '</h2><div class="muted" style="font-size:12.5px">' + esc(c.en || '') + '</div></div><div style="text-align:right;min-width:90px"><div style="font-size:22px;font-weight:800;color:var(--accent2)">' + chapterPct(ci) + '%</div><div class="muted" style="font-size:11px">hoàn thành chương</div></div></div>'
     + '<div class="ch-steps" style="margin-top:10px">' + STEPS.map(function(s, i){ return '<button class="' + (S.step === i ? 'on' : stepDone(ci, i) ? 'ok' : '') + '" onclick="chStep(' + i + ')">' + s + (stepDone(ci, i) && S.step !== i ? ' ✓' : '') + '</button>'; }).join('') + '</div></div>';
@@ -231,7 +246,7 @@ function render(){
   else if (S.step === 1){
     var tp = teachPct(ci);
     body = '<div class="card"><h3 style="margin:0 0 6px">② Nghe thầy giảng chương này</h3><p class="muted" style="line-height:1.6">Đi hết các slide: hình mô phỏng → giảng từng đoạn → hỏi lại → bẫy → số liệu → chốt thuật ngữ. ' + (tp >= 100 ? '<b style="color:var(--green)">Đã nghe xong.</b>' : tp ? 'Đang ở ' + tp + '%.' : 'Chưa bắt đầu.') + '</p><div class="ch-prog" style="margin:8px 0"><i style="width:' + tp + '%"></i></div>'
-      + '<div class="gb-row"><button class="btn" onclick="gbStart(' + ci + ')">🎙️ ' + (tp && tp < 100 ? 'Nghe tiếp' : tp >= 100 ? 'Nghe lại' : 'Bắt đầu nghe giảng') + '</button><button class="btn sec" onclick="gbStart(' + ci + ',true,true)">🎧 Tự chạy cả chương</button><button class="btn ghost" onclick="go(\'learn\');openChap(' + ci + ')">📄 Bản đọc đầy đủ</button>' + (tp >= 100 || tp > 0 ? '<button class="btn sec" onclick="chStep(2)">Sang ③ Mổ xẻ mục →</button>' : '') + '</div></div>';
+      + '<div class="gb-row"><button class="btn" onclick="gbStart(' + ci + ')">🎙️ ' + (tp && tp < 100 ? 'Nghe tiếp' : tp >= 100 ? 'Nghe lại' : 'Bắt đầu nghe giảng') + '</button><button class="btn sec" onclick="gbStart(' + ci + ',true,true)">🎧 Tự chạy cả chương</button><button class="btn ghost" onclick="go(\'learn\');openChap(' + ci + ')">📄 Bản đọc đầy đủ</button>' + (window.sachChapter ? '<button class="btn sec" onclick="sachChapter(' + ci + ')">📖 Đọc phần giáo trình gốc của chương</button>' : '') + (tp >= 100 || tp > 0 ? '<button class="btn sec" onclick="chStep(2)">Sang ③ Mổ xẻ mục →</button>' : '') + '</div></div>';
   }
   else if (S.step === 2){
     body = '<div class="card"><h3 style="margin:0 0 6px">③ Mổ xẻ từng mục — ' + lessonsDone(ci) + '/' + c.lessons.length + ' đã nắm</h3><p class="muted" style="line-height:1.6">Mỗi mục gom: ý chính, đoạn giảng giải, hình, <b>đề thi hỏi gì đúng ở mục này</b>, bẫy, số liệu. Đọc xong, tự nói lại 1 câu, bấm "Tôi nắm" để mở mục tiếp. Mục nào "chưa thấy trong đề" đọc nhanh thôi.</p><div class="ch-prog"><i style="width:' + Math.round(lessonsDone(ci) / Math.max(1, c.lessons.length) * 100) + '%"></i></div>'
@@ -257,12 +272,14 @@ function render(){
     var ws = wrongOfChapter(ci);
     body = '<div class="card"><h3 style="margin:0 0 6px">⑦ Câu sai của chương này — ' + ws.length + ' câu chưa thuộc</h3><p class="muted" style="line-height:1.6">Gom từ mọi chế độ (quiz, thi chương, tài liệu thi, thi thử, học từ đề). Luyện lại đến khi đúng 2 lần.</p>'
       + (ws.length ? ws.slice(0, 30).map(function(w){ return '<div class="nr-wrong"><div class="q">' + esc(w.q) + (w.qv ? '<div class="muted" style="font-weight:400;font-size:13px">' + esc(w.qv) + '</div>' : '') + '</div><div class="o ok" style="margin-top:6px">✓ ' + esc(w.o[w.a]) + '</div>' + (w.ev ? '<div class="ex">💡 ' + esc(w.ev) + '</div>' : '') + '</div>'; }).join('') : '<p style="color:var(--green)">🎉 Không còn câu sai nào thuộc chương này.</p>')
-      + '<div class="gb-row" style="margin-top:12px">' + (ws.length ? '<button class="btn" onclick="chReviewWrong(' + ci + ')">📝 Luyện lại ' + Math.min(20, ws.length) + ' câu</button>' : '') + '<button class="btn sec" onclick="go(\'wrong\')">📕 Sổ câu sai chung</button><button class="btn sec" onclick="chStep(7)">Sang ⑧ Số liệu →</button></div></div>';
+      + '<div class="gb-row" style="margin-top:12px">' + (ws.length ? '<button class="btn" onclick="chReviewWrong(' + ci + ')">📝 Luyện lại ' + Math.min(20, ws.length) + ' câu</button>' : '') + '<button class="btn sec" onclick="go(\'wrong\')">📕 Sổ câu sai chung</button><button class="btn sec" onclick="chStep(7)">Sang ⑧ Số liệu & thuật ngữ →</button></div></div>';
   }
   else {
     var nx = ORDER[(ORDER.indexOf(ci) + 1) % ORDER.length];
-    body = '<div class="card"><h3 style="margin:0 0 6px">⑧ Số liệu & thần chú phải thuộc của chương</h3>' + (X.numbers ? '<ul class="lesson">' + X.numbers.map(function(n){ return '<li>' + n + '</li>'; }).join('') + '</ul>' : '<p class="muted">Chương này không có bảng số riêng.</p>') + (X.mnemonic ? '<div class="gb-story" style="margin-top:10px">🧷 ' + X.mnemonic + '</div>' : '')
+    body = '<div class="card"><h3 style="margin:0 0 6px">⑧ Số liệu, thần chú & tiếng Anh chuyên ngành của chương</h3>' + (X.numbers ? '<ul class="lesson">' + X.numbers.map(function(n){ return '<li>' + n + '</li>'; }).join('') + '</ul>' : '<p class="muted">Chương này không có bảng số riêng.</p>') + (X.mnemonic ? '<div class="gb-story" style="margin-top:10px">🧷 ' + X.mnemonic + '</div>' : '')
       + (X.traps ? '<h4 style="margin:14px 0 4px;color:var(--red);font-size:14px">⚠️ Bẫy đề của chương (' + X.traps.length + ')</h4><ul class="lesson">' + X.traps.map(function(t){ return '<li>' + t + '</li>'; }).join('') + '</ul>' : '')
+      + (window.sotayHTML && sotayHTML(ci, true) ? '<h4 style="margin:16px 0 4px;color:var(--accent);font-size:14px">📝 Trang sổ tay tóm tắt viết tay của chương</h4>' + sotayHTML(ci, false) : '')
+      + (window.ENT ? ENT.chapterHTML(ci) : '')
       + '<div class="gb-row" style="margin-top:14px"><button class="btn" onclick="chStart(' + nx + ',0)">▶ Chương tiếp theo: ' + esc(DATA.chapters[nx].vi) + '</button><button class="btn sec" onclick="chList()">Danh sách chương</button></div></div>';
   }
   el.innerHTML = '<div class="ch-wrap">' + h + body + '</div>';
