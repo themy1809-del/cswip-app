@@ -274,6 +274,9 @@
   /* ---------- API ---------- */
   window.THI={
     learn:learn, quiz:quiz, drill:drill, drillGroup:drillGroup, exam:exam,
+    mastery:function(id){ var m=0, n=0; SETS.forEach(function(x){ if(id&&x.id!==id) return; var r=setMast(x); if(r){ m+=r.m; n+=r.n; } }); return {m:m, n:n}; },
+    setName:function(id){ var x=getSet(id); return x?x.vi:id; },
+    examName:function(id){ var e=EXAMS.filter(function(x){ return x.id===id; })[0]; return e?e.vi:id; },
     exPick:function(i){ if(!EX||EX.done)return; var k=EX.cur; if(exIsMS(k)){ var a=EX.ans[k]||{}; a[i]=!a[i]; EX.ans[k]=a; } else EX.ans[k]=i; render(); },
     exGo:function(k){ if(!EX||k<0||k>=EX.list.length)return; EX.cur=k; render(); window.scrollTo(0,0); },
     exFlag:function(){ if(!EX)return; EX.flag[EX.cur]=!EX.flag[EX.cur]; render(); },

@@ -162,11 +162,11 @@ function roadmapHTML(){
   function st(id){ return ph.id === id ? ' cur' : (['base', 'drill', 'mock', 'final', 'rest'].indexOf(id) < ['base', 'drill', 'mock', 'final', 'rest'].indexOf(ph.id) ? ' past' : ''); }
   function bar(v, t, lbl, col){ var p = t ? Math.min(100, Math.round(v / t * 100)) : 0; return '<div class="nr-weak"><div class="nm"><div>' + lbl + ' <span class="muted" style="font-size:12px">' + v + '/' + t + '</span></div><div class="nr-bar"><i style="width:' + p + '%;background:' + (col || 'var(--accent2)') + '"></i></div></div><div class="pc" style="color:' + (p >= 100 ? 'var(--green)' : 'var(--txt)') + '">' + p + '%</div></div>'; }
   var h = '<details class="card nr-road" ' + (days > 40 || days % 7 === 0 ? 'open' : '') + '><summary style="cursor:pointer"><b>🗺️ Kế hoạch ' + days + ' ngày để thi đậu CSWIP 3.1</b> <span class="muted" style="font-size:12.5px">— đang ở giai đoạn: <b style="color:' + ph.col + '">' + ph.name + '</b></span></summary>'
-    + '<div style="margin-top:8px;font-size:13.5px;line-height:1.6"><b>Đích đến trước ngày thi:</b> thi thử ổn định ≥80% cả 3 phần · tự trả lời được 420/420 câu đề · đọc & ngấm hết 120 mục sách · thi chương đậu 18/18.</div>'
-    + '<div style="margin-top:8px">' + bar(chDone, DATA.chapters.length, '📗 Chương đã thi đậu (≥70%)') + (M ? bar(M.m, M.tot, '🎯 Câu đề tự trả lời được', 'var(--green)') : '') + (bk ? bar(bk.done, bk.total, '📖 Mục sách đã ngấm', 'var(--accent)') : '') + bar(mock == null ? 0 : mock, 80, '🎓 TB 3 đề thi thử gần nhất (mục tiêu 80%)', 'var(--yellow)') + '</div>'
+    + '<div style="margin-top:8px;font-size:13.5px;line-height:1.6"><b>Đích đến trước ngày thi:</b> thi thử ổn định ≥80% cả 3 phần · Tài liệu thi tự trả lời hết, mọi đề Thi như thật ≥80% · tự trả lời được toàn bộ câu đề · đọc & ngấm hết 120 mục sách · thi chương đậu 18/18.</div>'
+    + '<div style="margin-top:8px">' + bar(chDone, DATA.chapters.length, '📗 Chương đã thi đậu (≥70%)') + (M ? bar(M.m, M.tot, '🎯 Câu đề tự trả lời được', 'var(--green)') : '') + (bk ? bar(bk.done, bk.total, '📖 Mục sách đã ngấm', 'var(--accent)') : '') + (function(){ try{ if (window.THI && THI.mastery){ var t = THI.mastery(); return t.n ? bar(t.m, t.n, '📖 Tài liệu thi tự trả lời được', '#7c5cff') : ''; } }catch(e){} return ''; })() + bar(mock == null ? 0 : mock, 80, '🎓 TB 3 đề thi thử gần nhất (mục tiêu 80%)', 'var(--yellow)') + '</div>'
     + '<div class="nr-steps">'
-    + '<div class="nr-step' + st('base') + st('drill') + '"><b>① Ngày ' + days + ' → 22 · Hiểu + cày từng chương</b><div>Mỗi ngày <b>1 chương</b> ở 📗 Học gọn chương (nghe giảng → mổ xẻ mục → mổ xẻ câu → tự trả lời hết → thi chương ≥70%). Thứ tự: chương hay ra đề trước (Khuyết tật, Quá trình hàn, NDT, WPS…). Song song: 📖 đọc sách 3 mục/ngày, 🎯 chốt 10 câu/ngày, 📖 25 câu Tài liệu thi. Mỗi 3 ngày 1 đề thi thử để quen áp lực giờ.</div></div>'
-    + '<div class="nr-step' + st('mock') + '"><b>② Ngày 21 → 8 · Thi thử + vá lỗ hổng</b><div>Cách ngày 1 đề thi thử bấm giờ (P1/P2/P3 luân phiên) → mổ xẻ từng câu sai → về đúng chương yếu nhất (bước ⑤ + ⑦). Ngày xen kẽ: ôn chương yếu + đọc nốt sách + chốt 15 câu/ngày. Bắt đầu lướt 📝 sổ tay tóm tắt sau mỗi phần.</div></div>'
+    + '<div class="nr-step' + st('base') + st('drill') + '"><b>① Ngày ' + days + ' → 22 · Hiểu + cày từng chương</b><div>Mỗi ngày <b>1 chương</b> ở 📗 Học gọn chương (nghe giảng → mổ xẻ mục → mổ xẻ câu → tự trả lời hết → thi chương ≥70%). Thứ tự: chương hay ra đề trước (Khuyết tật, Quá trình hàn, NDT, WPS…). Song song: 📖 Tài liệu thi — Học chắc 1 bộ/ngày (Quiz đầu khóa → Homework → Handout ôn chương → Leading → Work Pack TWI → Rings → WP1 → WP2), 3 ngày 1 đề ⏱ Thi như thật. 📖 đọc sách 3 mục/ngày, 🎯 chốt 10 câu/ngày. Cuối tuần 1 đề thi thử 3 phần.</div></div>'
+    + '<div class="nr-step' + st('mock') + '"><b>② Ngày 21 → 8 · Thi thử + vá lỗ hổng</b><div>Cách ngày 1 đề thi thử bấm giờ (P1/P2/P3 luân phiên), xen ⏱ Thi như thật Tài liệu thi (Homework, Work Pack) → mổ xẻ từng câu sai → về đúng chương yếu nhất (bước ⑤ + ⑦). Ngày xen kẽ: ôn chương yếu + đọc nốt sách + chốt 15 câu/ngày. Bắt đầu lướt 📝 sổ tay tóm tắt sau mỗi phần.</div></div>'
     + '<div class="nr-step' + st('final') + '"><b>③ Ngày 7 → 3 · Chốt</b><div>Không học mới. Mỗi ngày: 📕 Sổ câu sai → ⏰ câu đã chốt lâu chưa gặp → 🔢 số liệu & thần chú 18 chương → 📝 sổ tay 12 trang → 🔤 120 từ vựng. Ngày thứ 5 làm đề thi thử cuối cùng đủ 3 phần.</div></div>'
     + '<div class="nr-step' + st('rest') + '"><b>④ Ngày 2 → 0 · Nghỉ & chuẩn bị</b><div>Lướt sổ tay 20 phút, chuẩn bị kính, dưỡng đo, bút, giấy tờ, lộ trình đến điểm thi. Ngủ đủ. Vào phòng thi: đọc kỹ từ phủ định, loại 2 phương án sai rõ, quyết bằng cơ chế đã học.</div></div>'
     + '</div><div class="muted" style="font-size:12px;margin-top:6px">Ngày thi hiện đặt ' + examDate().toLocaleDateString('vi-VN') + ' — đổi ở thẻ đếm ngược nếu khác. Việc hằng ngày bên dưới tự sinh theo kế hoạch này.</div></details>';
@@ -363,9 +363,12 @@ function todayTasks(){
   }
   if (ph.id === 'drill' || ph.id === 'mock' || ph.id === 'base'){
     var ws = weakThiSet();
-    add('thi', '📖 Làm ' + (ph.id === 'base' ? 15 : 25) + ' câu Tài liệu thi — ' + ws.label + (ws.p != null ? ' (đang ' + ws.p + '%)' : ''), "go('thi');THI.quiz('" + ws.id + "')", L.thi >= (ph.id === 'base' ? 15 : 25));
+    var tdid = window.THI && THI.drill ? thiDrillOfDay(days) : null;
+    if (tdid) add('thi', '📖 Tài liệu thi — 🎯 Học chắc: ' + thiName(tdid) + ' (' + (ph.id === 'base' ? 15 : 25) + ' câu, tiếng Anh trước)', "go('thi');THI.drill('" + tdid + "')", L.thi >= (ph.id === 'base' ? 15 : 25));
+    else add('thi', '📖 Làm ' + (ph.id === 'base' ? 15 : 25) + ' câu Tài liệu thi — ' + ws.label + (ws.p != null ? ' (đang ' + ws.p + '%)' : ''), "go('thi');THI.quiz('" + ws.id + "')", L.thi >= (ph.id === 'base' ? 15 : 25));
   }
-  if (window.THI && THI.exam && days % 3 === 0 && ph.id !== 'final'){ var EXR = [['hoq','Quiz đầu khóa TWI'],['hw1','Homework Paper 1'],['wptwi','Work Pack TWI'],['hw2','Homework Paper 2'],['hos','Ôn chương Handout 40 câu'],['wp1','Work Pack 1'],['hw3','Homework Paper 3'],['wp2','Work Pack 2']], ex = EXR[Math.floor(days / 3) % EXR.length]; var exb = 0; try{ var EH = JSON.parse(localStorage.getItem('cswip_thiexam') || '{}'); exb = EH[ex[0]] ? EH[ex[0]].n : 0; }catch(e){} add('thiex', '⏱ Tài liệu thi — Thi như thật: ' + ex[1] + ' (bấm giờ, chỉ tiếng Anh, chấm 70%)', "go('thi');THI.exam('" + ex[0] + "')", false); }
+  var exid = (window.THI && THI.exam && ph.id !== 'final') ? thiExamOfDay(days) : null;
+  if (exid) add('thiex', '⏱ Tài liệu thi — Thi như thật: ' + thiExamName(exid) + ' (bấm giờ, chỉ tiếng Anh, chấm 70%)', "go('thi');THI.exam('" + exid + "')", false);
   var needMock = (ph.id === 'mock') || (ph.id === 'drill' && days % 3 === 0) || (ph.id === 'base' && days % 7 === 0);
   if (needMock){
     var p = ['p1', 'p2', 'p3'][days % 3];
@@ -391,6 +394,13 @@ function chapOfDay(days){
   }
   return CHAP_ORDER[Math.abs(idx) % CHAP_ORDER.length];
 }
+/* lộ trình Tài liệu thi: bộ "Học chắc" của ngày & đề "Thi như thật" 3 ngày/lần */
+var THI_DRILL_ORDER = ['hoq', 'hw', 'hos', 'lead', 'wptwi', 'ring', 'fb', 'wp1', 'wp2'];
+var THI_EXAM_ORDER = ['hoq', 'hw1', 'wptwi', 'hw2', 'hos', 'wp1', 'hw3', 'wp2', 'lead'];
+function thiDrillOfDay(days){ var k = anchor() - days; var arr = THI_DRILL_ORDER; try{ if (window.THI && THI.mastery){ var open = arr.filter(function(id){ var r = THI.mastery(id); return r.n && r.m < r.n; }); if (open.length) arr = open; } }catch(e){} return arr[((k % arr.length) + arr.length) % arr.length]; }
+function thiExamOfDay(days){ return days % 3 === 0 ? THI_EXAM_ORDER[Math.floor(days / 3) % THI_EXAM_ORDER.length] : null; }
+function thiName(id){ try{ return THI.setName(id); }catch(e){ return id; } }
+function thiExamName(id){ try{ return THI.examName(id); }catch(e){ return id; } }
 function weakThiSet(){
   var best = null;
   for (var id in THI_SETS){
@@ -592,12 +602,13 @@ function renderHomeNR(){
 function dayPlan(days, d){
   var ph = phase(days), L = LOG[dkey(d)];
   var txt;
+  var td = ''; try{ if (window.THI && THI.drill && days >= 3){ td = ' 📖 Tài liệu thi: 🎯 Học chắc ' + thiName(thiDrillOfDay(days)) + '.'; var xe = thiExamOfDay(days); if (xe) td += ' ⏱ Thi như thật: ' + thiExamName(xe) + '.'; } }catch(e){}
   var rd = ''; try{ if (window.sachPlanDay && days >= 3 && days <= daysLeft()){ var ids = sachPlanDay(daysLeft() - days); if (ids.length) rd = ' 📖 Đọc sách: ' + ids.map(function(x){ return x.split(' ')[0]; }).join(', ') + '.'; } }catch(e){}
   if (ph.id === 'rest') txt = 'Nghỉ. Lướt Sổ câu sai 20 phút. Chuẩn bị dụng cụ & giấy tờ. Ngủ sớm.';
   else if (ph.id === 'final') txt = '📝 Sổ tay tóm tắt viết tay (12 trang) + 🔢 số liệu & thần chú từng chương · 📕 Sổ câu sai · ⏰ câu đã chốt lâu chưa gặp · 🔤 120 từ vựng. Không học chủ đề mới.' + (days === 5 ? ' 🎓 Đề thi thử CUỐI CÙNG (đủ 3 phần).' : '');
-  else if (ph.id === 'mock') txt = rd + ' ' + (days % 2 === 0 ? '🎓 Thi thử Phần ' + (['1', '2', '3'][Math.floor(days / 2) % 3]) + ' bấm giờ → mổ xẻ câu sai → về Học gọn chương yếu nhất.' : '📗 Ôn chương yếu: ' + chName(chapOfDay(days)) + ' (bước ⑤ tự trả lời + ⑦ câu sai).') + ' 📖 Đọc sách 3 mục · 🎯 chốt 15 câu · 📝 lướt sổ tay tóm tắt.';
-  else if (ph.id === 'drill') txt = '📗 Học gọn chương "' + chName(chapOfDay(days)) + '" đủ 8 bước.' + rd + ' · 🎯 chốt 10 câu tự trả lời · 📖 25 câu Tài liệu thi · Sổ câu sai.' + (days % 3 === 0 ? ' 🎓 1 đề thi thử bấm giờ.' : '');
-  else if (ph.id === 'base'){ txt = '📗 Học gọn chương "' + chName(chapOfDay(days)) + '" (nghe giảng → mổ xẻ → tự trả lời → thi chương).' + rd + ' · 🎯 chốt 10 câu · 15 câu Tài liệu thi.' + (days % 7 === 0 ? ' 🎓 Thi thử cuối tuần.' : ''); }
+  else if (ph.id === 'mock') txt = rd + td + ' ' + (days % 2 === 0 ? '🎓 Thi thử Phần ' + (['1', '2', '3'][Math.floor(days / 2) % 3]) + ' bấm giờ → mổ xẻ câu sai → về Học gọn chương yếu nhất.' : '📗 Ôn chương yếu: ' + chName(chapOfDay(days)) + ' (bước ⑤ tự trả lời + ⑦ câu sai).') + ' 📖 Đọc sách 3 mục · 🎯 chốt 15 câu · 📝 lướt sổ tay tóm tắt.';
+  else if (ph.id === 'drill') txt = '📗 Học gọn chương "' + chName(chapOfDay(days)) + '" đủ 8 bước.' + rd + ' · 🎯 chốt 10 câu tự trả lời.' + td + ' · Sổ câu sai.';
+  else if (ph.id === 'base'){ txt = '📗 Học gọn chương "' + chName(chapOfDay(days)) + '" (nghe giảng → mổ xẻ → tự trả lời → thi chương).' + rd + ' · 🎯 chốt 10 câu.' + td + (days % 7 === 0 ? ' 🎓 Thi thử 3 phần cuối tuần.' : ''); }
   else txt = '—';
   var st = '';
   if (L && (L.n || (L.mock && L.mock.length))) st = '<span style="color:var(--green)">✓ ' + L.n + ' câu, đúng ' + L.k + (L.mock && L.mock.length ? ' · thi thử ' + L.mock.join('%, ') + '%' : '') + '</span>';
