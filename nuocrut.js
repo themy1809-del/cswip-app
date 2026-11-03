@@ -591,11 +591,12 @@ function renderHomeNR(){
 function dayPlan(days, d){
   var ph = phase(days), L = LOG[dkey(d)];
   var txt;
+  var rd = ''; try{ if (window.sachPlanDay && days >= 3 && days <= daysLeft()){ var ids = sachPlanDay(daysLeft() - days); if (ids.length) rd = ' 📖 Đọc sách: ' + ids.map(function(x){ return x.split(' ')[0]; }).join(', ') + '.'; } }catch(e){}
   if (ph.id === 'rest') txt = 'Nghỉ. Lướt Sổ câu sai 20 phút. Chuẩn bị dụng cụ & giấy tờ. Ngủ sớm.';
   else if (ph.id === 'final') txt = '📝 Sổ tay tóm tắt viết tay (12 trang) + 🔢 số liệu & thần chú từng chương · 📕 Sổ câu sai · ⏰ câu đã chốt lâu chưa gặp · 🔤 120 từ vựng. Không học chủ đề mới.' + (days === 5 ? ' 🎓 Đề thi thử CUỐI CÙNG (đủ 3 phần).' : '');
-  else if (ph.id === 'mock') txt = (days % 2 === 0 ? '🎓 Thi thử Phần ' + (['1', '2', '3'][Math.floor(days / 2) % 3]) + ' bấm giờ → mổ xẻ câu sai → về Học gọn chương yếu nhất.' : '📗 Ôn chương yếu: ' + chName(chapOfDay(days)) + ' (bước ⑤ tự trả lời + ⑦ câu sai).') + ' 📖 Đọc sách 3 mục · 🎯 chốt 15 câu · 📝 lướt sổ tay tóm tắt.';
-  else if (ph.id === 'drill') txt = '📗 Học gọn chương "' + chName(chapOfDay(days)) + '" đủ 8 bước · 📖 Đọc sách 3 mục · 🎯 chốt 10 câu tự trả lời · 📖 25 câu Tài liệu thi · Sổ câu sai.' + (days % 3 === 0 ? ' 🎓 1 đề thi thử bấm giờ.' : '');
-  else if (ph.id === 'base'){ txt = '📗 Học gọn chương "' + chName(chapOfDay(days)) + '" (nghe giảng → mổ xẻ → tự trả lời → thi chương) · 📖 Đọc sách 3 mục · 🎯 chốt 10 câu · 15 câu Tài liệu thi.' + (days % 7 === 0 ? ' 🎓 Thi thử cuối tuần.' : ''); }
+  else if (ph.id === 'mock') txt = rd + ' ' + (days % 2 === 0 ? '🎓 Thi thử Phần ' + (['1', '2', '3'][Math.floor(days / 2) % 3]) + ' bấm giờ → mổ xẻ câu sai → về Học gọn chương yếu nhất.' : '📗 Ôn chương yếu: ' + chName(chapOfDay(days)) + ' (bước ⑤ tự trả lời + ⑦ câu sai).') + ' 📖 Đọc sách 3 mục · 🎯 chốt 15 câu · 📝 lướt sổ tay tóm tắt.';
+  else if (ph.id === 'drill') txt = '📗 Học gọn chương "' + chName(chapOfDay(days)) + '" đủ 8 bước.' + rd + ' · 🎯 chốt 10 câu tự trả lời · 📖 25 câu Tài liệu thi · Sổ câu sai.' + (days % 3 === 0 ? ' 🎓 1 đề thi thử bấm giờ.' : '');
+  else if (ph.id === 'base'){ txt = '📗 Học gọn chương "' + chName(chapOfDay(days)) + '" (nghe giảng → mổ xẻ → tự trả lời → thi chương).' + rd + ' · 🎯 chốt 10 câu · 15 câu Tài liệu thi.' + (days % 7 === 0 ? ' 🎓 Thi thử cuối tuần.' : ''); }
   else txt = '—';
   var st = '';
   if (L && (L.n || (L.mock && L.mock.length))) st = '<span style="color:var(--green)">✓ ' + L.n + ' câu, đúng ' + L.k + (L.mock && L.mock.length ? ' · thi thử ' + L.mock.join('%, ') + '%' : '') + '</span>';
